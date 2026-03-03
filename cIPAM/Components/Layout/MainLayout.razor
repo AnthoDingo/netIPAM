@@ -1,0 +1,41 @@
+﻿@inherits LayoutComponentBase
+
+<!-- wrapper -->
+<div class="wrapper">
+    @Body
+</div>
+<!-- Base for IE -->
+<div class="iebase hidden">/</div>
+
+<!-- pusher -->
+<div class="pusher"></div>
+
+<!-- end wrapper -->
+<!-- weather prettyLinks are user, for JS! -->
+<div id="prettyLinks" style="display:none">Yes</div>
+
+<!-- Page Footer -->
+<div class="footer">
+    <table class="donate">
+        <tbody>
+            <tr>
+                <td>
+                    <a href="http://phpipam.net">cIPAM IP address management [v1.7.3]</a>
+                </td>
+
+                <td>
+                    In case of problems please contact <a href="mailto:admin@domain.local">Sysadmin</a>
+                </td>
+                <td id="donate" class="hidden-xs hidden-sm" rel="tooltip" data-html="true" title="" data-original-title="phpIPAM is free, open-source project.&lt;br&gt;If you like the software you can donate by clicking this button to support further development.">
+                    <a href="https://phpipam.net/donate/" target="_blank"><input type="image" src="css/images/btn_donate_SM.gif" alt="Donation button" name="submit"></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

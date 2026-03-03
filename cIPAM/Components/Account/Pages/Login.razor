@@ -1,0 +1,210 @@
+﻿@page "/Account/Login"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Identity
+@using cIPAM.Data
+
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>cIPAM : Log in</PageTitle>
+
+<HeaderBar>Login</HeaderBar>
+
+<div class="content_overlay">
+    <div class="container-fluid" id="mainContainer">
+        <div id="login">
+            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="loginold">
+                <DataAnnotationsValidator />
+                <div class="loginForm row">
+
+                    <!-- title -->
+                    <div class="col-xs-12">
+                        <legend style="margin-top:10px;">Please login</legend>
+                    </div>
+                    
+                    <!-- username -->
+                    <div class="col-xs-12">
+                        <strong>Username</strong>
+                    </div>
+                    <div class="col-xs-12">
+                        <InputText @bind-Value="Input.Username"
+                            id="Input.Username" 
+                            class="form-control input-sm" 
+                            aria-required="true" 
+                            placeholder="Username"
+                            autocomplete="username webauthn" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                    </div>
+
+                    <!-- password -->
+                    <div class="col-xs-12">
+                        <strong>Password</strong>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <InputText type="password" @bind-Value="Input.Password"
+                            id="Input.Password" 
+                            class="form-control input-sm"                                   
+                            aria-required="true" 
+                            placeholder="Password"
+                            autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                    </div>
+
+                    <div class="col-xs-12" style="padding-top:15px;">
+                        <!-- <hr style="margin-top:5px;margin-bottom:10px;"> -->
+                        <button type="submit" value="Login" class="btn btn-sm btn-success" style="width:100%">Login</button>
+                    </div>
+
+                    <!-- login response -->
+                    <div id="loginCheck" class="col-xs-12 text-center">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                        <div class="alert alert-danger">@errorMessage</div>
+                        }
+                        @if (!string.IsNullOrEmpty(successMessage))
+                        {
+                            <div class="alert alert-success">@successMessage</div>
+                        }
+                    </div>
+
+                    <!-- passkey -->
+                    <div class="col-xs-12" style="padding-top:20px;">
+                        <div style="width: 45%;" class="text-center pull-left">
+                            <hr style="padding-top: 3px">
+                        </div>
+                        <div style="width: 10%;" class="text-center pull-left">
+                            or
+                        </div>
+                        <div style="width: 45%;" class="text-center pull-left">
+                            <hr style="padding-top: 3px">
+                        </div>
+
+                        <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" UserName="Input.UserName" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
+                    </div>
+
+                    <div id="loginCheckPasskeys" class="col-xs-12 text-center" style="">
+                        @if (!string.IsNullOrEmpty(errorPasskey))
+                        {
+                            <div class="alert alert-danger">@errorPasskey</div>
+                        }
+                    </div>
+
+                    <ExternalLoginPicker />
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? errorMessage;
+    private string? successMessage;
+    private string? errorPasskey;
+    private EditContext editContext = default!;
+
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    [SupplyParameterFromForm]
+    private InputModel Input { get; set; } = default!;
+
+    [SupplyParameterFromQuery]
+    private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Input ??= new();
+
+        editContext = new EditContext(Input);
+
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    public async Task LoginUser()
+    {
+        errorMessage = null;
+        successMessage = null;
+        errorPasskey = null;
+
+        if (string.IsNullOrEmpty(Input.Username) || string.IsNullOrEmpty(Input.Password))
+        {
+            errorMessage = "Please enter your username and password";
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(Input.Passkey?.Error))
+        {
+            // errorMessage = $"Error: {Input.Passkey.Error}";
+            errorPasskey = "Passkey authentication failed!";
+            return;
+        }
+
+        SignInResult result;
+        if (!string.IsNullOrEmpty(Input.Passkey?.CredentialJson))
+        {
+            // When performing passkey sign-in, don't perform form validation.
+            result = await SignInManager.PasskeySignInAsync(Input.Passkey.CredentialJson);
+        }
+        else
+        {
+            // If doing a password sign-in, validate the form.
+            if (!editContext.Validate())
+            {
+                return;
+            }
+
+            // This doesn't count login failures towards account lockout
+            // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+            result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        }
+
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("User logged in.");
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            RedirectManager.RedirectTo(
+                "Account/LoginWith2fa",
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        }
+        else if (result.IsLockedOut)
+        {
+            Logger.LogWarning("User account locked out.");
+            RedirectManager.RedirectTo("Account/Lockout");
+        }
+        else
+        {
+            errorMessage = "Error: Invalid login attempt.";
+        }
+    }
+
+    private sealed class InputModel
+    {
+        // [Required]
+        // [EmailAddress]
+        // public string Email { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Text)]
+        public string Username { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Display(Name = "Remember me?")]
+        public bool RememberMe { get; set; }
+
+        public PasskeyInputModel? Passkey { get; set; }
+    }
+}
