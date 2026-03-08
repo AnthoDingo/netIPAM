@@ -1,0 +1,99 @@
+﻿@page "/login"
+
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using netIPAM.Pages.Layout
+@using netIPAM.Components.Login
+
+@attribute [AllowAnonymous]
+
+<PageTitle>netIPAM : Log in</PageTitle>
+
+<HeaderBar>Login</HeaderBar>
+
+<div class="content_overlay">
+    <div class="container-fluid" id="mainContainer">
+        <div id="login">
+            <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
+                <DataAnnotationsValidator />
+                <div class="loginForm row">
+
+                    <!-- title -->
+                    <div class="col-xs-12">
+                        <legend style="margin-top:10px;">Please login</legend>
+                    </div>
+                    
+                    <!-- username -->
+                    <div class="col-xs-12">
+                        <strong>Username</strong>
+                    </div>
+                    <div class="col-xs-12">
+                        <InputText @bind-Value="Input.Email"
+                            id="Input.Email" 
+                            class="form-control input-sm" 
+                            aria-required="true" 
+                            placeholder="Email"
+                            autocomplete="username webauthn" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                    </div>
+
+                    <!-- password -->
+                    <div class="col-xs-12">
+                        <strong>Password</strong>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <InputText type="password" @bind-Value="Input.Password"
+                            id="Input.Password" 
+                            class="form-control input-sm"                                   
+                            aria-required="true" 
+                            placeholder="Password"
+                            autocomplete="current-password" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                    </div>
+
+                    <div class="col-xs-12" style="padding-top:15px;">
+                        <!-- <hr style="margin-top:5px;margin-bottom:10px;"> -->
+                        <button type="submit" value="Login" class="btn btn-sm btn-success" style="width:100%">Login</button>
+                    </div>
+
+                    <!-- login response -->
+                    <div id="loginCheck" class="col-xs-12 text-center">
+                        @if (!string.IsNullOrEmpty(errorMessage))
+                        {
+                        <div class="alert alert-danger">@errorMessage</div>
+                        }
+                        @if (!string.IsNullOrEmpty(successMessage))
+                        {
+                            <div class="alert alert-success">@successMessage</div>
+                        }
+                    </div>
+
+                    <!-- passkey -->
+                    <div class="col-xs-12" style="padding-top:20px;">
+                        <div style="width: 45%;" class="text-center pull-left">
+                            <hr style="padding-top: 3px">
+                        </div>
+                        <div style="width: 10%;" class="text-center pull-left">
+                            or
+                        </div>
+                        <div style="width: 45%;" class="text-center pull-left">
+                            <hr style="padding-top: 3px">
+                        </div>
+
+                        <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" UserName="Input.UserName" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
+                    </div>
+
+                    <div id="loginCheckPasskeys" class="col-xs-12 text-center" style="">
+                        @if (!string.IsNullOrEmpty(errorPasskey))
+                        {
+                            <div class="alert alert-danger">@errorPasskey</div>
+                        }
+                    </div>
+
+                    <ExternalLoginPicker />
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>

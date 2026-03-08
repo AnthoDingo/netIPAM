@@ -1,0 +1,382 @@
+﻿@implements IDisposable
+
+@inject NavigationManager NavigationManager
+
+<div class="content">
+	<div id="sections_overlay">
+		<div class="navbar" id="menu">
+			<nav class="navbar navbar-default" id="menu-navbar" role="navigation">
+
+				<!-- Collapsed display for mobile -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#menu-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<span class="navbar-brand visible-xs">Subnets menu</span>
+				</div>
+
+				<!-- menu -->
+				<div class="collapse navbar-collapse" id="menu-collapse">
+
+					<!-- sections -->
+					<ul class="nav navbar-nav sections icons">
+
+						<li class="first-item">
+							<NavLink class="nav-link" href="/">
+								<i class="fa fa-dashboard"></i> Dashboard
+							</NavLink>
+						</li>
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-sitemap"></i> Subnets <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+
+								<li> <a href="/subnets/" rel="tooltip" data-placement="bottom" title="" data-original-title="Show all sections">All sections</a></li>
+								<li class="divider"></li>
+								<li>	<a href="/subnets/2/" rel="tooltip" data-placement="bottom" title="" data-original-title="Section for servers">Servers</a></li>
+								<li>	<a href="/subnets/3/" rel="tooltip" data-placement="bottom" title="" data-original-title="Section for IPv6 addresses">IPv6 section</a></li>
+								<li>	<a href="/subnets/1/" rel="tooltip" data-placement="bottom" title="" data-original-title="Section for customers">Customers / Hosting</a></li>
+							</ul>
+						</li>
+					</ul>
+
+					<!-- Tools -->
+					<ul class="nav navbar-nav icons hidden-xs hidden-sm">
+						@foreach(Tool tool in tools)
+						{
+							<li rel="tooltip" title="" data-placement="bottom" class="" data-original-title="@tool.Tooltip">
+								<NavLink class="nav-link" href="@tool.Link">
+									<i class="hidden-xs fa @tool.Icon"></i>
+									<span class="visible-xs">
+										<i class="fa @tool.Icon"></i>@tool.Name
+									</span>
+								</NavLink>
+							</li>
+						}
+
+						<!-- all tools -->
+						<li class="">
+							<NavLink class="nav-link" href="/tools/">
+								<i class="fa fa-list"></i> All tools
+							</NavLink>
+						</li>
+					</ul>
+
+					<!-- Tools (for small menu) -->
+					<ul class="nav navbar-nav visible-xs visible-sm navbar-right">
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Tools <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="/tools/">Show all tools</a></li>
+								<li class="divider"></li>
+								<li class="nav-header">Subnets</li>
+								@foreach(Tool tool in tools)
+								{
+									<li class="">
+										<NavLink class="nav-link" href="@tool.Link">
+											@tool.Name
+										</NavLink>
+									</li>
+								}
+								<li class=""><a href="/tools/customers/">Customers</a></li>
+								<li class=""><a href="/tools/favourites/">Favourite networks</a></li>
+								<li class=""><a href="/tools/subnets/">Subnets</a></li>
+								<li class=""><a href="/tools/vlan/">VLAN</a></li>
+								<li class=""><a href="/tools/vrf/">VRF</a></li>
+								<li class=""><a href="/tools/nat/">NAT</a></li>
+								<li class=""><a href="/tools/routing/">Routing</a></li>
+								<li class=""><a href="/tools/firewall-zones/">Firewall Zones</a></li>
+								<li class=""><a href="/tools/scanned-networks/">Scanned networks</a></li>
+								<li class=""><a href="/tools/subnet-masks/">Subnet masks</a></li>
+								<li class=""><a href="/tools/temp-shares/">Temporary shares</a></li>
+								<li class=""><a href="/tools/inactive-hosts/">Inactive Hosts</a></li>
+								<li class=""><a href="/tools/duplicates/">Duplicates</a></li>
+								<li class=""><a href="/tools/threshold/">Threshold</a></li>
+								<li class="nav-header">Devices</li>
+								<li class=""><a href="/tools/devices/">Devices</a></li>
+								<li class=""><a href="/tools/racks/">Racks</a></li>
+								<li class=""><a href="/tools/circuits/">Circuits</a></li>
+								<li class=""><a href="/tools/locations/">Locations</a></li>
+								<li class="nav-header">Tools</li>
+								<li class=""><a href="/tools/documentation/">Documentation</a></li>
+								<li class=""><a href="/tools/search/">Search</a></li>
+								<li class=""><a href="/tools/ip-calculator/">IP calculator</a></li>
+								<li class=""><a href="/tools/ip-calculator/bw-calculator/">Bandwidth calculator</a></li>
+								<li class=""><a href="/tools/changelog/">Changelog</a></li>
+								<li class=""><a href="/tools/logs/">Log files</a></li>
+								<li class=""><a href="/tools/requests/">IP requests</a></li>
+								<li class=""><a href="/tools/instructions/">Instructions</a></li>
+								<li class=""><a href="/tools/pstn-prefixes/">PSTN prefixes</a></li>
+								<li class=""><a href="/tools/mac-lookup/">MAC lookup</a></li>
+								<li class=""><a href="/tools/vaults/">Vaults</a></li>
+								<li class="nav-header">User Menu</li>
+								<li class=""><a href="/tools/user-menu/">My account</a></li>
+							</ul>
+						</li>
+					</ul>
+
+					<!-- Administration -->
+					<ul class="nav navbar-nav navbar-right">
+						<li class="dropdown administration">
+							<a class="dropdown-toggle btn-danger" data-toggle="dropdown" href="/administration/" id="admin" rel="tooltip" data-placement="bottom" title="" data-original-title="Show Administration menu">
+								<i class="fa fa-cog"></i> Administration <b class="caret"></b>
+							</a>
+							<ul class="dropdown-menu admin">
+								<li class="nav-header">Available IPAM tools</li>
+								<li><a href="/administration/">Show all settings</a></li>
+								<li class="divider"></li>
+								<li class="nav-header">Server management</li>
+								<li class=""><a href="/administration/settings/">phpIPAM settings</a></li>
+								<li class=""><a href="/administration/users/">Users</a></li>
+								<li class=""><a href="/administration/groups/">Groups</a></li>
+								<li class=""><a href="/administration/authentication-methods/">Authentication methods</a></li>
+								<li class=""><a href="/administration/2fa/">2FA</a></li>
+								<li class=""><a href="/administration/password-policy/">Password policy</a></li>
+								<li class=""><a href="/administration/mail/">Mail settings</a></li>
+								<li class=""><a href="/administration/api/">API</a></li>
+								<li class=""><a href="/administration/scan-agents/">Scan agents</a></li>
+								<li class=""><a href="/administration/languages/">Languages</a></li>
+								<li class=""><a href="/administration/widgets/">Widgets</a></li>
+								<li class=""><a href="/administration/tags/">Tags</a></li>
+								<li class=""><a href="/administration/pstn-prefixes/">PSTN prefixes</a></li>
+								<li class=""><a href="/administration/instructions/">Edit instructions</a></li>
+								<li class="nav-header">IP related management</li>
+								<li class=""><a href="/administration/customers/">Customers</a></li>
+								<li class=""><a href="/administration/sections/">Sections</a></li>
+								<li class=""><a href="/administration/subnets/">Subnets</a></li>
+								<li class=""><a href="/administration/vlans/">VLAN</a></li>
+								<li class=""><a href="/administration/vrf/">VRF</a></li>
+								<li class=""><a href="/administration/nat/">NAT</a></li>
+								<li class=""><a href="/administration/routing/">Routing</a></li>
+								<li class=""><a href="/administration/nameservers/">Nameservers</a></li>
+								<li class=""><a href="/administration/firewall-zones/">Firewall Zones</a></li>
+								<li class=""><a href="/administration/import-export/">Import / Export</a></li>
+								<li class=""><a href="/administration/ripe-import/">RIPE import</a></li>
+								<li class=""><a href="/administration/filter-fields/">Filter IP fields</a></li>
+								<li class=""><a href="/administration/required-fields/">Required IP fields</a></li>
+								<li class=""><a href="/administration/custom-fields/">Custom fields</a></li>
+								<li class="nav-header">Device management</li>
+								<li class=""><a href="/administration/devices/">Devices</a></li>
+								<li class=""><a href="/administration/racks/">Racks</a></li>
+								<li class=""><a href="/administration/circuits/">Circuits</a></li>
+								<li class=""><a href="/administration/locations/">Locations</a></li>
+								<li class="nav-header">Tools</li>
+								<li class=""><a href="/administration/version-check/">Version check</a></li>
+								<li class=""><a href="/administration/verify-database/">Verify database</a></li>
+								<li class=""><a href="/administration/replace-fields/">Replace fields</a></li>
+							</ul>
+						</li>
+					</ul>
+
+					<!-- Tools -->
+					<ul class="nav navbar-nav navbar-right hidden-xs hidden-sm icon-ul">
+
+						<!-- Dash lock/unlock -->
+						<li class="w-lock">
+							<a href="#" rel="tooltip" class="icon-li" data-placement="bottom" title="" data-original-title="Click to reorder widgets"><i class="fa fa-dashboard"></i></a>
+						</li>
+
+						<!-- masks -->
+						<li>
+							<a href="" class="icon-li show-masks" rel="tooltip" data-placement="bottom" title="" data-closeclass="hidePopups" data-original-title="Subnet masks"><i class="fa fa-th-large"></i></a>
+						</li>
+
+						<!-- Favourites -->
+						<li class="">
+							<a href="/tools/favourites/" class="icon-li" rel="tooltip" data-placement="bottom" title="" data-original-title="Favourite networks"><i class="fa fa-star-o"></i></a>
+						</li>
+
+						<!-- instructions -->
+						<li class="">
+							<a href="/tools/instructions/" class="icon-li" rel="tooltip" data-placement="bottom" title="" data-original-title="Show IP addressing guide"><i class="fa fa-info"></i></a>
+						</li>
+
+						<!-- tools -->
+						<li class="tools dropdown ">
+							<a class="dropdown-toggle icon-li" data-toggle="dropdown" href="" rel="tooltip" data-placement="bottom" title="" data-original-title="Show tools menu"><i class="fa fa-wrench"></i></a>
+							<ul class="dropdown-menu admin tools_dropdown">
+								<!-- public -->
+								<li class="nav-header">Available IPAM tools </li>
+								<!-- private -->
+								<li><a href="/tools/">Show all tools</a></li>
+								<li class="divider"></li>
+								<li class="nav-header">Subnets</li>
+								<li class=""><a href="/tools/customers/">Customers</a></li>
+								<li class=""><a href="/tools/favourites/">Favourite networks</a></li>
+								<li class=""><a href="/tools/subnets/">Subnets</a></li>
+								<li class=""><a href="/tools/vlan/">VLAN</a></li>
+								<li class=""><a href="/tools/vrf/">VRF</a></li>
+								<li class=""><a href="/tools/nat/">NAT</a></li>
+								<li class=""><a href="/tools/routing/">Routing</a></li>
+								<li class=""><a href="/tools/firewall-zones/">Firewall Zones</a></li>
+								<li class=""><a href="/tools/scanned-networks/">Scanned networks</a></li>
+								<li class=""><a href="/tools/subnet-masks/">Subnet masks</a></li>
+								<li class=""><a href="/tools/temp-shares/">Temporary shares</a></li>
+								<li class=""><a href="/tools/inactive-hosts/">Inactive Hosts</a></li>
+								<li class=""><a href="/tools/duplicates/">Duplicates</a></li>
+								<li class=""><a href="/tools/threshold/">Threshold</a></li>
+								<li class="nav-header">Devices</li>
+								<li class=""><a href="/tools/devices/">Devices</a></li>
+								<li class=""><a href="/tools/racks/">Racks</a></li>
+								<li class=""><a href="/tools/circuits/">Circuits</a></li>
+								<li class=""><a href="/tools/locations/">Locations</a></li>
+								<li class="nav-header">Tools</li>
+								<li class=""><a href="/tools/documentation/">Documentation</a></li>
+								<li class=""><a href="/tools/search/">Search</a></li>
+								<li class=""><a href="/tools/ip-calculator/">IP calculator</a></li>
+								<li class=""><a href="/tools/ip-calculator/bw-calculator/">Bandwidth calculator</a></li>
+								<li class=""><a href="/tools/changelog/">Changelog</a></li>
+								<li class=""><a href="/tools/logs/">Log files</a></li>
+								<li class=""><a href="/tools/requests/">IP requests</a></li>
+								<li class=""><a href="/tools/instructions/">Instructions</a></li>
+								<li class=""><a href="/tools/pstn-prefixes/">PSTN prefixes</a></li>
+								<li class=""><a href="/tools/mac-lookup/">MAC lookup</a></li>
+								<li class=""><a href="/tools/vaults/">Vaults</a></li>
+								<li class="nav-header">User Menu</li>
+								<li class=""><a href="/tools/user-menu/">My account</a></li>
+							</ul>
+						</li>
+
+						<!-- DB verification -->
+
+						<li>	<a href="/administration/version-check/" class="icon-li btn-warning" rel="tooltip" data-placement="bottom" title="" data-original-title="New version available"><i class="fa fa-bullhorn"></i><sup>1.7.4</sup></a></li>
+					</ul>
+
+					
+				</div>	 <!-- end menu div -->
+			</nav>
+		</div>
+	</div>
+</div>
+
+@code {
+	private string? currentUrl;
+	private List<Tool> tools = new();
+
+	protected override void OnInitialized()
+	{
+		currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+		NavigationManager.LocationChanged += OnLocationChanged;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		tools.Add(new Tool
+		{
+			Name = "Customers",
+			Icon = "fa-users",
+			Tooltip = "Customers",
+			Link = "/tools/customers/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "VLAN",
+			Icon = "fa-cloud",
+			Tooltip = "Show VLANs and belonging subnets",
+			Link = "/tools/vlan/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "VRF",
+			Icon = "fa-cloud",
+			Tooltip = "Show VRFs and belonging networks",
+			Link = "/tools/vrf/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "NAT",
+			Icon = "fa-exchange",
+			Tooltip = "Nat translations",
+			Link = "/tools/nat/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Locations",
+			Icon = "fa-map",
+			Tooltip = "Show locations",
+			Link = "/tools/locations/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Devices",
+			Icon = "fa-desktop",
+			Tooltip = "Show all configured devices",
+			Link = "/tools/devices/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Racks",
+			Icon = "fa-bars",
+			Tooltip = "Show racks",
+			Link = "/tools/racks/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Circuits",
+			Icon = "fa-random",
+			Tooltip = "Show circuits",
+			Link = "/tools/circuits/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Routing",
+			Icon = "fa-exchange",
+			Tooltip = "Show routing",
+			Link = "/tools/routing/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "PSTN",
+			Icon = "fa-phone",
+			Tooltip = "PSTN prefixes",
+			Link = "/tools/pstn-prefixes/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Vaults",
+			Icon = "fa-key",
+			Tooltip = "Vaults",
+			Link = "/tools/vaults/"
+		});
+
+		tools.Add(new Tool
+		{
+			Name = "Search",
+			Icon = "fa-search",
+			Tooltip = "Search database Addresses, subnets and VLANs",
+			Link = "/tools/search/"
+		});
+	}
+
+	private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+	{
+		currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+		StateHasChanged();
+	}
+
+	public void Dispose()
+	{
+		NavigationManager.LocationChanged -= OnLocationChanged;
+	}
+
+	private sealed class Tool
+	{
+
+		public string Name { get; set; }
+		public string Icon { get; set; }
+		public string Tooltip { get; set; }
+		public string Link { get; set; }
+	}
+}
+
