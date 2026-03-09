@@ -1,3 +1,3 @@
 <Solution>
-  <Project Path="./netIPAM/netIPAM.csproj" />
+  <Project Path="netIPAM/netIPAM.csproj" />
 </Solution>

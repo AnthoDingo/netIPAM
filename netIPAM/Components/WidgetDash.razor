@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components.Routing
+<div class="col-xs-12 col-md-6 col-lg-6 widget-dash">
+    <div class="inner thumbnail">
+        <div class="hContent">
+            <div class="icon">
+                <NavLink href="@Url">
+                    <i class="@Icon"></i>
+                </NavLink>
+            </div>
+            <div class="text">
+                <NavLink href="@Url">
+                    @Title
+                </NavLink>
+                <hr />
+                <span class="text-muted">@Description</span>
+            </div>
+        </div>
+    </div>
+</div>
