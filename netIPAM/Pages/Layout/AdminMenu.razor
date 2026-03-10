@@ -1,0 +1,163 @@
+﻿@using netIPAM.Components.Administration
+<td id="subnetsLeft">
+    <div id="leftMenu" class="menu-administration">
+        <div class="panel panel-default adminMenu">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-cogs"></i> Server management
+                </h3>
+            </div>
+            <ul class="list-group">
+                <AdminSubMenuItem Name="netIPAM settings" Url="/administration/settings/" />
+                <AdminSubMenuItem Name="Users" Url="/administration/users/" />
+                <AdminSubMenuItem Name="Groups" Url="/administration/groups/" />
+                <AdminSubMenuItem Name="Authentication methods" Url="/administration/authentication-methods/" />
+                <AdminSubMenuItem Name="2FA" Url="/administration/2fa/" />
+                <AdminSubMenuItem Name="Password policy" Url="/administration/password-policy/" />
+                <AdminSubMenuItem Name="Mail settings" Url="/administration/mail/" />
+                <li class="list-group-item ">
+                    <NavLink href="/administration/mail/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Mail settings
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/api/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>API
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/scan-agents/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Scan agents
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/languages/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Languages
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/widgets/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Widgets
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/tags/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Tags
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/instructions/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Edit instructions
+                    </NavLink>
+                </li>
+            </ul>
+        </div>
+        <div class="panel panel-default adminMenu">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-sitemap"></i> IP related management
+                </h3>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item ">
+                    <NavLink href="/administration/sections/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Sections
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/subnets/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Subnets
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/vlans/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>VLAN
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/nat/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>NAT
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/routing/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Routing
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/nameservers/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Nameservers
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/import-export/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Import / Export
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/ripe-import/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>RIPE import
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/filter-fields/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Filter IP fields
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/required-fields/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Required IP fields
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/custom-fields/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Custom fields
+                    </NavLink>
+                </li>
+            </ul>
+        </div>
+        <div class="panel panel-default adminMenu">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-desktop"></i> Device management
+                </h3>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item ">
+                    <NavLink href="/administration/devices/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Devices
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/locations/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Locations
+                    </NavLink>
+                </li>
+            </ul>
+        </div>
+        <div class="panel panel-default adminMenu">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-wrench"></i> Tools
+                </h3>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item ">
+                    <NavLink href="/administration/version-check/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Version check
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/verify-database/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Verify database
+                    </NavLink>
+                </li>
+                <li class="list-group-item ">
+                    <NavLink href="/administration/replace-fields/">
+                        <i class="fa fa-angle-right pull-right icon-gray"></i>Replace fields
+                    </NavLink>
+                </li>
+            </ul>
+        </div>
+    </div>
+</td>
