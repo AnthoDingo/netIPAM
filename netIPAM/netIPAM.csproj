@@ -68,6 +68,7 @@
 
   <ItemGroup>
     <Folder Include="Services\Administration\" />
+    <Folder Include="Services\Tools\" />
     <Folder Include="wwwroot\js\" />
   </ItemGroup>
 

@@ -2,6 +2,7 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using netIPAM.Components
+@using netIPAM.Models
 
 @attribute [Authorize]
 
@@ -20,11 +21,6 @@
 					<div class="row">
 						<div class="col-lg-offset-6 col-lg-6 col-xs-offset-12 col-xs-12" style="padding:5px 20px;">
 							@* TODO To fix *@
-							@* <InputText 
-												@bind-Value="Filter" 
-												@bind-Value:event="oninput"
-												class="form-control tools-filter-string" 
-												placeholder="Filter string" /> *@
 							<input type="text"
 								   class="form-control tools-filter-string"
 								   placeholder="Filter string"
@@ -33,11 +29,11 @@
 								   @bind:after="OnFilterChanged" />
 						</div>
 					</div>
-					@foreach (WidgetGroup group in FilteredGroups)
+					@foreach (AdminItem item in FilteredGroups)
 					{
-						<h4>@group.Title</h4>
+						<h4>@item.Title</h4>
 						<hr class="hr-h4" />
-						@foreach (WidgetDash widget in group.Widgets)
+						@foreach (AdminSubItem widget in item.Items)
 						{
 							<WidgetDash Title="@widget.Title"
 										Description="@widget.Description"
@@ -51,53 +47,3 @@
 		</div>
 	</td>
 </ContentOverlay>
-@* 
-<div class="content_overlay">
-	<div class="container-fluid" id="mainContainer">
-		<table id="subnetsMenu">
-			<tbody>
-				<tr>
-					<td id="subnetsContent">
-						<div class="row menu-administration" id="content">
-							<div class="container">
-								<div id="dashboard" class="tools-all">
-									<div class="row">
-										<div class="col-lg-offset-6 col-lg-6 col-xs-offset-12 col-xs-12" style="padding:5px 20px;">
-											@* TODO To fix *@
-											@* <InputText 
-												@bind-Value="Filter" 
-												@bind-Value:event="oninput"
-												class="form-control tools-filter-string" 
-												placeholder="Filter string" /> *@
-											<input 
-												type="text"
-												class="form-control tools-filter-string"
-												placeholder="Filter string"
-												@bind="Filter"
-												@bind:event="oninput"
-												@bind:after="OnFilterChanged"
-												/>
-										</div>
-									</div>
-									@foreach (WidgetGroup group in FilteredGroups)
-									{
-										<h4>@group.Title</h4>
-										<hr class="hr-h4" />
-										@foreach (WidgetDash widget in group.Widgets)
-										{
-											<WidgetDash Title="@widget.Title"
-														Description="@widget.Description"
-														Icon="@widget.Icon"
-														Url="@widget.Url" />
-										}
-										<div class="clearfix" />
-									}
-								</div>
-							</div>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-</div> *@

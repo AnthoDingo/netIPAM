@@ -1,4 +1,5 @@
-﻿@implements IDisposable
+﻿@using netIPAM.Models
+@implements IDisposable
 
 @inject NavigationManager NavigationManager
 
@@ -43,7 +44,7 @@
 
 					<!-- Tools -->
 					<ul class="nav navbar-nav icons hidden-xs hidden-sm">
-						@foreach(Tool tool in tools)
+						@foreach (ToolItem tool in ToolItems.Where(w => w.ShowInMenuBar).ToList())
 						{
 							<li rel="tooltip" title="" data-placement="bottom" class="" data-original-title="@tool.Tooltip">
 								<NavLink class="nav-link" href="@tool.Link">
@@ -126,45 +127,18 @@
 								<li class="nav-header">Available IPAM tools</li>
 								<li><a href="/administration/">Show all settings</a></li>
 								<li class="divider"></li>
-								<li class="nav-header">Server management</li>
-								<li class=""><a href="/administration/settings/">phpIPAM settings</a></li>
-								<li class=""><a href="/administration/users/">Users</a></li>
-								<li class=""><a href="/administration/groups/">Groups</a></li>
-								<li class=""><a href="/administration/authentication-methods/">Authentication methods</a></li>
-								<li class=""><a href="/administration/2fa/">2FA</a></li>
-								<li class=""><a href="/administration/password-policy/">Password policy</a></li>
-								<li class=""><a href="/administration/mail/">Mail settings</a></li>
-								<li class=""><a href="/administration/api/">API</a></li>
-								<li class=""><a href="/administration/scan-agents/">Scan agents</a></li>
-								<li class=""><a href="/administration/languages/">Languages</a></li>
-								<li class=""><a href="/administration/widgets/">Widgets</a></li>
-								<li class=""><a href="/administration/tags/">Tags</a></li>
-								<li class=""><a href="/administration/pstn-prefixes/">PSTN prefixes</a></li>
-								<li class=""><a href="/administration/instructions/">Edit instructions</a></li>
-								<li class="nav-header">IP related management</li>
-								<li class=""><a href="/administration/customers/">Customers</a></li>
-								<li class=""><a href="/administration/sections/">Sections</a></li>
-								<li class=""><a href="/administration/subnets/">Subnets</a></li>
-								<li class=""><a href="/administration/vlans/">VLAN</a></li>
-								<li class=""><a href="/administration/vrf/">VRF</a></li>
-								<li class=""><a href="/administration/nat/">NAT</a></li>
-								<li class=""><a href="/administration/routing/">Routing</a></li>
-								<li class=""><a href="/administration/nameservers/">Nameservers</a></li>
-								<li class=""><a href="/administration/firewall-zones/">Firewall Zones</a></li>
-								<li class=""><a href="/administration/import-export/">Import / Export</a></li>
-								<li class=""><a href="/administration/ripe-import/">RIPE import</a></li>
-								<li class=""><a href="/administration/filter-fields/">Filter IP fields</a></li>
-								<li class=""><a href="/administration/required-fields/">Required IP fields</a></li>
-								<li class=""><a href="/administration/custom-fields/">Custom fields</a></li>
-								<li class="nav-header">Device management</li>
-								<li class=""><a href="/administration/devices/">Devices</a></li>
-								<li class=""><a href="/administration/racks/">Racks</a></li>
-								<li class=""><a href="/administration/circuits/">Circuits</a></li>
-								<li class=""><a href="/administration/locations/">Locations</a></li>
-								<li class="nav-header">Tools</li>
-								<li class=""><a href="/administration/version-check/">Version check</a></li>
-								<li class=""><a href="/administration/verify-database/">Verify database</a></li>
-								<li class=""><a href="/administration/replace-fields/">Replace fields</a></li>
+								@foreach (AdminItem item in AdminItems)
+								{
+									<li class="nav-header">@item.Title</li>
+									@foreach(AdminSubItem subItem in item.Items)
+									{
+										<li class="">
+											<NavLink href="@subItem.Url">
+                                                @subItem.Title
+											</NavLink>
+										</li>	
+									}
+								}
 							</ul>
 						</li>
 					</ul>
@@ -240,7 +214,11 @@
 
 						<!-- DB verification -->
 
-						<li>	<a href="/administration/version-check/" class="icon-li btn-warning" rel="tooltip" data-placement="bottom" title="" data-original-title="New version available"><i class="fa fa-bullhorn"></i><sup>1.7.4</sup></a></li>
+						<li>	
+							<a href="/administration/version-check/" class="icon-li btn-warning" rel="tooltip" data-placement="bottom" title="" data-original-title="New version available">
+								<i class="fa fa-bullhorn"></i><sup>1.7.4</sup>
+							</a>
+						</li>
 					</ul>
 
 					
@@ -254,110 +232,110 @@
 	private string? currentUrl;
 	private List<Tool> tools = new();
 
-	protected override void OnInitialized()
-	{
-		currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-		NavigationManager.LocationChanged += OnLocationChanged;
-	}
+	// protected override void OnInitialized()
+	// {
+	// 	currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+	// 	NavigationManager.LocationChanged += OnLocationChanged;
+	// }
 
-	protected override async Task OnInitializedAsync()
-	{
-		tools.Add(new Tool
-		{
-			Name = "Customers",
-			Icon = "fa-users",
-			Tooltip = "Customers",
-			Link = "/tools/customers/"
-		});
+	// protected override async Task OnInitializedAsync()
+	// {
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Customers",
+	// 		Icon = "fa-users",
+	// 		Tooltip = "Customers",
+	// 		Link = "/tools/customers/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "VLAN",
-			Icon = "fa-cloud",
-			Tooltip = "Show VLANs and belonging subnets",
-			Link = "/tools/vlan/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "VLAN",
+	// 		Icon = "fa-cloud",
+	// 		Tooltip = "Show VLANs and belonging subnets",
+	// 		Link = "/tools/vlan/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "VRF",
-			Icon = "fa-cloud",
-			Tooltip = "Show VRFs and belonging networks",
-			Link = "/tools/vrf/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "VRF",
+	// 		Icon = "fa-cloud",
+	// 		Tooltip = "Show VRFs and belonging networks",
+	// 		Link = "/tools/vrf/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "NAT",
-			Icon = "fa-exchange",
-			Tooltip = "Nat translations",
-			Link = "/tools/nat/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "NAT",
+	// 		Icon = "fa-exchange",
+	// 		Tooltip = "Nat translations",
+	// 		Link = "/tools/nat/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Locations",
-			Icon = "fa-map",
-			Tooltip = "Show locations",
-			Link = "/tools/locations/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Locations",
+	// 		Icon = "fa-map",
+	// 		Tooltip = "Show locations",
+	// 		Link = "/tools/locations/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Devices",
-			Icon = "fa-desktop",
-			Tooltip = "Show all configured devices",
-			Link = "/tools/devices/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Devices",
+	// 		Icon = "fa-desktop",
+	// 		Tooltip = "Show all configured devices",
+	// 		Link = "/tools/devices/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Racks",
-			Icon = "fa-bars",
-			Tooltip = "Show racks",
-			Link = "/tools/racks/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Racks",
+	// 		Icon = "fa-bars",
+	// 		Tooltip = "Show racks",
+	// 		Link = "/tools/racks/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Circuits",
-			Icon = "fa-random",
-			Tooltip = "Show circuits",
-			Link = "/tools/circuits/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Circuits",
+	// 		Icon = "fa-random",
+	// 		Tooltip = "Show circuits",
+	// 		Link = "/tools/circuits/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Routing",
-			Icon = "fa-exchange",
-			Tooltip = "Show routing",
-			Link = "/tools/routing/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Routing",
+	// 		Icon = "fa-exchange",
+	// 		Tooltip = "Show routing",
+	// 		Link = "/tools/routing/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "PSTN",
-			Icon = "fa-phone",
-			Tooltip = "PSTN prefixes",
-			Link = "/tools/pstn-prefixes/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "PSTN",
+	// 		Icon = "fa-phone",
+	// 		Tooltip = "PSTN prefixes",
+	// 		Link = "/tools/pstn-prefixes/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Vaults",
-			Icon = "fa-key",
-			Tooltip = "Vaults",
-			Link = "/tools/vaults/"
-		});
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Vaults",
+	// 		Icon = "fa-key",
+	// 		Tooltip = "Vaults",
+	// 		Link = "/tools/vaults/"
+	// 	});
 
-		tools.Add(new Tool
-		{
-			Name = "Search",
-			Icon = "fa-search",
-			Tooltip = "Search database Addresses, subnets and VLANs",
-			Link = "/tools/search/"
-		});
-	}
+	// 	tools.Add(new Tool
+	// 	{
+	// 		Name = "Search",
+	// 		Icon = "fa-search",
+	// 		Tooltip = "Search database Addresses, subnets and VLANs",
+	// 		Link = "/tools/search/"
+	// 	});
+	// }
 
 	private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
 	{

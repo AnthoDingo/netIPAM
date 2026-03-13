@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using netIPAM;
 using netIPAM.DBContexts;
 using netIPAM.Pages;
+using netIPAM.Services;
 //using netIPAM.Services.Account.Identity.IdentityRevalidatingAuthenticationStateProvider;
 
 
@@ -50,6 +51,8 @@ namespace netIPAM
             });
 
             services.AddSingleton<IEmailSender<AppUser>, IdentityNoOpEmailSender>();
+
+            services.AddSingleton<MenuItemsService>();
 
             WebApplication app = builder.Build();
 
