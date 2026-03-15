@@ -16,15 +16,17 @@
     <link rel="stylesheet" type="text/css" href="@Assets["css/bootstrap/bootstrap-custom.css"]">
     <link rel="stylesheet" type="text/css" href="@Assets["css/font-awesome/font-awesome.min.css"]">
     <link rel="stylesheet" type="text/css" href="@Assets["css/bootstrap/bootstrap-custom-dark.css"]">
+    
     @* <link rel="stylesheet" href="@Assets["app.css"]" /> *@
     <link rel="stylesheet" href="@Assets["netIPAM.styles.css"]" />
     <ImportMap />
     <link rel="shortcut icon" href="@Assets["css/images/favicon.png"]">
 
     <script src="@Assets["js/jquery-3.7.1.min.js"]"></script>
-    <script src="@Assets[" js/login.js"]"></script>
+    @* <script src="@Assets["js/login.js"]"></script> *@
     <script src="@Assets["js/bootstrap.min.js"]"></script>
-    <script src="@Assets[" js/bootstrap.custom.js"]"></script>
+    <script src="@Assets["js/bootstrap.custom.js"]"></script>
+    <script src="@Assets["js/bootstrap-switch/bootstrap-switch.min.js"]"></script>
     <script>
         $(document).ready(function(){
              if ($("[rel=tooltip]").length) { $("[rel=tooltip]").tooltip(); }
@@ -41,7 +43,6 @@
     <ReconnectModal />
 
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script src="@Assets["Components/Login/PasskeySubmit.razor.js"]" type="module"></script>
 </body>
 
 </html>

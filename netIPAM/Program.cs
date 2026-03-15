@@ -26,10 +26,11 @@ namespace netIPAM
             services.AddScoped<IdentityRedirectManager>();
             services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
-            services.ApplyAuthProviders(builder.Configuration);            
+            services.ApplyAuthProviders(builder.Configuration);
 
             //string connectionString = builder.Configuration.GetConnectionString("mssql") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             services.AddDbContext<AppDbContext>();
+            //services.AddDbContextFactory<AppDbContext>();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -82,6 +83,7 @@ namespace netIPAM
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
+
 
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();

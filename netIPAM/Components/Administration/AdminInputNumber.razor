@@ -1,0 +1,19 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using System.Linq.Expressions
+
+<tr class="">
+    <td class="title">@Title</td>
+    <td>
+        <InputNumber
+            Value="@Value"
+            ValueChanged="@ValueChanged"
+            ValueExpression="@ValueExpression"
+            class="form-control input-sm"
+            min="@Min"
+            max="@Max"
+            name="@Name" />
+    </td>
+    <td class="info2">
+        @Description
+    </td>
+</tr>
