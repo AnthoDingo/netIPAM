@@ -28,5 +28,21 @@ namespace netIPAM.Components.Administration
         [Parameter]
         [Required]
         public required string Description { get; set; }
+
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters);
+            StateHasChanged();
+        }
+
+        private async Task OnStateChanged(bool newValue)
+        {
+            Value = newValue;
+            if (ValueChanged.HasDelegate)
+            {
+                await ValueChanged.InvokeAsync(newValue);
+            }
+        }
+
     }
 }

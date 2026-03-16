@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Components.Sections
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -24,9 +25,9 @@
 
     <script src="@Assets["js/jquery-3.7.1.min.js"]"></script>
     @* <script src="@Assets["js/login.js"]"></script> *@
-    <script src="@Assets["js/bootstrap.min.js"]"></script>
+    @* <script src="@Assets["js/bootstrap.min.js"]"></script>
     <script src="@Assets["js/bootstrap.custom.js"]"></script>
-    <script src="@Assets["js/bootstrap-switch/bootstrap-switch.min.js"]"></script>
+    <script src="@Assets["js/bootstrap-switch/bootstrap-switch.min.js"]"></script> *@
     <script>
         $(document).ready(function(){
              if ($("[rel=tooltip]").length) { $("[rel=tooltip]").tooltip(); }
@@ -43,6 +44,15 @@
     <ReconnectModal />
 
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+
+    @* <script src="@Assets["js/bootstrap.min.js"]"></script> *@
+    <script src="@Assets["js/bootstrap.bundle.min.js"]"></script>
+    @* <script src="@Assets["js/bootstrap.custom.js"]"></script> *@
+    <script src="@Assets["js/bootstrap-switch/bootstrap-switch.min.js"]"></script>
+    <script src="_content/Blazor.Bootstrap/blazor.bootstrap.js"></script>
+
+    <SectionOutlet SectionName="modals" />
+    
 </body>
 
 </html>

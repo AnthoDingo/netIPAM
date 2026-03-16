@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Forms;
+using netIPAM.Services;
 
 namespace netIPAM.Pages.Login
 {
@@ -21,9 +22,15 @@ namespace netIPAM.Pages.Login
         [Inject]
         protected IdentityRedirectManager RedirectManager { get; set; } = default!;
 
+        [Inject]
+        private CacheService CacheService { get; set; } = default!;
+
         private string? errorMessage;
         private string? successMessage;
+
+        private bool isPasskeyEnabled = false;
         private string? errorPasskey;
+        
         private EditContext editContext = default!;
 
         [CascadingParameter]
@@ -46,6 +53,9 @@ namespace netIPAM.Pages.Login
                 // Clear the existing external cookie to ensure a clean login process
                 await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
             }
+
+            bool value = await CacheService.GetSettingBoolAsync("passkeys");
+            isPasskeyEnabled = value;
         }
 
         public async Task LoginUser()
@@ -54,13 +64,13 @@ namespace netIPAM.Pages.Login
             successMessage = null;
             errorPasskey = null;
 
-            if (string.IsNullOrEmpty(Input.Email) || string.IsNullOrEmpty(Input.Password))
+            if (string.IsNullOrEmpty(Input.Username) || string.IsNullOrEmpty(Input.Password))
             {
                 errorMessage = "Please enter your username and password";
                 return;
             }
 
-            if (!string.IsNullOrEmpty(Input.Passkey?.Error))
+            if (!string.IsNullOrEmpty(Input.Passkey?.Error))  
             {
                 // errorMessage = $"Error: {Input.Passkey.Error}";
                 errorPasskey = "Passkey authentication failed!";
@@ -83,7 +93,7 @@ namespace netIPAM.Pages.Login
 
                 // This doesn't count login failures towards account lockout
                 // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
             }
 
             if (result.Succeeded)
@@ -111,8 +121,12 @@ namespace netIPAM.Pages.Login
         private sealed class InputModel
         {
             [Required]
-            [EmailAddress]
-            public string Email { get; set; } = "";
+            [DataType(DataType.Text)]
+            public string Username { get; set; } = "";
+
+            //[Required]
+            //[EmailAddress]
+            //public string Email { get; set; } = "";
 
             //[Required]
             //[DataType(DataType.Text)]

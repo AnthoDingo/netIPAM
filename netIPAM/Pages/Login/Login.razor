@@ -18,6 +18,7 @@
         <div id="login">
             <EditForm EditContext="editContext" method="post" OnSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
+
                 <div class="loginForm row">
 
                     <!-- title -->
@@ -30,11 +31,11 @@
                         <strong>Username</strong>
                     </div>
                     <div class="col-xs-12">
-                        <InputText @bind-Value="Input.Email"
-                            id="Input.Email" 
+                        <InputText @bind-Value="Input.Username"
+                            id="Input.Username" 
                             class="form-control input-sm" 
                             aria-required="true" 
-                            placeholder="Email"
+                            placeholder="Username"
                             autocomplete="username webauthn" autocorrect="off" autocapitalize="off" spellcheck="false" />
                     </div>
 
@@ -68,28 +69,31 @@
                             <div class="alert alert-success">@successMessage</div>
                         }
                     </div>
+                    
+                    @if (isPasskeyEnabled)
+                    {
+                        <!-- passkey -->
+                        <div class="col-xs-12" style="padding-top:20px;">
+                            <div style="width: 45%;" class="text-center pull-left">
+                                <hr style="padding-top: 3px">
+                            </div>
+                            <div style="width: 10%;" class="text-center pull-left">
+                                or
+                            </div>
+                            <div style="width: 45%;" class="text-center pull-left">
+                                <hr style="padding-top: 3px">
+                            </div>
 
-                    <!-- passkey -->
-                    <div class="col-xs-12" style="padding-top:20px;">
-                        <div style="width: 45%;" class="text-center pull-left">
-                            <hr style="padding-top: 3px">
-                        </div>
-                        <div style="width: 10%;" class="text-center pull-left">
-                            or
-                        </div>
-                        <div style="width: 45%;" class="text-center pull-left">
-                            <hr style="padding-top: 3px">
+                            <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" UserName="Input.UserName" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
                         </div>
 
-                        <PasskeySubmit Operation="PasskeyOperation.Request" Name="Input.Passkey" UserName="Input.UserName" class="btn btn-link mx-auto">Log in with a passkey</PasskeySubmit>
-                    </div>
-
-                    <div id="loginCheckPasskeys" class="col-xs-12 text-center" style="">
-                        @if (!string.IsNullOrEmpty(errorPasskey))
-                        {
-                            <div class="alert alert-danger">@errorPasskey</div>
-                        }
-                    </div>
+                        <div id="loginCheckPasskeys" class="col-xs-12 text-center" style="">
+                            @if (!string.IsNullOrEmpty(errorPasskey))
+                            {
+                                <div class="alert alert-danger">@errorPasskey</div>
+                            }
+                        </div>
+                    }
 
                     <ExternalLoginPicker />
                 </div>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using netIPAM.Models;
 
 namespace netIPAM.DBContexts
@@ -40,7 +41,9 @@ namespace netIPAM.DBContexts
 #if DEBUG
             optionsBuilder
                 .EnableSensitiveDataLogging();
-                //.LogTo(Console.WriteLine, LogLevel.Debug);
+            optionsBuilder.ConfigureWarnings(w =>
+                w.Ignore(RelationalEventId.PendingModelChangesWarning));
+            //.LogTo(Console.WriteLine, LogLevel.Debug);
 #endif
         }
 
@@ -56,11 +59,24 @@ namespace netIPAM.DBContexts
             builder.Entity<IdentityRoleClaim<string>>(entity => { entity.ToTable("RoleClaims"); });
             builder.Entity<IdentityUserToken<string>>(entity => { entity.ToTable("UserTokens"); });
 
+            builder.Entity<AppUser>().HasData(new AppUser()
+            {
+                Id = "8b5abfdb-2cfe-405d-aca2-4d884fa29b9b",
+                UserName = "admin",
+                NormalizedUserName = "ADMIN",
+                Email = "admin@local.lan",
+                NormalizedEmail = "ADMIN@LOCAL.LAN",
+                EmailConfirmed = true,
+                SecurityStamp = "9c78a916-aa9e-4862-b40b-8563a3ae874a",
+                PasswordHash = "AQAAAAIAAYagAAAAEGM/ll7G62x2i5K84HUeA1LRTrMucZ6zPbAIMxnNEgg2KCVy9remI9mlliHU2tpHrw=="
+            });
+
+            builder.Entity<Setting>().HasIndex(s => s.Name);
             builder.Entity<Setting>().HasData(
                 new Setting { Id = 1, Name = "siteTitle", Value = "netIPAM address management", Type = SettingType.String },
                 new Setting { Id = 2, Name = "siteDomain", Value = "domain.local", Type = SettingType.String },
                 new Setting { Id = 3, Name = "siteURL", Value = "http://yourpublicurl.com", Type = SettingType.String },
-                new Setting { Id = 4, Name = "siteLoginText", Value = string.Empty, Type = SettingType.String },
+                new Setting { Id = 4, Name = "siteLoginText", Value = "", Type = SettingType.String },
                 new Setting { Id = 5, Name = "permissionPropagate", Value = true.ToString(), Type = SettingType.Boolean },
                 new Setting { Id = 6, Name = "vlanMax", Value = 4096.ToString(), Type = SettingType.Integer },
                 new Setting { Id = 7, Name = "maintaneanceMode", Value = false.ToString(), Type = SettingType.Boolean },

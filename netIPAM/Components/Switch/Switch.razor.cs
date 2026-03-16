@@ -112,44 +112,77 @@ namespace netIPAM.Components.Switch
 
         private const string SetStatusJsCall = @"setSwitchButtonStatus";
 
+        private bool _pendingStateUpdate = false;
+        private bool _hasPendingUpdate = false;
+
 
         /// <inheritdoc />
         protected async override Task OnAfterRenderAsync(bool firstRender)
         {
             await base.OnAfterRenderAsync(firstRender);
-            if (firstRender)
+            if (!firstRender)
+                return;
+
+            var switchOption = new SwitchOption
             {
-                var switchOption = new SwitchOption
-                {
-                    Onlabel = OnUiLabel,
-                    Offlabel = OffUiLabel,
-                    Onstyle = OnUiStyle,
-                    Offstyle = OffUiStyle,
-                    Width = SwitchWidth,
-                    Height = SwitchHeight
-                };
+                Onlabel = OnUiLabel,
+                Offlabel = OffUiLabel,
+                Onstyle = OnUiStyle,
+                Offstyle = OffUiStyle,
+                Width = SwitchWidth,
+                Height = SwitchHeight
+            };
 
-                if (!string.IsNullOrEmpty(SwitchSize))
+            if (!string.IsNullOrEmpty(SwitchSize))
+            {
+                switchOption.Size = SwitchSize;
+            }
+
+            if (!string.IsNullOrEmpty(SwitchStyle))
+            {
+                switchOption.Style = SwitchStyle;
+            }
+
+            _switchButtonJsModule = await JS.InvokeAsync<IJSObjectReference>("import", "/Components/Switch/Switch.razor.js");
+            _checkBoxInputJsRef =
+                await _switchButtonJsModule.InvokeAsync<IJSObjectReference>("createSwitchButton", _switchButtonContainer,
+                    switchOption);
+
+            //await _switchButtonJsModule.InvokeVoidAsync(SetStatusJsCall, _checkBoxInputJsRef, InitialState ? "on" : "off", true);
+            await _switchButtonJsModule.InvokeVoidAsync(SetStatusJsCall, _checkBoxInputJsRef, _currentState ? "on" : "off", true);
+
+            _switchBtnEventInvokeRef = await _switchButtonJsModule.InvokeAsync<IJSObjectReference>("createDotNetInvokeRef");
+
+            _dotNetInvokeRef = DotNetObjectReference.Create(this);
+            await _switchBtnEventInvokeRef.InvokeVoidAsync("init", _dotNetInvokeRef, _checkBoxInputJsRef);
+
+            if (_hasPendingUpdate)
+            {
+                await _switchButtonJsModule.InvokeVoidAsync(
+                    SetStatusJsCall, _checkBoxInputJsRef, _pendingStateUpdate ? "on" : "off", true);
+                _hasPendingUpdate = false;
+            }
+        }
+
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            bool previousState = _currentState;
+
+            await base.SetParametersAsync(parameters);
+
+            if (_currentState != previousState)
+            {
+                if (_switchButtonJsModule != null)
                 {
-                    switchOption.Size = SwitchSize;
+                    await _switchButtonJsModule.InvokeVoidAsync(
+                        SetStatusJsCall, _checkBoxInputJsRef, _currentState ? "on" : "off", true);
                 }
-
-                if (!string.IsNullOrEmpty(SwitchStyle))
+                else
                 {
-                    switchOption.Style = SwitchStyle;
+                    // JS pas encore prêt, on mémorise pour l'appliquer après
+                    _pendingStateUpdate = _currentState;
+                    _hasPendingUpdate = true;
                 }
-
-                _switchButtonJsModule = await JS.InvokeAsync<IJSObjectReference>("import", "/Components/Switch/Switch.razor.js");
-                _checkBoxInputJsRef =
-                    await _switchButtonJsModule.InvokeAsync<IJSObjectReference>("createSwitchButton", _switchButtonContainer,
-                        switchOption);
-
-                await _switchButtonJsModule.InvokeVoidAsync(SetStatusJsCall, _checkBoxInputJsRef, InitialState ? "on" : "off", true);
-                
-                _switchBtnEventInvokeRef = await _switchButtonJsModule.InvokeAsync<IJSObjectReference>("createDotNetInvokeRef");
-
-                _dotNetInvokeRef = DotNetObjectReference.Create(this);
-                await _switchBtnEventInvokeRef.InvokeVoidAsync("init", _dotNetInvokeRef, _checkBoxInputJsRef);
             }
         }
 
@@ -181,6 +214,7 @@ namespace netIPAM.Components.Switch
             {
                 await _switchButtonJsModule.InvokeVoidAsync(SetStatusJsCall, _checkBoxInputJsRef, inputState, true);
             }
+            StateHasChanged();
         }
 
         #region Dispose Pattern implementation
@@ -247,6 +281,10 @@ namespace netIPAM.Components.Switch
                 {
                     // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
                     Logger.LogDebug(ex, _disposeTimeoutLogTemplate);
+                }
+                catch (JSDisconnectedException ex)
+                {
+                    Logger.LogDebug(ex, "JS interop disposal failed due to circuit disconnection");
                 }
             }
 

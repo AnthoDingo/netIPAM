@@ -29,8 +29,11 @@ namespace netIPAM
             services.ApplyAuthProviders(builder.Configuration);
 
             //string connectionString = builder.Configuration.GetConnectionString("mssql") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            services.AddDbContext<AppDbContext>();
-            //services.AddDbContextFactory<AppDbContext>();
+            //services.AddDbContext<AppDbContext>();
+            services.AddDbContextFactory<AppDbContext>();
+
+            services.AddMemoryCache();
+            services.AddSingleton<CacheService>();
 
             services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -50,6 +53,8 @@ namespace netIPAM
                 // options.LogoutPath = "/logout";
                 options.AccessDeniedPath = "/access-denied";
             });
+
+            services.AddBlazorBootstrap();
 
             services.AddSingleton<IEmailSender<AppUser>, IdentityNoOpEmailSender>();
 

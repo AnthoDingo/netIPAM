@@ -1,10 +1,13 @@
 ﻿@page "/administration/settings/"
 
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Sections
 @using netIPAM.Components
 @using netIPAM.Components.Administration
 
-@* @attribute [Authorize] *@
+@rendermode InteractiveServer
+
+@attribute [Authorize]
 
 <PageTitle>netIPAM : Settings</PageTitle>
 
@@ -36,14 +39,17 @@
         <div class="row menu-administration" id="content">
             <h4>netIPAM Server settings</h4>
             <hr />
-            <EditForm EditContext="editContext" name="settings" id="settings">
+            <EditForm id="settings" EditContext="editContext" method="post" OnSubmit="SaveSettings" FormName="settings">
                 <table id="settings" class="table table-hover table-condensed table-top">
                     <tbody>
 
                         <!-- #region Site settings -->
+
                         <!-- Site settings -->
                         <tr class="settings-title">
-                            <th colspan="3"><h4>Site settings</h4></th>
+                            <th colspan="3">
+                                <h4>Site settings</h4>
+                            </th>
                         </tr>
 
                         <!-- site title-->
@@ -73,7 +79,13 @@
                         <!-- Default language -->
                         <!-- Default theme -->
                         <!-- Policy propagation -->
-                        <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: false)"
+                        @* <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: true)"
+                                     Title="Default permission propagation"
+                                     Name="permissionPropagate"
+                                     Description="Set subnet / section permission propagate button to on by default"
+                                     @bind-Value="Input.PermissionPropagation" /> *@
+
+                        <AdminSwitch
                                      Title="Default permission propagation"
                                      Name="permissionPropagate"
                                      Description="Set subnet / section permission propagate button to on by default"
@@ -94,12 +106,14 @@
                                      Name="maintaneanceMode"
                                      Description="Put netIPAM to maintenance mode"
                                      @bind-Value="Input.MaintenanceMode" />
-
+                        
                         <!-- #endregion -->
                         <!-- #region Admin settings -->
                         <!-- Admin settings -->
                         <tr class="settings-title">
-                            <th colspan="3"><h4>Admin settings</h4></th>
+                            <th colspan="3">
+                                <h4>Admin settings</h4>
+                            </th>
                         </tr>
 
                         <!-- Admin name -->
@@ -113,11 +127,15 @@
                                         Name="siteAdminMail"
                                         Description="Set administrator e-mail"
                                         @bind-Value="Input.AdminEmail" />
-                        <!-- #endregion -->
+                         <!-- #endregion -->
+
                         <!-- #region Features -->
+
                         <!-- features -->
                         <tr class="settings-title">
-                            <th colspan="3"><h4>Feature settings</h4></th>
+                            <th colspan="3">
+                                <h4>Feature settings</h4>
+                            </th>
                         </tr>
 
                         <!-- API -->
@@ -133,7 +151,7 @@
                                      Name="enableIPrequests"
                                      Description="Enable or disable IP request module server module"
                                      @bind-Value="Input.IPRequestModule" />
-
+                        
                         <!-- VRF -->
                         <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: false)"
                                      Title="Enable VRF support"
@@ -154,7 +172,7 @@
                                      Name="enablePowerDNS"
                                      Description="Enable or disable PowerDNS module"
                                      @bind-Value="Input.PowerDNS" />
-
+                        
                         <!-- dHCP -->
                         <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: false)"
                                      Title="Enable DHCP"
@@ -175,7 +193,7 @@
                                      Name="enableDNSresolving"
                                      Description="Check reverse dns lookups for IP addresses that do not have hostname in database. (Activating this feature can significantly increase ip address pages loading time!)"
                                      @bind-Value="Input.ResolveDNS" />
-
+                        
                         <!-- Share -->
                         <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: false)"
                                      Title="Temporary shares"
@@ -210,7 +228,7 @@
                                      Name="enableRACK"
                                      Description="Enable or disable rack drawing module"
                                      @bind-Value="Input.RackModule" />
-
+                        
                         <!-- Circuits -->
                         <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: false)"
                                      Title="Circuits module"
@@ -238,7 +256,7 @@
                                      Name="enablePSNT"
                                      Description="Enable or disable PSTN module to manage phone numbers"
                                      @bind-Value="Input.PSTNModule" />
-
+                        
                         <!-- customers -->
                         <AdminSwitch @rendermode="new InteractiveServerRenderMode(prerender: false)"
                                      Title="Customers module"
@@ -299,9 +317,37 @@
 
                         <!-- #endregion -->
 
+
+                        <!-- #region submit -->
+
+                        <!-- Submit-->
+                        <tr class="th">
+                            <td class="title"></td>
+                            <td class="submit">
+                                <input type="submit" class="btn btn-default btn-success btn-sm submit_popup" value="Save" />
+                            </td>
+                            <td></td>
+                        </tr>
+                        <!-- #endregion -->
                     </tbody>
                 </table>
             </EditForm>
         </div>
     </td>
 </ContentOverlay>
+
+
+<SectionContent SectionName="modals">
+    <Modal @ref="loadingModal"
+           UseStaticBackdrop="true"
+           CloseOnEscape="false"
+           IsVerticallyCentered="true"
+           ShowCloseButton="false">
+        <BodyTemplate>
+            <div class="d-flex align-items-center gap-3">
+                <Spinner Type="SpinnerType.Border" Color="SpinnerColor.Primary" />
+                <span>Loading...</span>
+            </div>
+        </BodyTemplate>
+    </Modal>
+</SectionContent>
