@@ -1,29 +1,9 @@
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
 
-<div class="phpipam-layout">
+<div class="phpipam-app">
     <NavMenu />
-    <main class="phpipam-main">
-        <header class="phpipam-topbar">
-            <div class="d-flex align-items-center justify-content-between w-100">
-                <div class="phpipam-breadcrumb">
-                    <i class="bi bi-house-door me-2"></i>
-                    <span class="text-muted">PhpIpamNet</span>
-                </div>
-                <AuthorizeView>
-                    <Authorized>
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="text-muted small">
-                                <i class="bi bi-person-circle me-1"></i>@context.User.Identity?.Name
-                            </span>
-                            <a class="btn btn-sm btn-outline-secondary" href="/logout">
-                                <i class="bi bi-box-arrow-right"></i>
-                            </a>
-                        </div>
-                    </Authorized>
-                </AuthorizeView>
-            </div>
-        </header>
+    <main class="phpipam-page">
         <div class="phpipam-content">
             @Body
         </div>
