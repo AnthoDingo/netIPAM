@@ -30,6 +30,7 @@ public class PhpIpamDbContext : DbContext
     public DbSet<ChangeLog> ChangeLogs => Set<ChangeLog>();
     public DbSet<Setting> Settings => Set<Setting>();
     public DbSet<Log> Logs => Set<Log>();
+    public DbSet<EntityPermission> EntityPermissions => Set<EntityPermission>();
     public DbSet<Request> Requests => Set<Request>();
 
     protected override void OnModelCreating(ModelBuilder mb)
@@ -56,6 +57,14 @@ public class PhpIpamDbContext : DbContext
         mb.Entity<Setting>().HasKey(x => x.Id);
         mb.Entity<Log>().HasKey(x => x.Id);
         mb.Entity<Request>().HasKey(x => x.Id);
+
+        // Permissions
+        mb.Entity<EntityPermission>().HasKey(x => x.Id);
+        mb.Entity<EntityPermission>()
+            .HasIndex(x => new { x.SubjectType, x.SubjectId, x.EntityType, x.EntityId })
+            .IsUnique();
+        mb.Entity<EntityPermission>().HasIndex(x => new { x.SubjectType, x.SubjectId });
+        mb.Entity<EntityPermission>().HasIndex(x => new { x.EntityType, x.EntityId });
 
         // Index uniques de l'original phpIPAM
         mb.Entity<Section>().HasIndex(x => x.Name).IsUnique();

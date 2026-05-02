@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using PhpIpamNet.Domain.Entities;
 using PhpIpamNet.Infrastructure.Data;
@@ -83,4 +84,63 @@ public class UserService
         user.PassChange = "No";
         await _db.SaveChangesAsync(ct);
     }
+
+    // ── Gestion des appartenances aux groupes ──────────────────────────
+
+    /// <summary>
+    /// Retourne les IDs de groupes dont fait partie l'utilisateur.
+    /// Format phpIPAM : JSON {"g_id":"level"} — on extrait les clés.
+    /// </summary>
+    public List<int> GetGroupIds(User user)
+    {
+        if (string.IsNullOrWhiteSpace(user.Groups)) return [];
+        try
+        {
+            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(user.Groups);
+            return dict?.Keys
+                .Select(k => int.TryParse(k, out var id) ? id : -1)
+                .Where(id => id > 0)
+                .ToList() ?? [];
+        }
+        catch { return []; }
+    }
+
+    /// <summary>
+    /// Persiste les IDs de groupes pour un utilisateur.
+    /// Conserve le level=1 (read) par défaut pour les nouveaux groupes.
+    /// </summary>
+    public async Task SetGroupIdsAsync(int userId, List<int> groupIds, CancellationToken ct = default)
+    {
+        var user = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        if (user is null) return;
+
+        // Reconstruire le JSON en préservant les levels existants
+        var existing = new Dictionary<string, string>();
+        if (!string.IsNullOrWhiteSpace(user.Groups))
+        {
+            try { existing = JsonSerializer.Deserialize<Dictionary<string, string>>(user.Groups) ?? []; }
+            catch { /* ignore format invalide */ }
+        }
+
+        var newDict = new Dictionary<string, string>();
+        foreach (var gId in groupIds)
+        {
+            var key = gId.ToString();
+            newDict[key] = existing.TryGetValue(key, out var level) ? level : "1";
+        }
+
+        user.Groups   = newDict.Count > 0 ? JsonSerializer.Serialize(newDict) : null;
+        user.EditDate = DateTime.UtcNow;
+        await _db.SaveChangesAsync(ct);
+    }
+
+    /// <summary>Retourne tous les utilisateurs appartenant à un groupe donné.</summary>
+    public async Task<List<User>> GetMembersOfGroupAsync(int groupId, CancellationToken ct = default)
+    {
+        var all = await _db.Users.ToListAsync(ct);
+        var gKey = $"\"{groupId}\"";
+        // On cherche la clé dans le JSON sans désérialiser en masse
+        return all.Where(u => u.Groups != null && u.Groups.Contains(gKey)).ToList();
+    }
 }
+

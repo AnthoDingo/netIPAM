@@ -1,43 +1,138 @@
 @page "/admin/groups/new"
 @page "/admin/groups/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
 @inject UserGroupService Groups
+@inject UserService Users
 @inject NavigationManager Nav
 
-<PageTitle>@(_isNew ? "New group" : "Edit group")</PageTitle>
+<PageTitle>@(_isNew ? "Nouveau groupe" : $"Groupe — {_group?.GName}")</PageTitle>
 
-<AdminPageHeader Title="@(_isNew ? "New group" : "Edit group")" Icon="bi bi-people-fill"
-                 BackHref="/admin/groups" BackLabel="Groups" />
+<AdminPageHeader Title="@(_isNew ? "Nouveau groupe" : "Modifier le groupe")" Icon="bi bi-people-fill"
+                 BackHref="/admin/groups" BackLabel="Groupes" />
 
-<div class="phpipam-card" style="max-width: 640px;">
-    <div class="phpipam-card-body">
-        @if (_group is not null)
+@if (_group is not null)
+{
+    <div class="row">
+        <div class="col-lg-5">
+            <div class="phpipam-card mb-3">
+                <div class="phpipam-card-header">Informations</div>
+                <div class="phpipam-card-body">
+                    <EditForm Model="_group" OnValidSubmit="Save" FormName="grpEdit">
+                        <div class="mb-3">
+                            <label class="form-label">Nom *</label>
+                            <InputText class="form-control" @bind-Value="_group.GName" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <InputTextArea class="form-control" rows="3" @bind-Value="_group.GDesc" />
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Enregistrer
+                        </button>
+                        <a class="btn btn-link" href="/admin/groups">Annuler</a>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+        @if (!_isNew)
         {
-            <EditForm Model="_group" OnValidSubmit="Save" FormName="grpEdit">
-                <div class="mb-3">
-                    <label class="form-label">Name *</label>
-                    <InputText class="form-control" @bind-Value="_group.GName" />
+            <div class="col-lg-7">
+                <div class="phpipam-card">
+                    <div class="phpipam-card-header d-flex align-items-center justify-content-between">
+                        <span>Membres (@_members.Count utilisateurs)</span>
+                    </div>
+                    @if (_allUsers is null) { <div class="phpipam-card-body text-muted">Chargement…</div> }
+                    else
+                    {
+                        <div class="phpipam-card-body" style="max-height:380px;overflow-y:auto">
+                            @foreach (var u in _allUsers)
+                            {
+                                var isMember = _members.Any(m => m.Id == u.Id);
+                                <div class="d-flex align-items-center justify-content-between py-2
+                                            border-bottom" style="border-color:var(--bs-border-color)!important">
+                                    <div>
+                                        <strong>@u.Username</strong>
+                                        @if (!string.IsNullOrEmpty(u.RealName))
+                                        {
+                                            <span class="text-muted ms-2 small">@u.RealName</span>
+                                        }
+                                        @if (!string.IsNullOrEmpty(u.Role))
+                                        {
+                                            <span class="badge bg-secondary ms-2">@u.Role</span>
+                                        }
+                                    </div>
+                                    @if (isMember)
+                                    {
+                                        <button class="btn btn-sm btn-outline-danger"
+                                                @onclick="() => RemoveMember(u.Id)">
+                                            <i class="bi bi-dash-circle"></i> Retirer
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-outline-success"
+                                                @onclick="() => AddMember(u.Id)">
+                                            <i class="bi bi-plus-circle"></i> Ajouter
+                                        </button>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(_memberMsg))
+                        {
+                            <div class="phpipam-card-body pt-0">
+                                <small class="text-success">@_memberMsg</small>
+                            </div>
+                        }
+                    }
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <InputTextArea class="form-control" rows="3" @bind-Value="_group.GDesc" />
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
-                <a class="btn btn-link" href="/admin/groups">Cancel</a>
-            </EditForm>
+            </div>
         }
     </div>
-</div>
+}
 
 @code {
     [Parameter] public int? Id { get; set; }
     private UserGroup? _group;
+    private List<User> _allUsers = [];
+    private List<User> _members  = [];
+    private string? _memberMsg;
     private bool _isNew => Id is null;
 
     protected override async Task OnParametersSetAsync()
     {
         _group = _isNew ? new UserGroup() : await Groups.GetAsync(Id!.Value);
-        if (_group is null) Nav.NavigateTo("/admin/groups");
+        if (_group is null) { Nav.NavigateTo("/admin/groups"); return; }
+        if (!_isNew) await ReloadMembers();
+    }
+
+    private async Task ReloadMembers()
+    {
+        _allUsers = await Users.ListAsync();
+        _members  = await Users.GetMembersOfGroupAsync(Id!.Value);
+    }
+
+    private async Task AddMember(int userId)
+    {
+        var user     = await Users.FindByIdAsync(userId);
+        if (user is null) return;
+        var groupIds = Users.GetGroupIds(user);
+        if (!groupIds.Contains(Id!.Value)) groupIds.Add(Id.Value);
+        await Users.SetGroupIdsAsync(userId, groupIds);
+        _memberMsg = $"✓ Membre ajouté.";
+        await ReloadMembers();
+    }
+
+    private async Task RemoveMember(int userId)
+    {
+        var user     = await Users.FindByIdAsync(userId);
+        if (user is null) return;
+        var groupIds = Users.GetGroupIds(user).Where(g => g != Id!.Value).ToList();
+        await Users.SetGroupIdsAsync(userId, groupIds);
+        _memberMsg = $"✓ Membre retiré.";
+        await ReloadMembers();
     }
 
     private async Task Save()

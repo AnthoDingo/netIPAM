@@ -62,6 +62,7 @@ public static class DependencyInjection
         services.AddScoped<LocationService>();
         services.AddScoped<IpTagService>();
         services.AddScoped<DashboardService>();
+        services.AddScoped<PermissionService>();
 
         return services;
     }
