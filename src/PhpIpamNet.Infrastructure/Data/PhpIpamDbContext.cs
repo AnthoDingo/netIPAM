@@ -30,7 +30,6 @@ public class PhpIpamDbContext : DbContext
     public DbSet<ChangeLog> ChangeLogs => Set<ChangeLog>();
     public DbSet<Setting> Settings => Set<Setting>();
     public DbSet<Log> Logs => Set<Log>();
-    public DbSet<PasskeyCredential> PasskeyCredentials => Set<PasskeyCredential>();
     public DbSet<Request> Requests => Set<Request>();
 
     protected override void OnModelCreating(ModelBuilder mb)
@@ -57,17 +56,6 @@ public class PhpIpamDbContext : DbContext
         mb.Entity<Setting>().HasKey(x => x.Id);
         mb.Entity<Log>().HasKey(x => x.Id);
         mb.Entity<Request>().HasKey(x => x.Id);
-
-        // Passkeys
-        mb.Entity<PasskeyCredential>().HasKey(x => x.Id);
-        mb.Entity<PasskeyCredential>()
-            .HasOne(c => c.User)
-            .WithMany()
-            .HasForeignKey(c => c.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-        mb.Entity<PasskeyCredential>().HasIndex(c => c.UserId);
-        // DescriptorId est un byte[] — index pour lookup rapide lors des assertions
-        mb.Entity<PasskeyCredential>().HasIndex(c => c.DescriptorId).IsUnique();
 
         // Index uniques de l'original phpIPAM
         mb.Entity<Section>().HasIndex(x => x.Name).IsUnique();

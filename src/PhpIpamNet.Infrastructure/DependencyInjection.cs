@@ -1,4 +1,3 @@
-using Fido2NetLib;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,24 +62,6 @@ public static class DependencyInjection
         services.AddScoped<LocationService>();
         services.AddScoped<IpTagService>();
         services.AddScoped<DashboardService>();
-        services.AddScoped<PasskeyService>();
-
-        // Fido2NetLib — configuration via "Fido2" section dans appsettings
-        var fido2Section = config.GetSection("Fido2");
-        var origins = (fido2Section["Origins"] ?? "https://localhost:7180;http://localhost:5180")
-            .Split(';', StringSplitOptions.RemoveEmptyEntries)
-            .ToHashSet();
-
-        services.AddFido2(opt =>
-        {
-            opt.ServerDomain           = fido2Section["Domain"] ?? "localhost";
-            opt.ServerName             = fido2Section["ServerName"] ?? "PhpIpamNet";
-            opt.Origins                = origins;
-            opt.TimestampDriftTolerance = 300_000; // 5 min en ms
-        });
-
-        // IMemoryCache requis par PasskeyService pour les challenges temporaires
-        services.AddMemoryCache();
 
         return services;
     }
