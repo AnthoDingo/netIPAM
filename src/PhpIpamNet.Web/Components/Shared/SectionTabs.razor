@@ -1,0 +1,27 @@
+@* Barre secondaire d'onglets de sections — visible dans les vues section/subnet *@
+@inject SectionService SectionSvc
+@inject NavigationManager Nav
+
+@if (_sections.Count > 0)
+{
+    <div class="pi-section-tabs">
+        <a class="pi-section-tab @(ActiveSectionId == 0 ? "active" : "")" href="/sections">
+            <i class="bi bi-house-door"></i>
+        </a>
+        @foreach (var s in _sections)
+        {
+            <a class="pi-section-tab @(s.Id == ActiveSectionId ? "active" : "")"
+               href="@($"/sections/{s.Id}/subnets")">
+                @s.Name
+            </a>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public int ActiveSectionId { get; set; }
+    private List<Section> _sections = [];
+
+    protected override async Task OnInitializedAsync()
+        => _sections = await SectionSvc.ListAsync();
+}

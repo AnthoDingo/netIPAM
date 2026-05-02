@@ -12,6 +12,13 @@ public class VlanService
     public Task<List<Vlan>> ListAsync(CancellationToken ct = default)
         => _db.Vlans.Include(v => v.Domain).OrderBy(v => v.Number).ToListAsync(ct);
 
+    /// <summary>VLANs utilisés par au moins un subnet dans cette section.</summary>
+    public Task<List<Vlan>> ForSectionAsync(int sectionId, CancellationToken ct = default)
+        => _db.Vlans
+              .Where(v => _db.Subnets.Any(s => s.SectionId == sectionId && s.VlanId == v.VlanId))
+              .OrderBy(v => v.Number)
+              .ToListAsync(ct);
+
     public Task<Vlan?> GetAsync(int vlanId, CancellationToken ct = default)
         => _db.Vlans.FirstOrDefaultAsync(v => v.VlanId == vlanId, ct);
 

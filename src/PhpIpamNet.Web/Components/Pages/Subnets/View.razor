@@ -4,117 +4,158 @@
 @inject SubnetService Subnets
 @inject IpAddressService Ips
 @inject NavigationManager Nav
+@using PhpIpamNet.Web.Components.Shared
 
-<PageTitle>Subnet — @_cidr</PageTitle>
+<PageTitle>@(_cidr.Length > 0 ? _cidr : "Subnet")</PageTitle>
 
-@if (_subnet is null)
+@* ── Onglets sections ── *@
+@if (_subnet?.SectionId is int sid)
 {
-    <p class="text-muted">Loading…</p>
+    <SectionTabs ActiveSectionId="sid" />
 }
-else
-{
-    <div class="d-flex align-items-center justify-content-between mb-3">
-        <h1 class="h3 mb-0">
-            <a href="@($"/sections/{_subnet.SectionId}/subnets")" class="text-decoration-none text-muted small">
-                <i class="bi bi-arrow-left"></i> Section
-            </a>
-            <i class="bi bi-diagram-3 ms-2 me-2"></i>@_cidr
-        </h1>
-        <div>
-            <a class="btn btn-outline-secondary btn-sm me-2" href="@($"/subnets/{Id}/edit")">
-                <i class="bi bi-pencil"></i> Edit
-            </a>
-            <a class="btn btn-primary btn-sm" href="@($"/subnets/{Id}/addresses/new")">
-                <i class="bi bi-plus-lg"></i> Add IP
-            </a>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="phpipam-card">
-                <div class="phpipam-card-header">Properties</div>
-                <div class="phpipam-card-body">
-                    <dl class="row mb-0">
-                        <dt class="col-sm-5 text-muted">Description</dt>
-                        <dd class="col-sm-7">@_subnet.Description</dd>
-                        <dt class="col-sm-5 text-muted">Network</dt>
-                        <dd class="col-sm-7">@_info?.Network</dd>
-                        <dt class="col-sm-5 text-muted">Broadcast</dt>
-                        <dd class="col-sm-7">@_info?.Broadcast</dd>
-                        <dt class="col-sm-5 text-muted">First usable</dt>
-                        <dd class="col-sm-7">@_info?.FirstUsable</dd>
-                        <dt class="col-sm-5 text-muted">Last usable</dt>
-                        <dd class="col-sm-7">@_info?.LastUsable</dd>
-                        <dt class="col-sm-5 text-muted">Total addresses</dt>
-                        <dd class="col-sm-7">@_info?.TotalAddresses</dd>
-                        <dt class="col-sm-5 text-muted">Usable hosts</dt>
-                        <dd class="col-sm-7">@_info?.UsableHosts</dd>
-                    </dl>
-                </div>
-            </div>
+@* ── Layout 2 colonnes ── *@
+<div class="pi-section-view">
 
-            <div class="phpipam-card">
-                <div class="phpipam-card-header">Usage</div>
-                <div class="phpipam-card-body">
-                    @{
-                        var pct = _usage.percentUsed;
-                        var cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
+    @* Sidebar *@
+    @if (_subnet?.SectionId is int sectionId)
+    {
+        <aside class="pi-sidebar">
+            <SectionSidebar SectionId="sectionId" ActiveSubnetId="Id" />
+        </aside>
+    }
+
+    @* Contenu *@
+    <div class="pi-section-main">
+
+        @if (_subnet is null)
+        {
+            <p class="text-muted">Chargement…</p>
+        }
+        else
+        {
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h1 class="h4 mb-0">
+                    <i class="bi bi-diagram-3 me-2 text-primary"></i>@_cidr
+                    @if (!string.IsNullOrEmpty(_subnet.Description))
+                    {
+                        <small class="text-muted ms-2 fw-normal">@_subnet.Description</small>
                     }
-                    <div class="phpipam-usage" style="height: 26px;">
-                        <div class="phpipam-usage-fill @cls" style="width: @($"{pct:0.#}")%"></div>
-                        <div class="phpipam-usage-label">@_usage.used / @_usage.total (@($"{pct:0.#}")%)</div>
+                </h1>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-outline-secondary btn-sm" href="@($"/subnets/{Id}/edit")">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <a class="btn btn-primary btn-sm" href="@($"/subnets/{Id}/addresses/new")">
+                        <i class="bi bi-plus-lg me-1"></i>Add IP
+                    </a>
+                </div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-lg-4">
+                    <div class="phpipam-card">
+                        <div class="phpipam-card-header">Properties</div>
+                        <div class="phpipam-card-body">
+                            <dl class="row mb-0" style="font-size:.875rem">
+                                <dt class="col-5 text-muted">Network</dt>
+                                <dd class="col-7"><code>@_info?.Network</code></dd>
+                                <dt class="col-5 text-muted">Broadcast</dt>
+                                <dd class="col-7"><code>@_info?.Broadcast</code></dd>
+                                <dt class="col-5 text-muted">First usable</dt>
+                                <dd class="col-7"><code>@_info?.FirstUsable</code></dd>
+                                <dt class="col-5 text-muted">Last usable</dt>
+                                <dd class="col-7"><code>@_info?.LastUsable</code></dd>
+                                <dt class="col-5 text-muted">Hosts</dt>
+                                <dd class="col-7">@_info?.UsableHosts</dd>
+                                @if (_subnet.Vlan is not null)
+                                {
+                                    <dt class="col-5 text-muted">VLAN</dt>
+                                    <dd class="col-7">
+                                        <span class="badge bg-warning text-dark">
+                                            @_subnet.Vlan.Name (@_subnet.Vlan.Number)
+                                        </span>
+                                    </dd>
+                                }
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="phpipam-card">
+                        <div class="phpipam-card-header">Usage</div>
+                        <div class="phpipam-card-body">
+                            @{
+                                var pct = _usage.percentUsed;
+                                var cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
+                            }
+                            <div class="phpipam-usage" style="height:24px">
+                                <div class="phpipam-usage-fill @cls" style="width:@($"{pct:0.#}")%"></div>
+                                <div class="phpipam-usage-label">
+                                    @_usage.used / @_usage.total (@($"{pct:0.#}")%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <div class="phpipam-card">
+                        <div class="phpipam-card-header">
+                            IP addresses (@(_addresses?.Count ?? 0))
+                        </div>
+                        @if (_addresses is null || _addresses.Count == 0)
+                        {
+                            <div class="phpipam-card-body text-center text-muted py-4">
+                                Aucune adresse IP enregistrée.
+                            </div>
+                        }
+                        else
+                        {
+                            <table class="phpipam-table">
+                                <thead>
+                                    <tr>
+                                        <th>IP</th>
+                                        <th>Hostname</th>
+                                        <th>État</th>
+                                        <th>Description</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var ip in _addresses)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <code>@FormatIp(ip)</code>
+                                                @if (ip.IsGateway)
+                                                {
+                                                    <span class="badge bg-info ms-1">GW</span>
+                                                }
+                                            </td>
+                                            <td>@ip.Hostname</td>
+                                            <td>@StateBadge(ip.State)</td>
+                                            <td class="text-muted small">@ip.Description</td>
+                                            <td class="text-end">
+                                                <a class="btn btn-sm btn-outline-secondary"
+                                                   href="@($"/subnets/{Id}/addresses/{ip.Id}/edit")">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button class="btn btn-sm btn-outline-danger"
+                                                        @onclick="() => DeleteIp(ip.Id)">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
                     </div>
                 </div>
             </div>
-        </div>
-
-        <div class="col-lg-8">
-            <div class="phpipam-card">
-                <div class="phpipam-card-header">IP addresses (@(_addresses?.Count ?? 0))</div>
-                @if (_addresses is null || _addresses.Count == 0)
-                {
-                    <div class="phpipam-card-body text-center text-muted py-4">
-                        No IP addresses recorded yet.
-                    </div>
-                }
-                else
-                {
-                    <table class="phpipam-table">
-                        <thead>
-                            <tr>
-                                <th>IP</th>
-                                <th>Hostname</th>
-                                <th>State</th>
-                                <th>Description</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var ip in _addresses)
-                            {
-                                <tr>
-                                    <td><code>@FormatIp(ip)</code> @if (ip.IsGateway) { <span class="badge bg-info ms-1">GW</span> }</td>
-                                    <td>@ip.Hostname</td>
-                                    <td>@StateBadge(ip.State)</td>
-                                    <td class="text-muted">@ip.Description</td>
-                                    <td class="text-end">
-                                        <a class="btn btn-sm btn-outline-secondary" href="@($"/subnets/{Id}/addresses/{ip.Id}/edit")">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(ip.Id)">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
+        }
     </div>
-}
+</div>
 
 @code {
     [Parameter] public int Id { get; set; }
@@ -140,7 +181,7 @@ else
         }
 
         _addresses = await Ips.ForSubnetAsync(Id);
-        _usage = await Subnets.UsageAsync(Id);
+        _usage     = await Subnets.UsageAsync(Id);
     }
 
     private static string FormatIp(IpAddress ip)
@@ -155,18 +196,18 @@ else
 
     private static MarkupString StateBadge(int? state) => state switch
     {
-        0 => new MarkupString("<span class=\"phpipam-state phpipam-state-offline\">Offline</span>"),
-        1 => new MarkupString("<span class=\"phpipam-state phpipam-state-active\">Active</span>"),
-        2 => new MarkupString("<span class=\"phpipam-state phpipam-state-used\">Used</span>"),
-        3 => new MarkupString("<span class=\"phpipam-state phpipam-state-reserved\">Reserved</span>"),
-        4 => new MarkupString("<span class=\"phpipam-state phpipam-state-dhcp\">DHCP</span>"),
-        _ => new MarkupString("")
+        0 => new("<span class='phpipam-state phpipam-state-offline'>Offline</span>"),
+        1 => new("<span class='phpipam-state phpipam-state-active'>Active</span>"),
+        2 => new("<span class='phpipam-state phpipam-state-used'>Used</span>"),
+        3 => new("<span class='phpipam-state phpipam-state-reserved'>Reserved</span>"),
+        4 => new("<span class='phpipam-state phpipam-state-dhcp'>DHCP</span>"),
+        _ => new("")
     };
 
-    private async Task Delete(int ipId)
+    private async Task DeleteIp(int ipId)
     {
         await Ips.DeleteAsync(ipId);
         _addresses = await Ips.ForSubnetAsync(Id);
-        _usage = await Subnets.UsageAsync(Id);
+        _usage     = await Subnets.UsageAsync(Id);
     }
 }

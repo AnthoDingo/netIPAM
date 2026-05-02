@@ -17,6 +17,17 @@ public class SubnetService
               .ThenBy(s => s.SubnetAddress)
               .ToListAsync(ct);
 
+    /// <summary>
+    /// Retourne tous les subnets d'une section en ordre hiérarchique (pour le sidebar tree).
+    /// Inclut le VLAN pour l'affichage.
+    /// </summary>
+    public Task<List<Subnet>> ForSectionWithVlanAsync(int sectionId, CancellationToken ct = default)
+        => _db.Subnets
+              .Where(s => s.SectionId == sectionId)
+              .Include(s => s.Vlan)
+              .OrderBy(s => s.SubnetAddress)
+              .ToListAsync(ct);
+
     public Task<Subnet?> GetAsync(int id, CancellationToken ct = default)
         => _db.Subnets
               .Include(s => s.Vlan)

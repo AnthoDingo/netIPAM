@@ -267,3 +267,146 @@ body { background: var(--pi-bg); font-size: 0.92rem; }
 }
 .phpipam-subject-row:hover { background: #f0f4f8; }
 .phpipam-subject-row.active { background: #ebf5fb; color: #185fa5; font-weight: 500; }
+
+/* ── Section tabs (barre secondaire) ────────────────────────── */
+.pi-section-tabs {
+    display: flex;
+    align-items: stretch;
+    background: #34495e;
+    border-bottom: 1px solid rgba(0,0,0,.2);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.pi-section-tabs::-webkit-scrollbar { display: none; }
+
+.pi-section-tab {
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    height: 34px;
+    color: #9aabbb;
+    font-size: 13px;
+    white-space: nowrap;
+    text-decoration: none;
+    border-right: 1px solid rgba(255,255,255,.06);
+    border-bottom: 2px solid transparent;
+    transition: background .1s, color .1s;
+}
+.pi-section-tab:hover  { background: rgba(255,255,255,.06); color: #fff; }
+.pi-section-tab.active { color: #fff; border-bottom-color: #3498db; background: rgba(52,152,219,.15); }
+
+/* ── Section view layout (2 colonnes) ───────────────────────── */
+.pi-section-view {
+    display: flex;
+    min-height: calc(100vh - 44px - 34px); /* viewport - navbar - tabs */
+    margin: -24px; /* annule le padding de phpipam-content */
+}
+
+.pi-sidebar {
+    width: 230px;
+    flex-shrink: 0;
+    background: #fff;
+    border-right: 1px solid var(--pi-border);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: calc(100vh - 78px);
+    position: sticky;
+    top: 78px; /* navbar + tabs */
+    align-self: flex-start;
+}
+
+.pi-section-main {
+    flex: 1;
+    min-width: 0;
+    padding: 20px;
+}
+
+/* ── Sidebar internals ──────────────────────────────────────── */
+.pi-sidebar-loading {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.pi-sidebar-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #8a94a6;
+    border-bottom: 1px solid var(--pi-border);
+}
+.pi-sidebar-add {
+    color: #3498db;
+    font-size: 14px;
+    text-decoration: none;
+    line-height: 1;
+}
+.pi-sidebar-add:hover { color: #2176ae; }
+
+.pi-sidebar-empty {
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #a0a8b4;
+}
+
+/* ── Subnet tree nodes ──────────────────────────────────────── */
+.pi-subnet-tree, .pi-vlan-list {
+    flex: 1;
+}
+
+.pi-tree-node {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px 5px 12px;
+    font-size: 12.5px;
+    color: #3d4554;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(0,0,0,.03);
+    transition: background .1s;
+    min-width: 0;
+}
+.pi-tree-node:hover  { background: #f0f4f8; color: #3498db; }
+.pi-tree-node.active { background: #ebf5fb; color: #185fa5; font-weight: 500; }
+
+.pi-tree-icon {
+    font-size: 11px;
+    flex-shrink: 0;
+    color: #9aa0aa;
+    width: 13px;
+}
+.pi-tree-icon.folder { color: #f0a500; }
+.pi-tree-icon.vlan   { color: #e67e22; }
+.pi-tree-node:hover .pi-tree-icon  { color: inherit; }
+.pi-tree-node.active .pi-tree-icon { color: inherit; }
+
+.pi-tree-label {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pi-tree-desc {
+    font-size: 11px;
+    color: #9aa0aa;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70px;
+    flex-shrink: 1;
+}
+
+.pi-vlan-num {
+    font-size: 11px;
+    color: #9aa0aa;
+    margin-left: auto;
+    flex-shrink: 0;
+}
