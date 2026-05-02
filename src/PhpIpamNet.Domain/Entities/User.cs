@@ -21,9 +21,6 @@ public class User
     [Column("authMethod")]
     public int AuthMethod { get; set; } = 1;
 
-    [Column("passkey_only")]
-    public bool PasskeyOnly { get; set; }
-
     [Column("password"), MaxLength(128)]
     public string? Password { get; set; }
 

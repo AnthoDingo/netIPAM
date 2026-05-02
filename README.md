@@ -122,7 +122,7 @@ PhpIpamNet/
 | NAT, Racks, PSTN, Circuits | Verticaux indépendants |
 | Custom fields | Métaprogrammation EF Core |
 | Multilingue | Resx + gettext phpIPAM |
-| 2FA / passkeys | Module identité séparé |
+| 2FA | Module identité séparé |
 | Migration depuis MySQL | ETL à écrire |
 
 ## Compatibilité avec une base phpIPAM existante

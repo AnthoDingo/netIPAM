@@ -76,5 +76,4 @@ public class Setting
     [Column("2fa_name"), MaxLength(32)] public string TwoFaName { get; set; } = "phpipam";
     [Column("2fa_length")] public int TwoFaLength { get; set; } = 26;
     [Column("2fa_userchange")] public bool TwoFaUserChange { get; set; } = true;
-    [Column("passkeys")] public bool Passkeys { get; set; } = true;
 }
