@@ -1,0 +1,85 @@
+@page "/admin/users"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
+@inject UserService Users
+@inject NavigationManager Nav
+
+<PageTitle>Users — admin</PageTitle>
+
+<AdminPageHeader Title="Users" Icon="bi bi-people">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/users/new">
+            <i class="bi bi-plus-lg"></i> New user
+        </a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_users is null)
+{
+    <p class="text-muted">Loading…</p>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Real name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last login</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in _users)
+                {
+                    <tr>
+                        <td><strong>@u.Username</strong></td>
+                        <td>@u.RealName</td>
+                        <td>@u.Email</td>
+                        <td>@(string.IsNullOrEmpty(u.Role) ? "—" : u.Role)</td>
+                        <td>
+                            @if (string.Equals(u.Disabled, "Yes", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <span class="badge bg-danger">Disabled</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                        </td>
+                        <td class="text-muted">@(u.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/users/{u.Id}/edit")" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/users/{u.Id}/password")" title="Reset password">
+                                <i class="bi bi-key"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(u.Id)" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<User>? _users;
+
+    protected override async Task OnInitializedAsync() => await Reload();
+
+    private async Task Reload() => _users = await Users.ListAsync();
+
+    private async Task Delete(int id)
+    {
+        await Users.DeleteAsync(id);
+        await Reload();
+    }
+}

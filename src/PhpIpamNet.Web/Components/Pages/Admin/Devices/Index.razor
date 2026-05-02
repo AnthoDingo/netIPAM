@@ -1,0 +1,66 @@
+@page "/admin/devices"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject DeviceService Devices
+@inject DeviceTypeService Types
+@inject NavigationManager Nav
+
+<PageTitle>Devices — admin</PageTitle>
+
+<AdminPageHeader Title="Devices" Icon="bi bi-router">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/devices/new"><i class="bi bi-plus-lg"></i> New device</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_devices is null) { <p class="text-muted">Loading…</p> }
+else if (_devices.Count == 0)
+{
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No devices yet.</div></div>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Hostname</th><th>IP</th><th>Type</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var d in _devices)
+                {
+                    <tr>
+                        <td><strong>@d.Hostname</strong></td>
+                        <td><code>@FormatIp(d.IpAddr)</code></td>
+                        <td>@_typeName(d.Type ?? 0)</td>
+                        <td class="text-muted">@d.Description</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/devices/{d.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(d.Id)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Device>? _devices;
+    private Dictionary<int, string> _types = new();
+    private Func<int, string> _typeName => id => _types.GetValueOrDefault(id, "—");
+
+    protected override async Task OnInitializedAsync()
+    {
+        var types = await Types.ListAsync();
+        _types = types.ToDictionary(t => t.Tid, t => t.Tname ?? "—");
+        await Reload();
+    }
+
+    private async Task Reload() => _devices = await Devices.ListAsync();
+    private async Task Delete(int id) { await Devices.DeleteAsync(id); await Reload(); }
+
+    private static string FormatIp(string? raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return "";
+        try { var v = IpConverter.GuessVersion(raw); return IpConverter.ToPresentation(raw, v); }
+        catch { return raw; }
+    }
+}

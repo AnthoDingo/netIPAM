@@ -1,0 +1,43 @@
+@page "/admin/devicetypes"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject DeviceTypeService Types
+@inject NavigationManager Nav
+
+<PageTitle>Device types — admin</PageTitle>
+
+<AdminPageHeader Title="Device types" Icon="bi bi-pc-display">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/devicetypes/new"><i class="bi bi-plus-lg"></i> New type</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_types is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var t in _types)
+                {
+                    <tr>
+                        <td><strong>@t.Tname</strong></td>
+                        <td class="text-muted">@t.Tdescription</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/devicetypes/{t.Tid}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(t.Tid)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<DeviceType>? _types;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _types = await Types.ListAsync();
+    private async Task Delete(int id) { await Types.DeleteAsync(id); await Reload(); }
+}

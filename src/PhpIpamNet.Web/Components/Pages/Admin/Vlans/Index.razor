@@ -1,0 +1,49 @@
+@page "/admin/vlans"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject VlanService Vlans
+@inject NavigationManager Nav
+
+<PageTitle>VLANs — admin</PageTitle>
+
+<AdminPageHeader Title="VLANs" Icon="bi bi-tag">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/vlans/new"><i class="bi bi-plus-lg"></i> New VLAN</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_vlans is null) { <p class="text-muted">Loading…</p> }
+else if (_vlans.Count == 0)
+{
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No VLANs defined.</div></div>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Number</th><th>Name</th><th>Domain</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var v in _vlans)
+                {
+                    <tr>
+                        <td><strong>@v.Number</strong></td>
+                        <td>@v.Name</td>
+                        <td class="text-muted">@(v.Domain?.Name ?? "—")</td>
+                        <td class="text-muted">@v.Description</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/vlans/{v.VlanId}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(v.VlanId)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Vlan>? _vlans;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _vlans = await Vlans.ListAsync();
+    private async Task Delete(int id) { await Vlans.DeleteAsync(id); await Reload(); }
+}

@@ -1,0 +1,49 @@
+@page "/admin/groups/new"
+@page "/admin/groups/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@inject UserGroupService Groups
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New group" : "Edit group")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New group" : "Edit group")" Icon="bi bi-people-fill"
+                 BackHref="/admin/groups" BackLabel="Groups" />
+
+<div class="phpipam-card" style="max-width: 640px;">
+    <div class="phpipam-card-body">
+        @if (_group is not null)
+        {
+            <EditForm Model="_group" OnValidSubmit="Save" FormName="grpEdit">
+                <div class="mb-3">
+                    <label class="form-label">Name *</label>
+                    <InputText class="form-control" @bind-Value="_group.GName" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" rows="3" @bind-Value="_group.GDesc" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/groups">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private UserGroup? _group;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _group = _isNew ? new UserGroup() : await Groups.GetAsync(Id!.Value);
+        if (_group is null) Nav.NavigateTo("/admin/groups");
+    }
+
+    private async Task Save()
+    {
+        if (_group is null) return;
+        if (_isNew) await Groups.CreateAsync(_group); else await Groups.UpdateAsync(_group);
+        Nav.NavigateTo("/admin/groups");
+    }
+}

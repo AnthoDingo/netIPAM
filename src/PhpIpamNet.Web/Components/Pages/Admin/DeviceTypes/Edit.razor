@@ -1,0 +1,49 @@
+@page "/admin/devicetypes/new"
+@page "/admin/devicetypes/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inject DeviceTypeService Types
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New type" : "Edit type")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New device type" : "Edit device type")" Icon="bi bi-pc-display"
+                 BackHref="/admin/devicetypes" BackLabel="Device types" />
+
+<div class="phpipam-card" style="max-width: 540px;">
+    <div class="phpipam-card-body">
+        @if (_type is not null)
+        {
+            <EditForm Model="_type" OnValidSubmit="Save" FormName="dtEdit">
+                <div class="mb-3">
+                    <label class="form-label">Name *</label>
+                    <InputText class="form-control" @bind-Value="_type.Tname" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputText class="form-control" @bind-Value="_type.Tdescription" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/devicetypes">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private DeviceType? _type;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _type = _isNew ? new DeviceType() : await Types.GetAsync(Id!.Value);
+        if (_type is null) Nav.NavigateTo("/admin/devicetypes");
+    }
+
+    private async Task Save()
+    {
+        if (_type is null) return;
+        if (_isNew) await Types.CreateAsync(_type); else await Types.UpdateAsync(_type);
+        Nav.NavigateTo("/admin/devicetypes");
+    }
+}

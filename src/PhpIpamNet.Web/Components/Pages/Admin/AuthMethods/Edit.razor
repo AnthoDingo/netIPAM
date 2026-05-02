@@ -1,0 +1,61 @@
+@page "/admin/authmethods/new"
+@page "/admin/authmethods/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@inject AuthMethodService Methods
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New auth method" : "Edit auth method")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New auth method" : "Edit auth method")" Icon="bi bi-shield-lock"
+                 BackHref="/admin/authmethods" BackLabel="Auth methods" />
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_method is not null)
+        {
+            <EditForm Model="_method" OnValidSubmit="Save" FormName="authEdit">
+                <div class="mb-3">
+                    <label class="form-label">Type *</label>
+                    <InputSelect class="form-select" @bind-Value="_method.Type">
+                        <option value="local">local</option>
+                        <option value="http">http</option>
+                        <option value="AD">AD (placeholder)</option>
+                        <option value="LDAP">LDAP (placeholder)</option>
+                        <option value="Radius">Radius (placeholder)</option>
+                        <option value="SAML2">SAML2 (placeholder)</option>
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" rows="2" @bind-Value="_method.Description" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Params (JSON)</label>
+                    <InputTextArea class="form-control font-monospace" rows="6" @bind-Value="_method.Params" />
+                    <small class="text-muted">Provider-specific configuration. Format kept as in phpIPAM.</small>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/authmethods">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private UserAuthMethod? _method;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _method = _isNew ? new UserAuthMethod { Type = "local", Protected = "No" } : await Methods.GetAsync(Id!.Value);
+        if (_method is null) Nav.NavigateTo("/admin/authmethods");
+    }
+
+    private async Task Save()
+    {
+        if (_method is null) return;
+        if (_isNew) await Methods.CreateAsync(_method); else await Methods.UpdateAsync(_method);
+        Nav.NavigateTo("/admin/authmethods");
+    }
+}

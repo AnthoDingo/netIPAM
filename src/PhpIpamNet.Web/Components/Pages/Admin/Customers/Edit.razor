@@ -1,0 +1,89 @@
+@page "/admin/customers/new"
+@page "/admin/customers/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inject CustomerService Customers
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New customer" : "Edit customer")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New customer" : "Edit customer")" Icon="bi bi-building"
+                 BackHref="/admin/customers" BackLabel="Customers" />
+
+<div class="phpipam-card" style="max-width: 760px;">
+    <div class="phpipam-card-body">
+        @if (_customer is not null)
+        {
+            <EditForm Model="_customer" OnValidSubmit="Save" FormName="custEdit">
+                <div class="mb-3">
+                    <label class="form-label">Title *</label>
+                    <InputText class="form-control" @bind-Value="_customer.Title" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <InputText class="form-control" @bind-Value="_customer.Address" />
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Postcode</label>
+                        <InputText class="form-control" @bind-Value="_customer.Postcode" />
+                    </div>
+                    <div class="col-md-5 mb-3">
+                        <label class="form-label">City</label>
+                        <InputText class="form-control" @bind-Value="_customer.City" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">State</label>
+                        <InputText class="form-control" @bind-Value="_customer.State" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Contact name</label>
+                        <InputText class="form-control" @bind-Value="_customer.ContactPerson" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Phone</label>
+                        <InputText class="form-control" @bind-Value="_customer.ContactPhone" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText class="form-control" @bind-Value="_customer.ContactMail" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Status</label>
+                    <InputSelect class="form-select" @bind-Value="_customer.Status">
+                        <option value="Active">Active</option>
+                        <option value="Reserved">Reserved</option>
+                        <option value="Inactive">Inactive</option>
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Note</label>
+                    <InputTextArea class="form-control" rows="3" @bind-Value="_customer.Note" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/customers">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Customer? _customer;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _customer = _isNew ? new Customer { Status = "Active" } : await Customers.GetAsync(Id!.Value);
+        if (_customer is null) Nav.NavigateTo("/admin/customers");
+    }
+
+    private async Task Save()
+    {
+        if (_customer is null) return;
+        if (_isNew) await Customers.CreateAsync(_customer); else await Customers.UpdateAsync(_customer);
+        Nav.NavigateTo("/admin/customers");
+    }
+}

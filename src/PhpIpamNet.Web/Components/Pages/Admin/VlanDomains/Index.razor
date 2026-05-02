@@ -1,0 +1,46 @@
+@page "/admin/l2domains"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject VlanDomainService Domains
+@inject NavigationManager Nav
+
+<PageTitle>L2 domains — admin</PageTitle>
+
+<AdminPageHeader Title="L2 domains" Icon="bi bi-layers">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/l2domains/new"><i class="bi bi-plus-lg"></i> New domain</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_domains is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var d in _domains)
+                {
+                    <tr>
+                        <td><strong>@d.Name</strong> @if (d.Id == 1) { <span class="badge bg-secondary ms-1">default</span> }</td>
+                        <td class="text-muted">@d.Description</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/l2domains/{d.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            @if (d.Id != 1)
+                            {
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(d.Id)"><i class="bi bi-trash"></i></button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<VlanDomain>? _domains;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _domains = await Domains.ListAsync();
+    private async Task Delete(int id) { await Domains.DeleteAsync(id); await Reload(); }
+}

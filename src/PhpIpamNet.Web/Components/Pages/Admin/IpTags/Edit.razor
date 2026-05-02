@@ -1,0 +1,68 @@
+@page "/admin/iptags/new"
+@page "/admin/iptags/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject IpTagService Tags
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New IP tag" : "Edit IP tag")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New IP tag" : "Edit IP tag")" Icon="bi bi-bookmark"
+                 BackHref="/admin/iptags" BackLabel="IP tags" />
+
+<div class="phpipam-card" style="max-width: 640px;">
+    <div class="phpipam-card-body">
+        @if (_tag is not null)
+        {
+            <EditForm Model="_tag" OnValidSubmit="Save" FormName="tagEdit">
+                <div class="mb-3">
+                    <label class="form-label">Type / label *</label>
+                    <InputText class="form-control" @bind-Value="_tag.Type" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Background color</label>
+                        <input type="color" class="form-control form-control-color" @bind="_tag.BgColor" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Foreground color</label>
+                        <input type="color" class="form-control form-control-color" @bind="_tag.FgColor" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Show in lists</label>
+                    <InputSelect class="form-select" @bind-Value="_tag.ShowTag">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </InputSelect>
+                </div>
+                <div class="form-check mb-3">
+                    <InputCheckbox class="form-check-input" id="updateTag" @bind-Value="_tag.UpdateTag" />
+                    <label class="form-check-label" for="updateTag">Update tag for matching IPs automatically</label>
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/iptags">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private IpTag? _tag;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _tag = _isNew ? new IpTag { ShowTag = 1, BgColor = "#3498db", FgColor = "#ffffff", Compress = "No", Locked = "No" }
+                     : await Tags.GetAsync(Id!.Value);
+        if (_tag is null) Nav.NavigateTo("/admin/iptags");
+    }
+
+    private async Task Save()
+    {
+        if (_tag is null) return;
+        if (_isNew) await Tags.CreateAsync(_tag); else await Tags.UpdateAsync(_tag);
+        Nav.NavigateTo("/admin/iptags");
+    }
+}

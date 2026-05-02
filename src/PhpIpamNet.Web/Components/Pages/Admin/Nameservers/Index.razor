@@ -1,0 +1,44 @@
+@page "/admin/nameservers"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject NameserverService Nameservers
+@inject NavigationManager Nav
+
+<PageTitle>Nameservers — admin</PageTitle>
+
+<AdminPageHeader Title="Nameservers" Icon="bi bi-globe">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/nameservers/new"><i class="bi bi-plus-lg"></i> New nameserver</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_nameservers is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Name</th><th>Servers</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var n in _nameservers)
+                {
+                    <tr>
+                        <td><strong>@n.Name</strong></td>
+                        <td><code>@n.Namesrv1</code></td>
+                        <td class="text-muted">@n.Description</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/nameservers/{n.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(n.Id)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Nameserver>? _nameservers;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _nameservers = await Nameservers.ListAsync();
+    private async Task Delete(int id) { await Nameservers.DeleteAsync(id); await Reload(); }
+}

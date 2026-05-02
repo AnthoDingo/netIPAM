@@ -1,0 +1,122 @@
+@page "/admin/users/new"
+@page "/admin/users/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
+@inject UserService Users
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New user" : $"Edit {_user?.Username}")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New user" : "Edit user")"
+                 Icon="bi bi-person"
+                 BackHref="/admin/users" BackLabel="Users" />
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_user is not null)
+        {
+            <EditForm Model="_form" OnValidSubmit="Save" FormName="userEdit">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Username *</label>
+                        <InputText class="form-control" @bind-Value="_user.Username" disabled="@(!_isNew)" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Real name</label>
+                        <InputText class="form-control" @bind-Value="_user.RealName" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <InputText class="form-control" @bind-Value="_user.Email" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Role</label>
+                        <InputSelect class="form-select" @bind-Value="_user.Role">
+                            <option value="">(none)</option>
+                            <option value="Administrator">Administrator</option>
+                            <option value="Operator">Operator</option>
+                            <option value="Guest">Guest</option>
+                        </InputSelect>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Status</label>
+                        <InputSelect class="form-select" @bind-Value="_user.Disabled">
+                            <option value="No">Active</option>
+                            <option value="Yes">Disabled</option>
+                        </InputSelect>
+                    </div>
+                </div>
+
+                @if (_isNew)
+                {
+                    <div class="mb-3">
+                        <label class="form-label">Initial password *</label>
+                        <input type="password" class="form-control" @bind="_form.Password" />
+                        <small class="text-muted">Stored as BCrypt hash. The user can change it after first login.</small>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-danger py-2">@_error</div>
+                }
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Save
+                </button>
+                <a class="btn btn-link" href="/admin/users">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    [SupplyParameterFromForm] private FormModel _form { get; set; } = new();
+    private User? _user;
+    private string? _error;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_isNew)
+            _user = new User { Disabled = "No", AuthMethod = 1 };
+        else
+        {
+            _user = await Users.FindByIdAsync(Id!.Value);
+            if (_user is null) Nav.NavigateTo("/admin/users");
+        }
+    }
+
+    private async Task Save()
+    {
+        if (_user is null) return;
+        _error = null;
+
+        try
+        {
+            if (_isNew)
+            {
+                if (string.IsNullOrWhiteSpace(_form.Password))
+                {
+                    _error = "Password is required.";
+                    return;
+                }
+                await Users.CreateAsync(_user, _form.Password);
+            }
+            else
+            {
+                await Users.UpdateAsync(_user);
+            }
+            Nav.NavigateTo("/admin/users");
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    public class FormModel { public string Password { get; set; } = string.Empty; }
+}

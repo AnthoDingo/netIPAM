@@ -1,0 +1,49 @@
+@page "/admin/groups"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
+@inject UserGroupService Groups
+@inject NavigationManager Nav
+
+<PageTitle>User groups — admin</PageTitle>
+
+<AdminPageHeader Title="User groups" Icon="bi bi-people-fill">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/groups/new">
+            <i class="bi bi-plus-lg"></i> New group
+        </a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_groups is null) { <p class="text-muted">Loading…</p> }
+else if (_groups.Count == 0)
+{
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No groups defined.</div></div>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var g in _groups)
+                {
+                    <tr>
+                        <td><strong>@g.GName</strong></td>
+                        <td class="text-muted">@g.GDesc</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/groups/{g.GId}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(g.GId)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<UserGroup>? _groups;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _groups = await Groups.ListAsync();
+    private async Task Delete(int id) { await Groups.DeleteAsync(id); await Reload(); }
+}

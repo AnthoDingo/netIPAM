@@ -1,0 +1,54 @@
+@page "/admin/authmethods"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
+@inject AuthMethodService Methods
+@inject NavigationManager Nav
+
+<PageTitle>Auth methods — admin</PageTitle>
+
+<AdminPageHeader Title="Authentication methods" Icon="bi bi-shield-lock">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/authmethods/new">
+            <i class="bi bi-plus-lg"></i> New method
+        </a>
+    </Actions>
+</AdminPageHeader>
+
+<div class="alert alert-info small">
+    <i class="bi bi-info-circle me-1"></i>
+    Only the <code>local</code> method is fully implemented. LDAP/AD/SAML/Radius are placeholders for future iterations.
+</div>
+
+@if (_methods is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Type</th><th>Description</th><th>Protected</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var m in _methods)
+                {
+                    <tr>
+                        <td><code>@m.Type</code></td>
+                        <td class="text-muted">@m.Description</td>
+                        <td>@(string.Equals(m.Protected, "Yes", StringComparison.OrdinalIgnoreCase) ? "Yes" : "No")</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/authmethods/{m.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            @if (!string.Equals(m.Protected, "Yes", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(m.Id)"><i class="bi bi-trash"></i></button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<UserAuthMethod>? _methods;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _methods = await Methods.ListAsync();
+    private async Task Delete(int id) { await Methods.DeleteAsync(id); await Reload(); }
+}
