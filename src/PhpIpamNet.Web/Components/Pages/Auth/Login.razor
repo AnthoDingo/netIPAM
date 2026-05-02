@@ -1,0 +1,164 @@
+@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject UserService Users
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpCtx
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@layout EmptyLayout
+
+<PageTitle>Login — PhpIpamNet</PageTitle>
+
+<div class="phpipam-login-bg">
+    <div class="phpipam-login-card">
+        <div class="text-center mb-4">
+            <i class="bi bi-diagram-3-fill" style="font-size: 2.4rem; color: #3498db;"></i>
+            <h1 class="h4 mt-2 mb-0">PhpIpamNet</h1>
+            <small class="text-muted">.NET port of phpIPAM</small>
+        </div>
+
+        @* ── Passkey ── *@
+        @if (_passkeySupported)
+        {
+            <button class="btn btn-outline-primary w-100 mb-3 d-flex align-items-center justify-content-center gap-2"
+                    @onclick="LoginWithPasskey" disabled="@_passkeyLoading">
+                @if (_passkeyLoading)
+                {
+                    <span class="spinner-border spinner-border-sm"></span>
+                }
+                else
+                {
+                    <i class="bi bi-key-fill"></i>
+                }
+                <span>Se connecter avec une passkey</span>
+            </button>
+
+            <div class="d-flex align-items-center my-3">
+                <hr class="flex-grow-1" /><span class="mx-2 text-muted small">ou</span><hr class="flex-grow-1" />
+            </div>
+        }
+
+        @* ── Mot de passe ── *@
+        <EditForm Model="_form" OnValidSubmit="HandleLogin" FormName="login" method="post">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <InputText class="form-control" @bind-Value="_form.Username" autocomplete="username" />
+                <ValidationMessage For="@(() => _form.Username)" class="text-danger small" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <InputText type="password" class="form-control" @bind-Value="_form.Password"
+                           autocomplete="current-password" />
+                <ValidationMessage For="@(() => _form.Password)" class="text-danger small" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <div class="alert alert-danger py-2">@_error</div>
+            }
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign in
+            </button>
+        </EditForm>
+
+        <hr class="my-4" />
+        <div class="text-center text-muted small">
+            Default : Admin / ipamadmin (à changer après init)
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private LoginForm _form { get; set; } = new();
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    private string? _error;
+    private bool _passkeySupported;
+    private bool _passkeyLoading;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                _passkeySupported = await JS.InvokeAsync<bool>("PhpIpamPasskey.isSupported");
+                StateHasChanged();
+            }
+            catch { /* browser ne supporte pas JS interop en SSR statique */ }
+        }
+    }
+
+    // ── Authentification par mot de passe (SSR statique, POST form) ──
+    private async Task HandleLogin()
+    {
+        var user = await Users.AuthenticateLocalAsync(_form.Username, _form.Password);
+        if (user is null) { _error = "Identifiants invalides."; return; }
+
+        var ctx = HttpCtx.HttpContext!;
+        await ctx.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            BuildPrincipal(user));
+
+        Nav.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+    }
+
+    // ── Authentification passkey (JS interop → fetch → cookie → redirect) ──
+    private async Task LoginWithPasskey()
+    {
+        _error         = null;
+        _passkeyLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            // PhpIpamPasskey.authenticate() :
+            //   POST /api/passkey/auth/options → options
+            //   navigator.credentials.get()   → assertion
+            //   POST /api/passkey/auth/complete → cookie posé côté serveur
+            await JS.InvokeVoidAsync("PhpIpamPasskey.authenticate");
+            // Si on arrive ici le cookie est posé — on force le rechargement
+            Nav.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+        }
+        catch (JSException ex)
+        {
+            _error = ex.Message;
+        }
+        catch
+        {
+            _error = "Erreur lors de l'authentification passkey.";
+        }
+        finally
+        {
+            _passkeyLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private static System.Security.Claims.ClaimsPrincipal BuildPrincipal(
+        PhpIpamNet.Domain.Entities.User user)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name,           user.Username),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email,          user.Email ?? string.Empty),
+        };
+        if (!string.IsNullOrEmpty(user.Role))
+            claims.Add(new(ClaimTypes.Role, user.Role));
+
+        return new System.Security.Claims.ClaimsPrincipal(
+            new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+    }
+
+    public class LoginForm
+    {
+        [Required] public string Username { get; set; } = string.Empty;
+        [Required] public string Password { get; set; } = string.Empty;
+    }
+}

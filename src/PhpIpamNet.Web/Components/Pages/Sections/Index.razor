@@ -1,0 +1,79 @@
+@page "/sections"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
+@inject SectionService Sections
+@inject NavigationManager Nav
+
+<PageTitle>Sections — PhpIpamNet</PageTitle>
+
+<div class="d-flex align-items-center justify-content-between mb-3">
+    <h1 class="h3 mb-0"><i class="bi bi-folder2-open me-2"></i>Sections</h1>
+    <a class="btn btn-primary btn-sm" href="/sections/new">
+        <i class="bi bi-plus-lg"></i> New section
+    </a>
+</div>
+
+@if (_sections is null)
+{
+    <p class="text-muted">Loading…</p>
+}
+else if (_sections.Count == 0)
+{
+    <div class="phpipam-card">
+        <div class="phpipam-card-body text-center text-muted py-5">
+            <i class="bi bi-folder2 d-block mb-2" style="font-size: 2rem;"></i>
+            No sections yet. <a href="/sections/new">Create one</a>.
+        </div>
+    </div>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Subnets</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in _sections)
+                {
+                    <tr>
+                        <td>
+                            <a href="@($"/sections/{s.Id}/subnets")" class="text-decoration-none">
+                                <i class="bi bi-folder me-1"></i> @s.Name
+                            </a>
+                        </td>
+                        <td class="text-muted">@s.Description</td>
+                        <td>@(s.Subnets?.Count ?? 0)</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/sections/{s.Id}/edit")">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(s.Id)">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Section>? _sections;
+
+    protected override async Task OnInitializedAsync() => await Reload();
+
+    private async Task Reload() => _sections = await Sections.ListAsync();
+
+    private async Task Delete(int id)
+    {
+        await Sections.DeleteAsync(id);
+        await Reload();
+    }
+}

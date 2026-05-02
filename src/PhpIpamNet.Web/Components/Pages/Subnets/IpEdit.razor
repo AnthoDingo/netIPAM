@@ -1,0 +1,115 @@
+@page "/subnets/{SubnetId:int}/addresses/new"
+@page "/subnets/{SubnetId:int}/addresses/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject IpAddressService Ips
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New IP" : "Edit IP")</PageTitle>
+
+<h1 class="h3 mb-4"><i class="bi bi-hdd-network me-2"></i>@(_isNew ? "New IP address" : "Edit IP address")</h1>
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_ip is not null)
+        {
+            <EditForm Model="_form" OnValidSubmit="Save">
+                <div class="mb-3">
+                    <label class="form-label">IP address *</label>
+                    <input type="text" class="form-control" @bind="_form.Address" placeholder="192.168.1.10" />
+                </div>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">Hostname</label>
+                        <InputText class="form-control" @bind-Value="_ip.Hostname" />
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">State</label>
+                        <InputSelect class="form-select" @bind-Value="_ip.State">
+                            <option value="0">Offline</option>
+                            <option value="1">Active</option>
+                            <option value="2">Used</option>
+                            <option value="3">Reserved</option>
+                            <option value="4">DHCP</option>
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputText class="form-control" @bind-Value="_ip.Description" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">MAC</label>
+                        <InputText class="form-control" @bind-Value="_ip.Mac" placeholder="aa:bb:cc:dd:ee:ff" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Owner</label>
+                        <InputText class="form-control" @bind-Value="_ip.Owner" />
+                    </div>
+                </div>
+                <div class="form-check mb-3">
+                    <InputCheckbox class="form-check-input" id="gw" @bind-Value="_ip.IsGateway" />
+                    <label class="form-check-label" for="gw">Gateway</label>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Note</label>
+                    <InputTextArea class="form-control" rows="2" @bind-Value="_ip.Note" />
+                </div>
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-danger py-2">@_error</div>
+                }
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Save
+                </button>
+                <a class="btn btn-link" href="@($"/subnets/{SubnetId}")">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int SubnetId { get; set; }
+    [Parameter] public int? Id { get; set; }
+    private IpAddress? _ip;
+    private FormModel _form = new();
+    private string? _error;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_isNew)
+        {
+            _ip = new IpAddress { SubnetId = SubnetId, State = 2 };
+        }
+        else
+        {
+            _ip = await Ips.GetAsync(Id!.Value);
+            if (_ip is null) { Nav.NavigateTo($"/subnets/{SubnetId}"); return; }
+            try
+            {
+                var v = IpConverter.GuessVersion(_ip.IpAddr);
+                _form.Address = IpConverter.ToPresentation(_ip.IpAddr, v);
+            }
+            catch { _form.Address = _ip.IpAddr; }
+        }
+    }
+
+    private async Task Save()
+    {
+        if (_ip is null) return;
+        _error = null;
+        if (string.IsNullOrWhiteSpace(_form.Address)) { _error = "IP required."; return; }
+        try { _ip.IpAddr = IpConverter.ToDecimal(_form.Address); }
+        catch (Exception ex) { _error = ex.Message; return; }
+
+        if (_isNew) await Ips.CreateAsync(_ip);
+        else await Ips.UpdateAsync(_ip);
+
+        Nav.NavigateTo($"/subnets/{SubnetId}");
+    }
+
+    public class FormModel { public string Address { get; set; } = string.Empty; }
+}

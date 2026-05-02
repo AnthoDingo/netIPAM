@@ -1,0 +1,239 @@
+/* PhpIpamNet — UI faithful-ish to phpIPAM admin look (sidebar + main) */
+
+:root {
+    --pi-bg: #f5f6f8;
+    --pi-sidebar-bg: #2c3e50;
+    --pi-sidebar-fg: #c5cfdb;
+    --pi-sidebar-active: #3498db;
+    --pi-sidebar-hover: #34495e;
+    --pi-topbar-bg: #ffffff;
+    --pi-border: #e1e4e8;
+    --pi-accent: #3498db;
+}
+
+html, body { height: 100%; }
+body { background: var(--pi-bg); font-size: 0.92rem; }
+
+.phpipam-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ---- Sidebar ---- */
+.phpipam-sidebar {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--pi-sidebar-bg);
+    color: var(--pi-sidebar-fg);
+    display: flex;
+    flex-direction: column;
+}
+
+.phpipam-brand {
+    padding: 18px 20px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.phpipam-brand i { color: var(--pi-accent); }
+
+.phpipam-nav {
+    flex: 1;
+    padding: 12px 0;
+    overflow-y: auto;
+}
+
+.phpipam-nav-section {
+    padding: 14px 20px 6px;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.phpipam-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 20px;
+    color: var(--pi-sidebar-fg);
+    text-decoration: none;
+    font-size: 0.92rem;
+    border-left: 3px solid transparent;
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.phpipam-nav-item:hover {
+    background: var(--pi-sidebar-hover);
+    color: #fff;
+}
+
+.phpipam-nav-item.active {
+    background: var(--pi-sidebar-hover);
+    color: #fff;
+    border-left-color: var(--pi-sidebar-active);
+}
+
+.phpipam-nav-item i { width: 18px; text-align: center; }
+
+.phpipam-sidebar-footer {
+    padding: 14px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ---- Main / topbar / content ---- */
+.phpipam-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.phpipam-topbar {
+    height: 52px;
+    background: var(--pi-topbar-bg);
+    border-bottom: 1px solid var(--pi-border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+}
+
+.phpipam-content { padding: 24px; flex: 1; }
+
+/* ---- Cards / blocks ---- */
+.phpipam-card {
+    background: #fff;
+    border: 1px solid var(--pi-border);
+    border-radius: 4px;
+    margin-bottom: 18px;
+}
+
+.phpipam-card-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--pi-border);
+    font-weight: 600;
+    background: #fafbfc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.phpipam-card-body { padding: 16px; }
+
+/* ---- Stat tiles (dashboard) ---- */
+.phpipam-stat {
+    background: #fff;
+    border: 1px solid var(--pi-border);
+    border-radius: 4px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.phpipam-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    color: #fff;
+    background: var(--pi-accent);
+    flex-shrink: 0;
+}
+
+.phpipam-stat-value { font-size: 1.6rem; font-weight: 600; line-height: 1; }
+.phpipam-stat-label { color: #6c757d; font-size: 0.85rem; }
+
+/* ---- Tables ---- */
+.phpipam-table {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--pi-border);
+}
+
+.phpipam-table th {
+    background: #fafbfc;
+    border-bottom: 1px solid var(--pi-border);
+    padding: 10px 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #586069;
+}
+
+.phpipam-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--pi-border);
+}
+
+.phpipam-table tr:last-child td { border-bottom: none; }
+.phpipam-table tr:hover td { background: #f8f9fa; }
+
+/* ---- Login screen ---- */
+.phpipam-login-bg {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+}
+
+.phpipam-login-card {
+    width: 380px;
+    max-width: 95vw;
+    background: #fff;
+    border-radius: 6px;
+    padding: 32px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* ---- Usage bars ---- */
+.phpipam-usage {
+    width: 100%;
+    height: 18px;
+    background: #ecf0f1;
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+}
+
+.phpipam-usage-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2ecc71 0%, #27ae60 100%);
+    transition: width 0.3s ease;
+}
+
+.phpipam-usage-fill.warn { background: linear-gradient(90deg, #f39c12 0%, #e67e22 100%); }
+.phpipam-usage-fill.crit { background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%); }
+
+.phpipam-usage-label {
+    position: absolute;
+    left: 0; right: 0; top: 0; bottom: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 600;
+    color: #2c3e50;
+}
+
+/* ---- State pills ---- */
+.phpipam-state {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+}
+.phpipam-state-offline  { background: #f59c99; }
+.phpipam-state-active   { background: #2ecc71; }
+.phpipam-state-used     { background: #a9c9a4; }
+.phpipam-state-reserved { background: #9ac0cd; }
+.phpipam-state-dhcp     { background: #95a5a6; }

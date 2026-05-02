@@ -1,0 +1,427 @@
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace PhpIpamNet.Migrations.SqlServer.Migrations;
+
+/// <inheritdoc />
+public partial class InitialCreate : Migration
+{
+    /// <inheritdoc />
+    protected override void Up(MigrationBuilder mb)
+    {
+        // ===== Tables sans dépendances =====
+
+        mb.CreateTable("customers", t => new
+        {
+            id            = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            title         = t.Column<string>(maxLength: 128, nullable: false),
+            address       = t.Column<string>(maxLength: 255, nullable: true),
+            postcode      = t.Column<string>(maxLength: 32,  nullable: true),
+            city          = t.Column<string>(maxLength: 255, nullable: true),
+            state         = t.Column<string>(maxLength: 255, nullable: true),
+            lat           = t.Column<string>(maxLength: 31,  nullable: true),
+            @long         = t.Column<string>(name: "long", maxLength: 31, nullable: true),
+            contact_person = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            contact_phone = t.Column<string>(maxLength: 32,  nullable: true),
+            contact_mail  = t.Column<string>(maxLength: 254, nullable: true),
+            note          = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            status        = t.Column<string>(maxLength: 16,  nullable: true, defaultValue: "Active"),
+        }, c => c.PrimaryKey("PK_customers", x => x.id));
+        mb.CreateIndex("IX_customers_title", "customers", "title", unique: true);
+
+        mb.CreateTable("sections", t => new
+        {
+            id              = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            name            = t.Column<string>(maxLength: 128, nullable: false),
+            description     = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            masterSection   = t.Column<int>(nullable: true, defaultValue: 0),
+            permissions     = t.Column<string>(maxLength: 1024, nullable: true),
+            strictMode      = t.Column<bool>(nullable: false, defaultValue: true),
+            subnetOrdering  = t.Column<string>(maxLength: 16,  nullable: true),
+            order           = t.Column<int>(nullable: true),
+            editDate        = t.Column<DateTime>(nullable: true),
+            showSubnet      = t.Column<bool>(nullable: false, defaultValue: true),
+            showVLAN        = t.Column<bool>(nullable: false, defaultValue: false),
+            showVRF         = t.Column<bool>(nullable: false, defaultValue: false),
+            showSupernetOnly = t.Column<bool>(nullable: false, defaultValue: false),
+            DNS             = t.Column<string>(maxLength: 128, nullable: true),
+        }, c => c.PrimaryKey("PK_sections", x => x.id));
+        mb.CreateIndex("IX_sections_name", "sections", "name", unique: true);
+
+        mb.CreateTable("vlanDomains", t => new
+        {
+            id          = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            name        = t.Column<string>(maxLength: 64,   nullable: true),
+            description = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            permissions = t.Column<string>(maxLength: 128,  nullable: true),
+        }, c => c.PrimaryKey("PK_vlanDomains", x => x.id));
+
+        mb.CreateTable("deviceTypes", t => new
+        {
+            tid          = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            tname        = t.Column<string>(maxLength: 128, nullable: true),
+            tdescription = t.Column<string>(maxLength: 128, nullable: true),
+        }, c => c.PrimaryKey("PK_deviceTypes", x => x.tid));
+
+        mb.CreateTable("nameservers", t => new
+        {
+            id          = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            name        = t.Column<string>(maxLength: 255, nullable: false),
+            namesrv1    = t.Column<string>(maxLength: 255, nullable: true),
+            description = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            permissions = t.Column<string>(maxLength: 128, nullable: true),
+            editDate    = t.Column<DateTime>(nullable: true),
+        }, c => c.PrimaryKey("PK_nameservers", x => x.id));
+
+        mb.CreateTable("locations", t => new
+        {
+            id          = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            name        = t.Column<string>(maxLength: 128, nullable: false),
+            description = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            address     = t.Column<string>(maxLength: 128, nullable: true),
+            lat         = t.Column<string>(maxLength: 31,  nullable: true),
+            @long       = t.Column<string>(name: "long", maxLength: 31, nullable: true),
+        }, c => c.PrimaryKey("PK_locations", x => x.id));
+
+        mb.CreateTable("ipTags", t => new
+        {
+            id        = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            type      = t.Column<string>(maxLength: 32, nullable: true),
+            showtag   = t.Column<byte>(nullable: false, defaultValue: (byte)1),
+            bgcolor   = t.Column<string>(maxLength: 7,  nullable: true, defaultValue: "#000"),
+            fgcolor   = t.Column<string>(maxLength: 7,  nullable: true, defaultValue: "#fff"),
+            compress  = t.Column<string>(maxLength: 3,  nullable: false, defaultValue: "No"),
+            locked    = t.Column<string>(maxLength: 3,  nullable: false, defaultValue: "No"),
+            updateTag = t.Column<bool>(nullable: false, defaultValue: false),
+        }, c => c.PrimaryKey("PK_ipTags", x => x.id));
+
+        mb.CreateTable("logs", t => new
+        {
+            id       = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            severity = t.Column<int>(nullable: true),
+            date     = t.Column<string>(maxLength: 32,  nullable: true),
+            username = t.Column<string>(maxLength: 255, nullable: true),
+            ipaddr   = t.Column<string>(maxLength: 64,  nullable: true),
+            command  = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            details  = t.Column<string>(type: "nvarchar(max)", nullable: true),
+        }, c => c.PrimaryKey("PK_logs", x => x.id));
+
+        mb.CreateTable("requests", t => new
+        {
+            id           = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            subnetId     = t.Column<int>(nullable: true),
+            ip_addr      = t.Column<string>(maxLength: 100, nullable: true),
+            description  = t.Column<string>(maxLength: 64,  nullable: true),
+            mac          = t.Column<string>(maxLength: 20,  nullable: true),
+            hostname     = t.Column<string>(maxLength: 255, nullable: true),
+            state        = t.Column<int>(nullable: true, defaultValue: 2),
+            owner        = t.Column<string>(maxLength: 128, nullable: true),
+            requester    = t.Column<string>(maxLength: 128, nullable: true),
+            comment      = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            processed    = t.Column<byte>(nullable: true),
+            accepted     = t.Column<byte>(nullable: true),
+            adminComment = t.Column<string>(type: "nvarchar(max)", nullable: true),
+        }, c => c.PrimaryKey("PK_requests", x => x.id));
+
+        mb.CreateTable("settings", t => new
+        {
+            id                  = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            siteTitle           = t.Column<string>(maxLength: 64,   nullable: true),
+            siteAdminName       = t.Column<string>(maxLength: 64,   nullable: true),
+            siteAdminMail       = t.Column<string>(maxLength: 254,  nullable: true),
+            siteDomain          = t.Column<string>(maxLength: 32,   nullable: true),
+            siteURL             = t.Column<string>(maxLength: 64,   nullable: true),
+            siteLoginText       = t.Column<string>(maxLength: 128,  nullable: true),
+            domainAuth          = t.Column<bool>(nullable: false, defaultValue: false),
+            enableIPrequests    = t.Column<bool>(nullable: false, defaultValue: false),
+            enableVRF           = t.Column<bool>(nullable: false, defaultValue: true),
+            enableDNSresolving  = t.Column<bool>(nullable: false, defaultValue: false),
+            enableFirewallZones = t.Column<bool>(nullable: false, defaultValue: false),
+            enablePowerDNS      = t.Column<bool>(nullable: false, defaultValue: false),
+            enableDHCP          = t.Column<bool>(nullable: false, defaultValue: false),
+            enableMulticast     = t.Column<bool>(nullable: false, defaultValue: false),
+            enableNAT           = t.Column<bool>(nullable: false, defaultValue: true),
+            enableSNMP          = t.Column<bool>(nullable: false, defaultValue: false),
+            enableThreshold     = t.Column<bool>(nullable: false, defaultValue: true),
+            enableRACK          = t.Column<bool>(nullable: false, defaultValue: true),
+            enableLocations     = t.Column<bool>(nullable: false, defaultValue: true),
+            enablePSTN          = t.Column<bool>(nullable: false, defaultValue: false),
+            enableChangelog     = t.Column<bool>(nullable: false, defaultValue: true),
+            enableCustomers     = t.Column<bool>(nullable: false, defaultValue: true),
+            enableVaults        = t.Column<bool>(nullable: false, defaultValue: true),
+            link_field          = t.Column<string>(maxLength: 32, nullable: true, defaultValue: "0"),
+            version             = t.Column<string>(maxLength: 5,  nullable: true),
+            dbversion           = t.Column<int>(nullable: false, defaultValue: 0),
+            dbverified          = t.Column<bool>(nullable: false, defaultValue: false),
+            donate              = t.Column<bool>(nullable: false, defaultValue: false),
+            IPfilter            = t.Column<string>(maxLength: 128, nullable: true),
+            IPrequired          = t.Column<string>(maxLength: 128, nullable: true),
+            vlanDuplicate       = t.Column<int>(nullable: false, defaultValue: 0),
+            vlanMax             = t.Column<int>(nullable: false, defaultValue: 4096),
+            subnetOrdering      = t.Column<string>(maxLength: 16, nullable: true, defaultValue: "subnet,asc"),
+            visualLimit         = t.Column<int>(nullable: false, defaultValue: 0),
+            theme               = t.Column<string>(maxLength: 32, nullable: false, defaultValue: "dark"),
+            autoSuggestNetwork  = t.Column<bool>(nullable: false, defaultValue: false),
+            pingStatus          = t.Column<string>(maxLength: 32, nullable: false, defaultValue: "1800;3600"),
+            defaultLang         = t.Column<int>(nullable: true),
+            editDate            = t.Column<DateTime>(nullable: true),
+            vcheckDate          = t.Column<DateTime>(nullable: true),
+            api                 = t.Column<bool>(nullable: false, defaultValue: false),
+            scanPingPath        = t.Column<string>(maxLength: 64, nullable: true, defaultValue: "/bin/ping"),
+            scanFPingPath       = t.Column<string>(maxLength: 64, nullable: true, defaultValue: "/bin/fping"),
+            scanPingType        = t.Column<string>(maxLength: 8,  nullable: false, defaultValue: "ping"),
+            scanMaxThreads      = t.Column<int>(nullable: false, defaultValue: 128),
+            prettyLinks         = t.Column<string>(maxLength: 3,  nullable: false, defaultValue: "No"),
+            hiddenCustomFields  = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            inactivityTimeout   = t.Column<int>(nullable: false, defaultValue: 3600),
+            updateTags          = t.Column<bool>(nullable: false, defaultValue: false),
+            enforceUnique       = t.Column<bool>(nullable: false, defaultValue: true),
+            authmigrated        = t.Column<byte>(nullable: false, defaultValue: (byte)0),
+            maintaneanceMode    = t.Column<bool>(nullable: false, defaultValue: false),
+            decodeMAC           = t.Column<bool>(nullable: false, defaultValue: true),
+            tempShare           = t.Column<bool>(nullable: false, defaultValue: false),
+            tempAccess          = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            log                 = t.Column<string>(maxLength: 8, nullable: false, defaultValue: "Database"),
+            subnetView          = t.Column<byte>(nullable: false, defaultValue: (byte)0),
+            enableCircuits      = t.Column<bool>(nullable: false, defaultValue: true),
+            enableRouting       = t.Column<bool>(nullable: false, defaultValue: false),
+            permissionPropagate = t.Column<bool>(nullable: false, defaultValue: true),
+            passwordPolicy      = t.Column<string>(maxLength: 1024, nullable: true),
+            twofa_provider      = t.Column<string>(name: "2fa_provider", maxLength: 24, nullable: false, defaultValue: "none"),
+            twofa_name          = t.Column<string>(name: "2fa_name", maxLength: 32, nullable: false, defaultValue: "phpipam"),
+            twofa_length        = t.Column<int>(name: "2fa_length", nullable: false, defaultValue: 26),
+            twofa_userchange    = t.Column<bool>(name: "2fa_userchange", nullable: false, defaultValue: true),
+            passkeys            = t.Column<bool>(nullable: false, defaultValue: true),
+        }, c => c.PrimaryKey("PK_settings", x => x.id));
+
+        mb.CreateTable("changelog", t => new
+        {
+            cid     = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            ctype   = t.Column<string>(maxLength: 16, nullable: false, defaultValue: ""),
+            coid    = t.Column<int>(nullable: false),
+            cuser   = t.Column<int>(nullable: false),
+            caction = t.Column<string>(maxLength: 16, nullable: false, defaultValue: "edit"),
+            cresult = t.Column<string>(maxLength: 8,  nullable: false, defaultValue: "success"),
+            cdate   = t.Column<DateTime>(nullable: false),
+            cdiff   = t.Column<string>(type: "nvarchar(max)", nullable: true),
+        }, c => c.PrimaryKey("PK_changelog", x => x.cid));
+        mb.CreateIndex("IX_changelog_coid",  "changelog", "coid");
+        mb.CreateIndex("IX_changelog_ctype", "changelog", "ctype");
+
+        mb.CreateTable("userGroups", t => new
+        {
+            g_id     = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            g_name   = t.Column<string>(maxLength: 32,   nullable: true),
+            g_desc   = t.Column<string>(maxLength: 1024, nullable: true),
+            editDate = t.Column<DateTime>(nullable: true),
+        }, c => c.PrimaryKey("PK_userGroups", x => x.g_id));
+
+        mb.CreateTable("usersAuthMethod", t => new
+        {
+            id          = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            type        = t.Column<string>(maxLength: 16, nullable: false, defaultValue: "local"),
+            @params     = t.Column<string>(name: "params", type: "nvarchar(max)", nullable: true),
+            @protected  = t.Column<string>(name: "protected", maxLength: 3, nullable: false, defaultValue: "Yes"),
+            description = t.Column<string>(type: "nvarchar(max)", nullable: true),
+        }, c => c.PrimaryKey("PK_usersAuthMethod", x => x.id));
+
+        mb.CreateTable("users", t => new
+        {
+            id                = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            username          = t.Column<string>(maxLength: 255, nullable: false),
+            authMethod        = t.Column<int>(nullable: false, defaultValue: 1),
+            passkey_only      = t.Column<bool>(nullable: false, defaultValue: false),
+            password          = t.Column<string>(maxLength: 128, nullable: true),
+            groups            = t.Column<string>(maxLength: 1024, nullable: true),
+            role              = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            real_name         = t.Column<string>(maxLength: 128, nullable: true),
+            email             = t.Column<string>(maxLength: 254, nullable: true),
+            domainUser        = t.Column<bool>(nullable: false, defaultValue: false),
+            widgets           = t.Column<string>(maxLength: 1024, nullable: true,
+                                                 defaultValue: "statistics;favourite_subnets;changelog;top10_hosts_v4"),
+            lang              = t.Column<int>(nullable: true, defaultValue: 9),
+            favourite_subnets = t.Column<string>(maxLength: 1024, nullable: true),
+            disabled          = t.Column<string>(maxLength: 3, nullable: false, defaultValue: "No"),
+            mailNotify        = t.Column<string>(maxLength: 3, nullable: false, defaultValue: "No"),
+            mailChangelog     = t.Column<string>(maxLength: 3, nullable: false, defaultValue: "No"),
+            passChange        = t.Column<string>(maxLength: 3, nullable: false, defaultValue: "No"),
+            editDate          = t.Column<DateTime>(nullable: true),
+            lastLogin         = t.Column<DateTime>(nullable: true),
+            lastActivity      = t.Column<DateTime>(nullable: true),
+            compressOverride  = t.Column<string>(maxLength: 16, nullable: false, defaultValue: "default"),
+            hideFreeRange     = t.Column<bool>(nullable: false, defaultValue: false),
+            menuType          = t.Column<string>(maxLength: 8,  nullable: false, defaultValue: "Dynamic"),
+            menuCompact       = t.Column<bool>(nullable: false, defaultValue: true),
+            twofa             = t.Column<bool>(name: "2fa", nullable: false, defaultValue: false),
+            twofa_secret      = t.Column<string>(name: "2fa_secret", maxLength: 32, nullable: true),
+            theme             = t.Column<string>(maxLength: 32, nullable: true),
+            token             = t.Column<string>(maxLength: 24, nullable: true),
+            token_valid_until = t.Column<DateTime>(nullable: true),
+            module_permissions = t.Column<string>(maxLength: 255, nullable: false,
+                defaultValue: "{\"vlan\":\"1\",\"l2dom\":\"1\",\"vrf\":\"1\",\"pdns\":\"1\",\"circuits\":\"1\",\"racks\":\"1\",\"nat\":\"1\",\"pstn\":\"1\",\"customers\":\"1\",\"locations\":\"1\",\"devices\":\"1\",\"routing\":\"1\",\"vaults\":\"1\"}"),
+            compress_actions  = t.Column<bool>(nullable: false, defaultValue: true),
+        }, c => c.PrimaryKey("PK_users", x => x.id));
+        mb.CreateIndex("IX_users_username", "users", "username", unique: true);
+
+        // ===== Tables avec FKs =====
+
+        mb.CreateTable("vlans", t => new
+        {
+            vlanId      = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            domainId    = t.Column<int>(nullable: false, defaultValue: 1),
+            name        = t.Column<string>(maxLength: 255, nullable: false),
+            number      = t.Column<int>(nullable: true),
+            description = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            editDate    = t.Column<DateTime>(nullable: true),
+            customer_id = t.Column<int>(nullable: true),
+        }, c =>
+        {
+            c.PrimaryKey("PK_vlans", x => x.vlanId);
+            c.ForeignKey("FK_vlans_vlanDomains", x => x.domainId, "vlanDomains", "id", onDelete: ReferentialAction.Restrict);
+            c.ForeignKey("FK_vlans_customers",   x => x.customer_id, "customers", "id", onDelete: ReferentialAction.SetNull);
+        });
+
+        mb.CreateTable("vrf", t => new
+        {
+            vrfId       = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            name        = t.Column<string>(maxLength: 32,  nullable: false),
+            rd          = t.Column<string>(maxLength: 32,  nullable: true),
+            description = t.Column<string>(maxLength: 256, nullable: true),
+            sections    = t.Column<string>(maxLength: 128, nullable: true),
+            editDate    = t.Column<DateTime>(nullable: true),
+            customer_id = t.Column<int>(nullable: true),
+        }, c =>
+        {
+            c.PrimaryKey("PK_vrf", x => x.vrfId);
+            c.ForeignKey("FK_vrf_customers", x => x.customer_id, "customers", "id", onDelete: ReferentialAction.SetNull);
+        });
+
+        mb.CreateTable("devices", t => new
+        {
+            id                    = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            hostname              = t.Column<string>(maxLength: 255, nullable: true),
+            ip_addr               = t.Column<string>(maxLength: 100, nullable: true),
+            type                  = t.Column<int>(nullable: true, defaultValue: 0),
+            description           = t.Column<string>(maxLength: 256, nullable: true),
+            sections              = t.Column<string>(maxLength: 1024, nullable: true),
+            snmp_community        = t.Column<string>(maxLength: 100, nullable: true),
+            snmp_version          = t.Column<string>(maxLength: 2, nullable: true, defaultValue: "0"),
+            snmp_port             = t.Column<int>(nullable: true, defaultValue: 161),
+            snmp_timeout          = t.Column<int>(nullable: true, defaultValue: 1000),
+            snmp_queries          = t.Column<string>(maxLength: 128, nullable: true),
+            snmp_v3_sec_level     = t.Column<string>(maxLength: 16, nullable: true, defaultValue: "none"),
+            snmp_v3_auth_protocol = t.Column<string>(maxLength: 8,  nullable: true, defaultValue: "none"),
+            snmp_v3_auth_pass     = t.Column<string>(maxLength: 64, nullable: true),
+            snmp_v3_priv_protocol = t.Column<string>(maxLength: 8,  nullable: true, defaultValue: "none"),
+            snmp_v3_priv_pass     = t.Column<string>(maxLength: 64, nullable: true),
+            snmp_v3_ctx_name      = t.Column<string>(maxLength: 64, nullable: true),
+            snmp_v3_ctx_engine_id = t.Column<string>(maxLength: 64, nullable: true),
+            rack                  = t.Column<int>(nullable: true),
+            rack_start            = t.Column<int>(nullable: true),
+            rack_size             = t.Column<int>(nullable: true),
+            location              = t.Column<int>(nullable: true),
+            editDate              = t.Column<DateTime>(nullable: true),
+        }, c => c.PrimaryKey("PK_devices", x => x.id));
+        mb.CreateIndex("IX_devices_hostname", "devices", "hostname");
+
+        mb.CreateTable("subnets", t => new
+        {
+            id                    = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            subnet                = t.Column<string>(maxLength: 255, nullable: true),
+            mask                  = t.Column<string>(maxLength: 3,   nullable: true),
+            sectionId             = t.Column<int>(nullable: true),
+            description           = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            linked_subnet         = t.Column<int>(nullable: true),
+            firewallAddressObject = t.Column<string>(maxLength: 100, nullable: true),
+            vrfId                 = t.Column<int>(nullable: true),
+            masterSubnetId        = t.Column<int>(nullable: false, defaultValue: 0),
+            allowRequests         = t.Column<bool>(nullable: false, defaultValue: false),
+            vlanId                = t.Column<int>(nullable: true),
+            showName              = t.Column<bool>(nullable: false, defaultValue: false),
+            device                = t.Column<int>(nullable: true, defaultValue: 0),
+            permissions           = t.Column<string>(maxLength: 1024, nullable: true),
+            pingSubnet            = t.Column<bool>(nullable: false, defaultValue: false),
+            discoverSubnet        = t.Column<bool>(nullable: false, defaultValue: false),
+            resolveDNS            = t.Column<bool>(nullable: false, defaultValue: false),
+            DNSrecursive          = t.Column<bool>(nullable: false, defaultValue: false),
+            DNSrecords            = t.Column<bool>(nullable: false, defaultValue: false),
+            nameserverId          = t.Column<int>(nullable: true,  defaultValue: 0),
+            scanAgent             = t.Column<int>(nullable: true),
+            customer_id           = t.Column<int>(nullable: true),
+            isFolder              = t.Column<bool>(nullable: false, defaultValue: false),
+            isFull                = t.Column<bool>(nullable: false, defaultValue: false),
+            isPool                = t.Column<bool>(nullable: false, defaultValue: false),
+            state                 = t.Column<int>(nullable: true,  defaultValue: 2),
+            threshold             = t.Column<int>(nullable: true,  defaultValue: 0),
+            location              = t.Column<int>(nullable: true),
+            editDate              = t.Column<DateTime>(nullable: true),
+            lastScan              = t.Column<DateTime>(nullable: true),
+            lastDiscovery         = t.Column<DateTime>(nullable: true),
+        }, c =>
+        {
+            c.PrimaryKey("PK_subnets", x => x.id);
+            c.ForeignKey("FK_subnets_sections",  x => x.sectionId,   "sections", "id",     onDelete: ReferentialAction.SetNull);
+            c.ForeignKey("FK_subnets_vlans",     x => x.vlanId,      "vlans",    "vlanId", onDelete: ReferentialAction.SetNull);
+            c.ForeignKey("FK_subnets_vrf",       x => x.vrfId,       "vrf",      "vrfId",  onDelete: ReferentialAction.SetNull);
+            c.ForeignKey("FK_subnets_customers", x => x.customer_id, "customers","id",     onDelete: ReferentialAction.SetNull);
+        });
+        mb.CreateIndex("IX_subnets_masterSubnetId", "subnets", "masterSubnetId");
+        mb.CreateIndex("IX_subnets_sectionId",      "subnets", "sectionId");
+
+        mb.CreateTable("ipaddresses", t => new
+        {
+            id                    = t.Column<int>(nullable: false).Annotation("SqlServer:Identity", "1, 1"),
+            subnetId              = t.Column<int>(nullable: true),
+            ip_addr               = t.Column<string>(maxLength: 100, nullable: false),
+            is_gateway            = t.Column<bool>(nullable: false, defaultValue: false),
+            description           = t.Column<string>(maxLength: 64,  nullable: true),
+            hostname              = t.Column<string>(maxLength: 255, nullable: true),
+            mac                   = t.Column<string>(maxLength: 20,  nullable: true),
+            owner                 = t.Column<string>(maxLength: 128, nullable: true),
+            state                 = t.Column<int>(nullable: true, defaultValue: 2),
+            @switch               = t.Column<int>(name: "switch", nullable: true),
+            location              = t.Column<int>(nullable: true),
+            port                  = t.Column<string>(maxLength: 32, nullable: true),
+            note                  = t.Column<string>(type: "nvarchar(max)", nullable: true),
+            lastSeen              = t.Column<DateTime>(nullable: true),
+            excludePing           = t.Column<bool>(nullable: false, defaultValue: false),
+            PTRignore             = t.Column<bool>(nullable: false, defaultValue: false),
+            PTR                   = t.Column<int>(nullable: true, defaultValue: 0),
+            firewallAddressObject = t.Column<string>(maxLength: 100, nullable: true),
+            editDate              = t.Column<DateTime>(nullable: true),
+            customer_id           = t.Column<int>(nullable: true),
+        }, c =>
+        {
+            c.PrimaryKey("PK_ipaddresses", x => x.id);
+            c.ForeignKey("FK_ipaddresses_subnets",   x => x.subnetId,    "subnets",   "id", onDelete: ReferentialAction.Cascade);
+            c.ForeignKey("FK_ipaddresses_customers", x => x.customer_id, "customers", "id", onDelete: ReferentialAction.SetNull);
+        });
+        mb.CreateIndex("IX_ipaddresses_ip_subnet", "ipaddresses", new[] { "ip_addr", "subnetId" }, unique: true);
+    }
+
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder mb)
+    {
+        // Suppression dans l'ordre inverse des FKs
+        mb.DropTable("ipaddresses");
+        mb.DropTable("subnets");
+        mb.DropTable("devices");
+        mb.DropTable("vrf");
+        mb.DropTable("vlans");
+        mb.DropTable("users");
+        mb.DropTable("usersAuthMethod");
+        mb.DropTable("userGroups");
+        mb.DropTable("changelog");
+        mb.DropTable("settings");
+        mb.DropTable("requests");
+        mb.DropTable("logs");
+        mb.DropTable("ipTags");
+        mb.DropTable("locations");
+        mb.DropTable("nameservers");
+        mb.DropTable("deviceTypes");
+        mb.DropTable("vlanDomains");
+        mb.DropTable("sections");
+        mb.DropTable("customers");
+    }
+}

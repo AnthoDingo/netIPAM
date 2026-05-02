@@ -1,0 +1,79 @@
+@using Microsoft.AspNetCore.Components.Authorization
+
+<aside class="phpipam-sidebar">
+    <div class="phpipam-brand">
+        <i class="bi bi-diagram-3-fill"></i>
+        <span>PhpIpamNet</span>
+    </div>
+
+    <nav class="phpipam-nav">
+        <NavLink class="phpipam-nav-item" href="" Match="NavLinkMatch.All">
+            <i class="bi bi-speedometer2"></i> <span>Dashboard</span>
+        </NavLink>
+        <NavLink class="phpipam-nav-item" href="sections">
+            <i class="bi bi-folder2-open"></i> <span>Sections</span>
+        </NavLink>
+        <NavLink class="phpipam-nav-item" href="tools/ipcalc">
+            <i class="bi bi-calculator"></i> <span>IP Calculator</span>
+        </NavLink>
+        <NavLink class="phpipam-nav-item" href="profile/passkeys">
+            <i class="bi bi-key-fill"></i> <span>Mes passkeys</span>
+        </NavLink>
+
+        <AuthorizeView Policy="Operator">
+            <div class="phpipam-nav-section">Network</div>
+            <NavLink class="phpipam-nav-item" href="admin/vlans">
+                <i class="bi bi-tag"></i> <span>VLANs</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/l2domains">
+                <i class="bi bi-layers"></i> <span>L2 domains</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/vrfs">
+                <i class="bi bi-share"></i> <span>VRFs</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/devices">
+                <i class="bi bi-router"></i> <span>Devices</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/devicetypes">
+                <i class="bi bi-pc-display"></i> <span>Device types</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/nameservers">
+                <i class="bi bi-globe"></i> <span>Nameservers</span>
+            </NavLink>
+
+            <div class="phpipam-nav-section">Business</div>
+            <NavLink class="phpipam-nav-item" href="admin/customers">
+                <i class="bi bi-building"></i> <span>Customers</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/locations">
+                <i class="bi bi-geo-alt"></i> <span>Locations</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/iptags">
+                <i class="bi bi-bookmark"></i> <span>IP tags</span>
+            </NavLink>
+        </AuthorizeView>
+
+        <AuthorizeView Policy="Admin">
+            <div class="phpipam-nav-section">System</div>
+            <NavLink class="phpipam-nav-item" href="admin/users">
+                <i class="bi bi-people"></i> <span>Users</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/groups">
+                <i class="bi bi-people-fill"></i> <span>Groups</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/authmethods">
+                <i class="bi bi-shield-lock"></i> <span>Auth methods</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/settings">
+                <i class="bi bi-gear"></i> <span>Settings</span>
+            </NavLink>
+            <NavLink class="phpipam-nav-item" href="admin/logs">
+                <i class="bi bi-list-ul"></i> <span>Logs</span>
+            </NavLink>
+        </AuthorizeView>
+    </nav>
+
+    <div class="phpipam-sidebar-footer">
+        <small class="text-muted">.NET port of phpIPAM</small>
+    </div>
+</aside>
