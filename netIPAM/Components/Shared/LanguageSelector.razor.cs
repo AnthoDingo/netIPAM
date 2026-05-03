@@ -1,6 +1,6 @@
 namespace netIPAM.Components.Shared
 {
-    public partial class LanguageSelector : LocalizedComponentBase
+    public partial class LanguageSelector
     {
         private string CurrentLanguage => Localization.GetCurrentLanguage();
 

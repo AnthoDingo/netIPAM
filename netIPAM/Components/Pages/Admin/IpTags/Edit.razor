@@ -2,6 +2,7 @@
 @page "/admin/iptags/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 <PageTitle>@(_isNew ? "New IP tag" : "Edit IP tag")</PageTitle>
 

@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Groups
 {
-    public partial class Edit : LocalizedComponentBase
+    public partial class Edit
     {
         [Inject]
         private UserGroupService Groups { get; set; } = default!;

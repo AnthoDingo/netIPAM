@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Users
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject]
         private UserService Users { get; set; } = default!;

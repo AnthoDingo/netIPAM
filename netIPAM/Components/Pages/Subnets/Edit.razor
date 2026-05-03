@@ -1,6 +1,7 @@
 @page "/sections/{SectionId:int}/subnets/new"
 @page "/subnets/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inherits LocalizedComponentBase
 
 <PageTitle>@(_isNew ? "New subnet" : "Edit subnet")</PageTitle>
 

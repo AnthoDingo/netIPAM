@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Vlans
 {
-    public partial class Edit : LocalizedComponentBase
+    public partial class Edit
     {
         [Inject]
         private VlanService Vlans { get; set; } = default!;

@@ -2,6 +2,7 @@
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @rendermode InteractiveServer
 @using netIPAM.Components.Shared
+@inherits LocalizedComponentBase
 
 <PageTitle>@(_cidr.Length > 0 ? _cidr : "Subnet")</PageTitle>
 

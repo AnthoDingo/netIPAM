@@ -1,6 +1,7 @@
 @page "/admin/customers/new"
 @page "/admin/customers/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inherits LocalizedComponentBase
 
 <PageTitle>@(_isNew ? "New customer" : "Edit customer")</PageTitle>
 

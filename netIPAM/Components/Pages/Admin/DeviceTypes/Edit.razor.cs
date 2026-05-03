@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.DeviceTypes
 {
-    public partial class Edit : LocalizedComponentBase
+    public partial class Edit
     {
         [Inject]
         private DeviceTypeService Types { get; set; } = default!;

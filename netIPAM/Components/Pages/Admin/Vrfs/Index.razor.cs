@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Vrfs
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject]
         private VrfService Vrfs { get; set; } = default!;

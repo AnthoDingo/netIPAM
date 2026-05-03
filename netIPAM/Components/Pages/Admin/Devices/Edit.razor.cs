@@ -2,7 +2,7 @@
 
 namespace netIPAM.Components.Pages.Admin.Devices
 {
-    public partial class Edit : LocalizedComponentBase
+    public partial class Edit
     {
         [Inject]
         private DeviceService Devices { get; set; } = default!;

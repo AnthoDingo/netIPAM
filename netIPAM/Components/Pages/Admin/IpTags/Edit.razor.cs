@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.IpTags
 {
-    public partial class Edit : LocalizedComponentBase
+    public partial class Edit
     {
         [Inject]
         private IpTagService Tags { get; set; } = default!;

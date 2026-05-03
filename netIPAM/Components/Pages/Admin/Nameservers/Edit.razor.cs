@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Nameservers
 {
-    public partial class Edit : LocalizedComponentBase
+    public partial class Edit
     {
         [Inject]
         private NameserverService Nameservers { get; set; } = default!;

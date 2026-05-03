@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Settings
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject]
         private SettingService SettingsSvc { get; set; } = default!;

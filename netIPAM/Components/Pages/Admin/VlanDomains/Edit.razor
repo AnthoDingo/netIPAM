@@ -1,6 +1,7 @@
 @page "/admin/l2domains/new"
 @page "/admin/l2domains/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inherits LocalizedComponentBase
 
 
 <PageTitle>@(_isNew ? "New L2 domain" : "Edit L2 domain")</PageTitle>

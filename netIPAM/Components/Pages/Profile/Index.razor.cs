@@ -3,7 +3,7 @@ using netIPAM.Identity;
 
 namespace netIPAM.Components.Pages.Profile
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject] private UserService Users { get; set; } = default!;
         [Inject] private IPasswordHasher Hasher { get; set; } = default!;

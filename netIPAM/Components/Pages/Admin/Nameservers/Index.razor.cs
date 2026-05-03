@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Nameservers
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject]
         private NameserverService Nameservers { get; set; } = default!;

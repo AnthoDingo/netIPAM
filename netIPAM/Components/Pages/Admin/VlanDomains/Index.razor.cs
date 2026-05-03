@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.VlanDomains
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject]
         private VlanDomainService Domains { get; set; } = default!;

@@ -2,6 +2,7 @@
 @page "/admin/authmethods/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 <PageTitle>@(_isNew ? "New auth method" : "Edit auth method")</PageTitle>
 

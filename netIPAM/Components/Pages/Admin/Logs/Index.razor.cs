@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Logs
 {
-    public partial class Index : LocalizedComponentBase
+    public partial class Index
     {
         [Inject]
         private LogService Logs { get; set; } = default!;

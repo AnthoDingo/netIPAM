@@ -2,6 +2,7 @@
 @page "/admin/users/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 <PageTitle>@(_isNew ? "New user" : $"Edit {_user?.Username}")</PageTitle>
 

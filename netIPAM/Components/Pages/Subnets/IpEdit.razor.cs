@@ -1,6 +1,6 @@
 namespace netIPAM.Components.Pages.Subnets
 {
-    public partial class IpEdit : LocalizedComponentBase
+    public partial class IpEdit
     {
         [Inject]
         private IpAddressService Ips { get; set; } = default!;
