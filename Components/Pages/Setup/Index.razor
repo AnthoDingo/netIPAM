@@ -1,0 +1,600 @@
+@page "/setup"
+@layout EmptyLayout
+@rendermode InteractiveServer
+@inject SetupService    SetupSvc
+@inject SetupState      SetupState
+@inject IHostApplicationLifetime Lifetime
+@inject NavigationManager Nav
+
+<PageTitle>Installation — netIPAM</PageTitle>
+
+<div class="setup-bg">
+    <div class="setup-card">
+
+        @* ── Header ── *@
+        <div class="setup-header">
+            <svg width="32" height="32" viewBox="0 0 18 18" fill="white">
+                <path d="M1 1h6v6H1zm10 0h6v6h-6zM1 11h6v6H1zm10 2h2v2h2v2h-2v2h-2v-2H9v-2h2z"/>
+            </svg>
+            <div>
+                <div class="setup-title">netIPAM</div>
+                <div class="setup-subtitle">Assistant d'installation</div>
+            </div>
+        </div>
+
+        @* ── Stepper ── *@
+        <div class="setup-stepper">
+            @foreach (var (label, idx) in Steps.Select((l, i) => (l, i)))
+            {
+                <div class="setup-step @(idx == _step ? "active" : idx < _step ? "done" : "")">
+                    <div class="step-num">
+                        @if (idx < _step) { <span>✓</span> } else { <span>@(idx + 1)</span> }
+                    </div>
+                    <span class="step-label">@label</span>
+                </div>
+                @if (idx < Steps.Length - 1)
+                {
+                    <div class="step-sep @(idx < _step ? "done" : "")"></div>
+                }
+            }
+        </div>
+
+        @* ══════════════════════════════════════════════════════════
+           ÉTAPE 0 — Bienvenue
+           ══════════════════════════════════════════════════════════ *@
+        @if (_step == 0)
+        {
+            <div class="setup-body">
+                <h2>Bienvenue dans netIPAM</h2>
+                <p class="text-muted">
+                    Cet assistant va vous guider pour configurer votre instance netIPAM en quelques minutes.
+                </p>
+                <ul class="setup-checklist">
+                    <li><i class="bi bi-database me-2 text-primary"></i>Choisir et connecter votre base de données</li>
+                    <li><i class="bi bi-table me-2 text-primary"></i>Créer le schéma (migrations EF Core)</li>
+                    <li><i class="bi bi-person-circle me-2 text-primary"></i>Créer le compte administrateur</li>
+                </ul>
+                <div class="setup-actions">
+                    <button class="btn btn-primary btn-lg" @onclick="() => _step = 1">
+                        Commencer <i class="bi bi-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+        }
+
+        @* ══════════════════════════════════════════════════════════
+           ÉTAPE 1 — Base de données
+           ══════════════════════════════════════════════════════════ *@
+        else if (_step == 1)
+        {
+            <div class="setup-body">
+                <h2>Configuration de la base de données</h2>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Type de base de données</label>
+                    <div class="setup-db-choice">
+                        <div class="setup-db-option @(_provider == "Sqlite" ? "selected" : "")"
+                             @onclick='() => SelectProvider("Sqlite")'>
+                            <div class="setup-db-icon">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M21 3C21 3 16.5 1 12 1S3 3 3 3v2c0 1 .5 2 2 2.5V20c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7.5C20.5 7 21 6 21 5V3z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">SQLite</div>
+                                <div class="text-muted small">Fichier local · Idéal pour démarrer</div>
+                            </div>
+                            @if (_provider == "Sqlite") { <i class="bi bi-check-circle-fill text-success ms-auto"></i> }
+                        </div>
+
+                        <div class="setup-db-option @(_provider == "SqlServer" ? "selected" : "")"
+                             @onclick='() => SelectProvider("SqlServer")'>
+                            <div class="setup-db-icon sqlserver">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                                    <ellipse cx="12" cy="6" rx="9" ry="3"/>
+                                    <path d="M3 6v4c0 1.66 4 3 9 3s9-1.34 9-3V6"/>
+                                    <path d="M3 10v4c0 1.66 4 3 9 3s9-1.34 9-3v-4"/>
+                                    <path d="M3 14v4c0 1.66 4 3 9 3s9-1.34 9-3v-4"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">SQL Server</div>
+                                <div class="text-muted small">Microsoft SQL Server / LocalDB</div>
+                            </div>
+                            @if (_provider == "SqlServer") { <i class="bi bi-check-circle-fill text-success ms-auto"></i> }
+                        </div>
+                    </div>
+                </div>
+
+                @* Chaîne de connexion *@
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Chaîne de connexion</label>
+
+                    @if (_provider == "Sqlite")
+                    {
+                        <input type="text" class="form-control font-monospace"
+                               @bind="_connectionString" @bind:event="oninput"
+                               placeholder="Data Source=netipam.db" />
+                        <div class="form-text">
+                            Chemin relatif ou absolu vers le fichier SQLite.
+                            <button type="button" class="btn btn-link btn-sm p-0 ms-2"
+                                    @onclick="() => _connectionString = 'Data Source=netipam.db'">
+                                Utiliser la valeur par défaut
+                            </button>
+                        </div>
+                    }
+                    else
+                    {
+                        <input type="text" class="form-control font-monospace"
+                               @bind="_connectionString" @bind:event="oninput"
+                               placeholder="Server=(localdb)\MSSQLLocalDB;Database=netIPAM;Trusted_Connection=True;TrustServerCertificate=True" />
+                        <div class="form-text">
+                            Exemple LocalDB :
+                            <code>Server=(localdb)\MSSQLLocalDB;Database=netIPAM;Trusted_Connection=True;TrustServerCertificate=True</code>
+                        </div>
+                        <div class="mt-2 alert alert-info py-2 small">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Pour SQL Server, la migration initiale doit avoir été générée via
+                            <code>dotnet ef migrations add InitialCreate -o Migrations/SqlServer --namespace netIPAM.Migrations.SqlServer</code>
+                        </div>
+                    }
+                </div>
+
+                @* Résultat du test *@
+                @if (_testResult is not null)
+                {
+                    <div class="alert @(_testResult.Success ? "alert-success" : "alert-danger") py-2 small">
+                        @if (_testResult.Success)
+                        {
+                            <i class="bi bi-check-circle me-1"></i>
+                            <strong>Connexion réussie</strong>
+                            @if (_testResult.Version is not null)
+                            {
+                                <span class="ms-2 text-muted">(@_testResult.Version)</span>
+                            }
+                        }
+                        else
+                        {
+                            <i class="bi bi-x-circle me-1"></i>
+                            <strong>Échec :</strong> @_testResult.Error
+                        }
+                    </div>
+                }
+
+                <div class="setup-actions">
+                    <button class="btn btn-outline-secondary" @onclick="() => { _step = 0; _testResult = null; }">
+                        <i class="bi bi-arrow-left me-1"></i>Retour
+                    </button>
+                    <button class="btn btn-outline-primary" @onclick="TestConnection" disabled="@_testing">
+                        @if (_testing)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-wifi me-1"></i>
+                        }
+                        Tester la connexion
+                    </button>
+                    <button class="btn btn-primary" @onclick="GoToMigrations"
+                            disabled="@(_testResult?.Success != true)">
+                        Suivant <i class="bi bi-arrow-right ms-1"></i>
+                    </button>
+                </div>
+            </div>
+        }
+
+        @* ══════════════════════════════════════════════════════════
+           ÉTAPE 2 — Migrations
+           ══════════════════════════════════════════════════════════ *@
+        else if (_step == 2)
+        {
+            <div class="setup-body">
+                <h2>Création du schéma</h2>
+                <p class="text-muted">
+                    Les migrations EF Core vont créer toutes les tables nécessaires.
+                </p>
+
+                @if (!_migrationsStarted)
+                {
+                    <div class="setup-actions">
+                        <button class="btn btn-outline-secondary" @onclick="() => _step = 1">
+                            <i class="bi bi-arrow-left me-1"></i>Retour
+                        </button>
+                        <button class="btn btn-primary btn-lg" @onclick="ApplyMigrations">
+                            <i class="bi bi-play-fill me-1"></i>Appliquer les migrations
+                        </button>
+                    </div>
+                }
+                else
+                {
+                    <div class="setup-log">
+                        @foreach (var line in _migrationLog)
+                        {
+                            <div class="log-line @(line.StartsWith("✓") ? "ok" : line.StartsWith("❌") ? "err" : "")">
+                                @line
+                            </div>
+                        }
+                        @if (_migrationsRunning)
+                        {
+                            <div class="log-line">
+                                <span class="spinner-border spinner-border-sm me-1"></span>En cours…
+                            </div>
+                        }
+                    </div>
+
+                    @if (_migrationsOk)
+                    {
+                        <div class="setup-actions mt-3">
+                            <button class="btn btn-primary" @onclick="() => _step = 3">
+                                Suivant <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+                    }
+                    else if (!_migrationsRunning)
+                    {
+                        <div class="setup-actions mt-3">
+                            <button class="btn btn-danger" @onclick="RetryMigrations">
+                                <i class="bi bi-arrow-repeat me-1"></i>Réessayer
+                            </button>
+                        </div>
+                    }
+                }
+            </div>
+        }
+
+        @* ══════════════════════════════════════════════════════════
+           ÉTAPE 3 — Compte administrateur
+           ══════════════════════════════════════════════════════════ *@
+        else if (_step == 3)
+        {
+            <div class="setup-body">
+                <h2>Compte administrateur</h2>
+                <p class="text-muted">Créez le premier compte avec les droits administrateur complets.</p>
+
+                <div class="mb-3">
+                    <label class="form-label">Nom d'utilisateur *</label>
+                    <input type="text" class="form-control" @bind="_adminUsername"
+                           placeholder="admin" autocomplete="username" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Adresse e-mail</label>
+                    <input type="email" class="form-control" @bind="_adminEmail"
+                           placeholder="admin@example.com" autocomplete="email" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe *</label>
+                    <input type="password" class="form-control" @bind="_adminPassword"
+                           autocomplete="new-password" />
+                    @if (!string.IsNullOrEmpty(_adminPassword))
+                    {
+                        var strength = PasswordStrength(_adminPassword);
+                        <div class="mt-1">
+                            <div class="progress" style="height:4px">
+                                <div class="progress-bar @strength.css" style="width:@strength.pct%"></div>
+                            </div>
+                            <small class="text-muted">@strength.label</small>
+                        </div>
+                    }
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Confirmer le mot de passe *</label>
+                    <input type="password" class="form-control
+                        @(_adminPassword != _adminPassword2 && !string.IsNullOrEmpty(_adminPassword2) ? "is-invalid" : "")"
+                           @bind="_adminPassword2" autocomplete="new-password" />
+                    @if (_adminPassword != _adminPassword2 && !string.IsNullOrEmpty(_adminPassword2))
+                    {
+                        <div class="invalid-feedback">Les mots de passe ne correspondent pas.</div>
+                    }
+                </div>
+
+                @if (!string.IsNullOrEmpty(_adminError))
+                {
+                    <div class="alert alert-danger py-2 small">@_adminError</div>
+                }
+
+                <div class="setup-actions">
+                    <button class="btn btn-outline-secondary" @onclick="() => _step = 2">
+                        <i class="bi bi-arrow-left me-1"></i>Retour
+                    </button>
+                    <button class="btn btn-primary" @onclick="CreateAdminAndFinish"
+                            disabled="@_creatingAdmin">
+                        @if (_creatingAdmin)
+                        {
+                            <span class="spinner-border spinner-border-sm me-1"></span>
+                        }
+                        <i class="bi bi-check-lg me-1"></i>Terminer l'installation
+                    </button>
+                </div>
+            </div>
+        }
+
+        @* ══════════════════════════════════════════════════════════
+           ÉTAPE 4 — Terminé
+           ══════════════════════════════════════════════════════════ *@
+        else if (_step == 4)
+        {
+            <div class="setup-body text-center">
+                <div class="setup-done-icon">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <h2>Installation terminée !</h2>
+                <p class="text-muted">
+                    La configuration a été enregistrée dans <code>appsettings.json</code>.
+                    L'application va redémarrer pour appliquer les paramètres.
+                </p>
+
+                <div class="setup-summary">
+                    <div><i class="bi bi-database me-2"></i><strong>Provider :</strong> @_provider</div>
+                    <div><i class="bi bi-person me-2"></i><strong>Admin :</strong> @_adminUsername</div>
+                </div>
+
+                <div class="alert alert-info mt-4 text-start small">
+                    <i class="bi bi-arrow-repeat me-1"></i>
+                    L'application s'arrête et redémarre automatiquement.
+                    Vous serez redirigé vers la page de connexion dans <strong>@_countdown secondes</strong>…
+                </div>
+
+                <div class="progress mt-2" style="height:4px">
+                    <div class="progress-bar progress-bar-animated progress-bar-striped bg-success"
+                         style="width:@(100 - _countdown * 100 / 8)%"></div>
+                </div>
+            </div>
+        }
+
+    </div>
+</div>
+
+<style>
+/* ── Setup page ── */
+.setup-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a2a3a 0%, #2c3e50 50%, #1a3a5c 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+}
+.setup-card {
+    width: 680px; max-width: 100%;
+    background: #fff; border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    overflow: hidden;
+}
+.setup-header {
+    background: linear-gradient(135deg, #2c3e50, #3498db);
+    color: #fff; padding: 24px 28px;
+    display: flex; align-items: center; gap: 16px;
+}
+.setup-title    { font-size: 1.4rem; font-weight: 600; }
+.setup-subtitle { font-size: .85rem; opacity: .75; }
+
+/* Stepper */
+.setup-stepper {
+    display: flex; align-items: center; padding: 16px 28px;
+    background: #f8f9fa; border-bottom: 1px solid #e1e4e8;
+}
+.setup-step {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #8a94a6; flex-shrink: 0;
+}
+.setup-step.active { color: #3498db; font-weight: 600; }
+.setup-step.done   { color: #2ecc71; }
+.step-num {
+    width: 24px; height: 24px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+    background: #e1e4e8; color: #8a94a6;
+}
+.setup-step.active .step-num { background: #3498db; color: #fff; }
+.setup-step.done   .step-num { background: #2ecc71; color: #fff; }
+.step-sep { flex: 1; height: 2px; background: #e1e4e8; margin: 0 8px; }
+.step-sep.done { background: #2ecc71; }
+
+/* Body */
+.setup-body { padding: 28px; }
+.setup-body h2 { font-size: 1.3rem; font-weight: 600; margin-bottom: 8px; }
+
+.setup-checklist { list-style: none; padding: 0; margin: 20px 0; }
+.setup-checklist li { padding: 8px 0; font-size: .95rem; border-bottom: 1px solid #f0f0f0; }
+
+.setup-actions { display: flex; gap: 10px; margin-top: 24px; justify-content: flex-end; }
+
+/* DB choice */
+.setup-db-choice { display: flex; flex-direction: column; gap: 10px; margin-bottom: 4px; }
+.setup-db-option {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px; border: 1.5px solid #e1e4e8; border-radius: 8px;
+    cursor: pointer; transition: border-color .15s, background .15s;
+}
+.setup-db-option:hover { border-color: #3498db; background: #f0f7fd; }
+.setup-db-option.selected { border-color: #3498db; background: #eaf4fd; }
+.setup-db-icon {
+    width: 44px; height: 44px; border-radius: 8px; background: #ecf0f1;
+    display: flex; align-items: center; justify-content: center;
+    color: #5a6a7a; flex-shrink: 0;
+}
+.setup-db-icon.sqlserver { background: #fff1e6; color: #e67e22; }
+
+/* Migrations log */
+.setup-log {
+    background: #1e2a35; color: #b2c2cc;
+    border-radius: 6px; padding: 14px 16px;
+    font-family: var(--font-mono, monospace);
+    font-size: 12.5px; line-height: 1.6;
+    max-height: 260px; overflow-y: auto;
+}
+.log-line.ok  { color: #2ecc71; }
+.log-line.err { color: #e74c3c; }
+
+/* Summary */
+.setup-summary {
+    background: #f8f9fa; border-radius: 8px; padding: 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    font-size: .9rem; text-align: left; margin: 16px 0;
+}
+.setup-done-icon { font-size: 4rem; color: #2ecc71; margin-bottom: 12px; }
+</style>
+
+@code {
+    private static readonly string[] Steps = ["Bienvenue", "Base de données", "Schéma", "Administrateur", "Terminé"];
+
+    private int    _step = 0;
+    private string _provider         = "Sqlite";
+    private string _connectionString = "Data Source=netipam.db";
+
+    // Test connexion
+    private bool                _testing;
+    private TestConnectionResult? _testResult;
+
+    // Migrations
+    private bool            _migrationsStarted;
+    private bool            _migrationsRunning;
+    private bool            _migrationsOk;
+    private List<string>    _migrationLog = [];
+
+    // Admin
+    private string _adminUsername = "Admin";
+    private string _adminEmail    = string.Empty;
+    private string _adminPassword  = string.Empty;
+    private string _adminPassword2 = string.Empty;
+    private string? _adminError;
+    private bool   _creatingAdmin;
+
+    // Countdown
+    private int _countdown = 8;
+    private System.Threading.Timer? _timer;
+
+    // ──────────────────────────────────────────────────────────────
+
+    private void SelectProvider(string p)
+    {
+        _provider         = p;
+        _testResult       = null;
+        _connectionString = p == "SqlServer"
+            ? "Server=(localdb)\\MSSQLLocalDB;Database=netIPAM;Trusted_Connection=True;TrustServerCertificate=True"
+            : "Data Source=netipam.db";
+    }
+
+    private async Task TestConnection()
+    {
+        _testing    = true;
+        _testResult = null;
+        StateHasChanged();
+        _testResult = await SetupSvc.TestConnectionAsync(_provider, _connectionString);
+        _testing    = false;
+    }
+
+    private void GoToMigrations()
+    {
+        if (_testResult?.Success == true)
+        {
+            _step             = 2;
+            _migrationsStarted = false;
+            _migrationsOk     = false;
+            _migrationLog     = [];
+        }
+    }
+
+    private async Task ApplyMigrations()
+    {
+        _migrationsStarted = true;
+        _migrationsRunning = true;
+        _migrationsOk      = false;
+        _migrationLog      = [];
+
+        await foreach (var line in SetupSvc.ApplyMigrationsAsync(_provider, _connectionString))
+        {
+            _migrationLog.Add(line);
+            StateHasChanged();
+            await Task.Delay(50); // effet visuel ligne par ligne
+        }
+
+        _migrationsRunning = false;
+        _migrationsOk      = !_migrationLog.Any(l => l.StartsWith("❌"));
+        StateHasChanged();
+    }
+
+    private async Task RetryMigrations()
+    {
+        _migrationsStarted = false;
+        await Task.Delay(100);
+        await ApplyMigrations();
+    }
+
+    private async Task CreateAdminAndFinish()
+    {
+        if (string.IsNullOrWhiteSpace(_adminUsername))
+        {
+            _adminError = "Le nom d'utilisateur est requis.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(_adminPassword))
+        {
+            _adminError = "Le mot de passe est requis.";
+            return;
+        }
+        if (_adminPassword != _adminPassword2)
+        {
+            _adminError = "Les mots de passe ne correspondent pas.";
+            return;
+        }
+
+        _adminError    = null;
+        _creatingAdmin = true;
+        StateHasChanged();
+
+        // Créer le compte admin
+        var error = await SetupSvc.CreateAdminAsync(
+            _provider, _connectionString,
+            _adminUsername, _adminEmail, _adminPassword);
+
+        if (error is not null)
+        {
+            _adminError    = error;
+            _creatingAdmin = false;
+            return;
+        }
+
+        // Écrire appsettings.json
+        SetupSvc.WriteAppSettings(_provider, _connectionString);
+
+        // Marquer comme terminé en mémoire (plus de redirection)
+        SetupState.MarkCompleted();
+
+        _step = 4;
+        _creatingAdmin = false;
+        StateHasChanged();
+
+        // Countdown + arrêt de l'application (redémarrage par le superviseur)
+        _timer = new System.Threading.Timer(_ =>
+        {
+            _countdown--;
+            InvokeAsync(StateHasChanged);
+            if (_countdown <= 0)
+            {
+                _timer?.Dispose();
+                Lifetime.StopApplication();
+            }
+        }, null, 1000, 1000);
+    }
+
+    // Indicateur de force de mot de passe
+    private (string css, int pct, string label) PasswordStrength(string pwd)
+    {
+        int score = 0;
+        if (pwd.Length >= 8)                           score++;
+        if (pwd.Length >= 12)                          score++;
+        if (pwd.Any(char.IsDigit))                     score++;
+        if (pwd.Any(char.IsUpper) && pwd.Any(char.IsLower)) score++;
+        if (pwd.Any(c => "!@#$%^&*()-_=+[]{}|;:,.<>?".Contains(c))) score++;
+
+        return score switch
+        {
+            <= 1 => ("bg-danger",  25, "Faible"),
+            2    => ("bg-warning", 50, "Moyen"),
+            3    => ("bg-info",    75, "Bon"),
+            _    => ("bg-success", 100, "Fort"),
+        };
+    }
+
+    public void Dispose() => _timer?.Dispose();
+}

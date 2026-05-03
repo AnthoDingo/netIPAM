@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
 using netIPAM;
 using netIPAM.Data;
 using netIPAM.Services;
@@ -7,15 +6,25 @@ using netIPAM.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Blazor Server avec rendu interactif côté serveur
+// ── Détection du besoin de setup ─────────────────────────────────
+var setupSvc   = new SetupService(builder.Environment);
+var setupState = new SetupState();
+
+if (setupSvc.IsSetupRequired(builder.Configuration))
+    setupState.MarkRequired();
+
+builder.Services.AddSingleton(setupState);
+builder.Services.AddSingleton<SetupService>();
+
+// ── Blazor ───────────────────────────────────────────────────────
 builder.Services
     .AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Persistence (DbContext + services métier)
+// ── Persistence (InMemory si setup requis, réel sinon) ──────────
 builder.Services.AddPersistence(builder.Configuration);
 
-// Authentification cookie (équivalent ASP.NET Core des sessions PHP)
+// ── Auth cookie ──────────────────────────────────────────────────
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(opt =>
@@ -25,7 +34,7 @@ builder.Services
         opt.AccessDeniedPath  = "/login";
         opt.ExpireTimeSpan    = TimeSpan.FromHours(8);
         opt.SlidingExpiration = true;
-        opt.Cookie.Name       = "phpipamnet.auth";
+        opt.Cookie.Name       = "netipam.auth";
         opt.Cookie.HttpOnly   = true;
         opt.Cookie.SameSite   = SameSiteMode.Lax;
     });
@@ -39,6 +48,7 @@ builder.Services.AddAuthorization(opt =>
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 
+// ── Build ─────────────────────────────────────────────────────────
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -49,6 +59,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+// Middleware setup : doit être avant Antiforgery et Blazor
+app.UseMiddleware<SetupMiddleware>();
+
 app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
@@ -56,12 +70,13 @@ app.UseAuthorization();
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 
-// Migrations + seed au démarrage. À retirer pour les déploiements production stricts.
-using (var scope = app.Services.CreateScope())
+// ── Migrations + seed (uniquement si setup déjà terminé) ─────────
+if (!setupState.SetupRequired)
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+    await app.Services.SeedAsync();
 }
-await app.Services.SeedAsync();
 
 app.Run();

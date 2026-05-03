@@ -12,35 +12,33 @@ public enum DbProvider { SqlServer, Sqlite }
 public static class DependencyInjection
 {
     /// <summary>
-    /// Enregistre le DbContext en sélectionnant le provider via la configuration :
-    ///   "Database:Provider" = "SqlServer" | "Sqlite"
-    ///   "Database:ConnectionString" = ...
-    /// L'assemblage de migrations correspondant est ciblé automatiquement.
+    /// Enregistre le DbContext via une lambda évaluée à chaque création de contexte.
+    /// Cela permet à IConfiguration de recharger appsettings.json après le setup
+    /// sans redémarrer l'application.
+    /// En mode setup (ConnectionString absente), utilise InMemory pour éviter un crash.
     /// </summary>
     public static IServiceCollection AddPersistence(
         this IServiceCollection services,
         IConfiguration config)
     {
-        var providerName = config["Database:Provider"] ?? "Sqlite";
-        var connection = config["Database:ConnectionString"]
-                         ?? throw new InvalidOperationException("Database:ConnectionString is required");
-
-        if (!Enum.TryParse<DbProvider>(providerName, ignoreCase: true, out var provider))
-            throw new InvalidOperationException($"Unknown Database:Provider '{providerName}'");
-
-        services.AddDbContext<AppDbContext>(opt =>
+        services.AddDbContext<AppDbContext>((sp, opt) =>
         {
-            switch (provider)
+            // Lecture live — supporte le rechargement de IConfiguration après setup
+            var cfg        = sp.GetRequiredService<IConfiguration>();
+            var provider   = cfg["Database:Provider"] ?? "Sqlite";
+            var connection = cfg["Database:ConnectionString"];
+
+            if (string.IsNullOrWhiteSpace(connection))
             {
-                case DbProvider.SqlServer:
-                    opt.UseSqlServer(connection, b =>
-                        b.MigrationsAssembly("netIPAM"));
-                    break;
-                case DbProvider.Sqlite:
-                    opt.UseSqlite(connection, b =>
-                        b.MigrationsAssembly("netIPAM"));
-                    break;
+                // Setup non terminé — utiliser InMemory pour que DI ne plante pas
+                opt.UseInMemoryDatabase("setup_placeholder");
+                return;
             }
+
+            if (string.Equals(provider, "SqlServer", StringComparison.OrdinalIgnoreCase))
+                opt.UseSqlServer(connection, b => b.MigrationsAssembly("netIPAM"));
+            else
+                opt.UseSqlite(connection, b => b.MigrationsAssembly("netIPAM"));
         });
 
         services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
