@@ -4,10 +4,10 @@ using netIPAM.Services;
 namespace netIPAM.Components;
 
 /// <summary>
-/// Classe de base pour tout composant qui affiche des textes traduits.
-/// S'abonne au OnLanguageChanged du LocalizationService et déclenche
-/// StateHasChanged automatiquement — les composants fils n'ont rien à faire.
-/// Expose T(key) comme raccourci pour Localization.Get(key).
+/// Classe de base pour tout composant Blazor qui affiche des textes traduits.
+/// S'abonne à OnLanguageChanged et force un re-render automatique.
+/// Tous les composants héritant de cette classe réagissent immédiatement
+/// au changement de langue — aucune navigation ni rechargement nécessaire.
 /// </summary>
 public abstract class LocalizedComponentBase : ComponentBase, IAsyncDisposable
 {
@@ -18,14 +18,18 @@ public abstract class LocalizedComponentBase : ComponentBase, IAsyncDisposable
 
     protected override void OnInitialized()
     {
-        Localization.OnLanguageChanged += OnLanguageChanged;
+        Localization.OnLanguageChanged += HandleLanguageChanged;
     }
 
-    private void OnLanguageChanged() => InvokeAsync(StateHasChanged);
+    private void HandleLanguageChanged()
+    {
+        // Tous les composants sont InteractiveServer — StateHasChanged est sûr en direct
+        StateHasChanged();
+    }
 
     public virtual ValueTask DisposeAsync()
     {
-        Localization.OnLanguageChanged -= OnLanguageChanged;
+        Localization.OnLanguageChanged -= HandleLanguageChanged;
         return ValueTask.CompletedTask;
     }
 }

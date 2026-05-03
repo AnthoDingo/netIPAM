@@ -1,7 +1,6 @@
 @page "/admin/groups/new"
 @page "/admin/groups/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
-@rendermode InteractiveServer
 @inherits LocalizedComponentBase
 
 <PageTitle>@(_isNew ? "Nouveau groupe" : $"Groupe — {_group?.GName}")</PageTitle>
