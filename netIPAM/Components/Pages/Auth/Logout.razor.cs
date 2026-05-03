@@ -17,7 +17,7 @@ namespace netIPAM.Components.Pages.Auth
             if (ctx is not null)
                 await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             //Nav.NavigateTo("/login", forceLoad: true);
-            HttpCtx.HttpContext!.Response.Redirect("/ogin");
+            HttpCtx.HttpContext!.Response.Redirect("/login");
         }
     }
 }
