@@ -1,11 +1,40 @@
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
+@inject MaintenanceState MaintenanceState
 
 <div class="phpipam-app">
     <NavMenu />
+    @if (MaintenanceState.IsEnabled)
+    {
+        <div class="maintenance-banner">
+            <i class="bi bi-cone-striped me-2"></i>
+            <strong>Mode maintenance actif</strong> — le site est inaccessible aux utilisateurs.
+            <a href="/admin/settings" class="maintenance-banner-link">Désactiver</a>
+        </div>
+    }
     <main class="phpipam-page">
         <div class="phpipam-content">
             @Body
         </div>
     </main>
 </div>
+
+<style>
+.maintenance-banner {
+    background: #e74c3c;
+    color: #fff;
+    padding: 8px 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.maintenance-banner-link {
+    margin-left: auto;
+    color: #fff;
+    font-weight: 600;
+    text-decoration: underline;
+    opacity: .9;
+}
+.maintenance-banner-link:hover { opacity: 1; }
+</style>

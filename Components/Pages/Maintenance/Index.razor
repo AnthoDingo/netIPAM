@@ -1,0 +1,136 @@
+@page "/maintenance"
+@layout EmptyLayout
+@inject MaintenanceState MainState
+@inject NavigationManager Nav
+
+@* Si le mode maintenance est désactivé (ex : admin l'a coupé entre-temps),
+   redirige automatiquement vers l'accueil *@
+@if (!MainState.IsEnabled)
+{
+    Nav.NavigateTo("/", forceLoad: true);
+}
+
+<PageTitle>Maintenance — netIPAM</PageTitle>
+
+<div class="mnt-bg">
+    <div class="mnt-card">
+
+        <div class="mnt-icon-wrap">
+            <div class="mnt-icon-ring">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                     stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+                             1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33
+                             l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2
+                             0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83
+                             l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0
+                             1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4
+                             9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                </svg>
+            </div>
+            <div class="mnt-icon-pulse"></div>
+        </div>
+
+        <h1 class="mnt-title">Maintenance en cours</h1>
+        <p class="mnt-sub">
+            netIPAM est temporairement indisponible.<br />
+            Nous revenons très bientôt.
+        </p>
+
+        <div class="mnt-divider"></div>
+
+        <div class="mnt-info">
+            <div class="mnt-info-row">
+                <span class="mnt-info-dot"></span>
+                L'application est en cours de maintenance ou de mise à jour.
+            </div>
+            <div class="mnt-info-row">
+                <span class="mnt-info-dot"></span>
+                Vos données sont en sécurité — aucune modification n'est effectuée.
+            </div>
+            <div class="mnt-info-row">
+                <span class="mnt-info-dot"></span>
+                Si vous êtes administrateur, <a href="/login" class="mnt-link">connectez-vous</a> pour accéder au site.
+            </div>
+        </div>
+
+        <div class="mnt-footer">
+            <div class="mnt-footer-brand">
+                <svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor" style="opacity:.5">
+                    <path d="M1 1h6v6H1zm10 0h6v6h-6zM1 11h6v6H1zm10 2h2v2h2v2h-2v2h-2v-2H9v-2h2z"/>
+                </svg>
+                netIPAM
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.mnt-bg {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0f1e2e 0%, #1a2c3e 40%, #0d2030 100%);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.mnt-card {
+    width: 480px; max-width: 100%;
+    text-align: center;
+}
+/* Icône animée */
+.mnt-icon-wrap {
+    position: relative; display: inline-flex;
+    align-items: center; justify-content: center;
+    margin-bottom: 28px;
+}
+.mnt-icon-ring {
+    width: 88px; height: 88px; border-radius: 50%;
+    background: linear-gradient(135deg, #2c4a6e, #3a6491);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; z-index: 1;
+    box-shadow: 0 0 0 2px rgba(52,152,219,.3);
+}
+.mnt-icon-pulse {
+    position: absolute; inset: -8px; border-radius: 50%;
+    border: 2px solid rgba(52,152,219,.2);
+    animation: pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: .4; }
+    50%       { transform: scale(1.12); opacity: .1; }
+}
+.mnt-title {
+    font-size: 1.6rem; font-weight: 500; color: #fff;
+    margin-bottom: 10px;
+}
+.mnt-sub {
+    font-size: .95rem; color: #7a9ab8; line-height: 1.6; margin-bottom: 28px;
+}
+.mnt-divider {
+    height: 1px; background: rgba(255,255,255,.08);
+    margin: 0 auto 24px; width: 60%;
+}
+.mnt-info {
+    text-align: left; margin-bottom: 32px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 10px; padding: 16px 20px;
+    display: flex; flex-direction: column; gap: 10px;
+}
+.mnt-info-row {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 13px; color: #7a9ab8; line-height: 1.5;
+}
+.mnt-info-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #3498db; flex-shrink: 0; margin-top: 5px;
+}
+.mnt-link { color: #5dade2; text-decoration: none; }
+.mnt-link:hover { text-decoration: underline; }
+.mnt-footer {
+    margin-top: 4px;
+}
+.mnt-footer-brand {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: rgba(255,255,255,.25); font-size: 13px; font-weight: 500;
+}
+</style>

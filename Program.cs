@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using netIPAM;
 using netIPAM.Data;
 using netIPAM.Services;
@@ -19,6 +20,10 @@ builder.Services.AddSingleton<SetupService>();
 // ── MigrationState (singleton, alimenté après build) ─────────────
 var migrationState = new MigrationState();
 builder.Services.AddSingleton(migrationState);
+
+// ── MaintenanceState (singleton, alimenté depuis DB après build) ──
+var maintenanceState = new MaintenanceState();
+builder.Services.AddSingleton(maintenanceState);
 
 // ── Blazor ───────────────────────────────────────────────────────
 builder.Services
@@ -72,6 +77,9 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Maintenance : après auth pour pouvoir lire ctx.User.IsInRole
+app.UseMiddleware<MaintenanceMiddleware>();
+
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 
@@ -98,6 +106,14 @@ if (!setupState.SetupRequired)
         {
             // Base à jour → seed si nécessaire
             await app.Services.SeedAsync();
+
+            // Charger l'état de maintenance depuis la DB
+            var settings = await db.Settings.FirstOrDefaultAsync();
+            if (settings?.MaintenanceMode == true)
+            {
+                maintenanceState.Enable();
+                app.Logger.LogWarning("Mode maintenance actif au démarrage.");
+            }
         }
     }
     catch (Exception ex)
