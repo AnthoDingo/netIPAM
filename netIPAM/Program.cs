@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using netIPAM;
 using netIPAM.Components;
 using netIPAM.Data;
+using System.Security.Claims;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -79,6 +81,52 @@ app.UseMiddleware<MaintenanceMiddleware>();
 
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
+
+// ── Endpoints d'authentification ──────────────────────────────────
+// Opèrent sur le vrai HttpContext avant que Blazor démarre —
+// compatibles avec le mode InteractiveServer global.
+
+app.MapPost("/api/auth/login", async (
+    HttpContext ctx,
+    [FromForm] string username,
+    [FromForm] string password,
+    [FromForm] string? returnUrl,
+    UserService users) =>
+{
+    User? user = await users.AuthenticateLocalAsync(username, password);
+    if (user is null)
+    {
+        string dest = string.IsNullOrEmpty(returnUrl)
+            ? "/login?error=1"
+            : $"/login?error=1&returnUrl={Uri.EscapeDataString(returnUrl)}";
+        return Results.Redirect(dest);
+    }
+
+    List<Claim> claims =
+    [
+        new(ClaimTypes.Name,           user.Username),
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new(ClaimTypes.Email,          user.Email ?? string.Empty),
+    ];
+    if (!string.IsNullOrEmpty(user.Role))
+        claims.Add(new(ClaimTypes.Role, user.Role));
+
+    ClaimsPrincipal principal = new(
+        new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+
+    await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+    return Results.Redirect(returnUrl ?? "/");
+})
+.AllowAnonymous()
+.DisableAntiforgery();
+
+app.MapGet("/api/auth/logout", async (HttpContext ctx) =>
+{
+    await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return Results.Redirect("/login");
+})
+.AllowAnonymous();
 
 // ── Initialisation post-build ─────────────────────────────────────
 if (!setupState.SetupRequired)

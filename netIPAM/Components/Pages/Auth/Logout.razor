@@ -1,6 +1,12 @@
 @page "/logout"
-
 @layout EmptyLayout
 
 <PageTitle>Logging out…</PageTitle>
 <p class="p-4">Logging out…</p>
+
+@code {
+    [Inject] NavigationManager Nav { get; set; } = default!;
+
+    protected override void OnInitialized() =>
+        Nav.NavigateTo("/api/auth/logout", forceLoad: true);
+}
