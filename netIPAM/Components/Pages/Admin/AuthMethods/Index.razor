@@ -12,10 +12,6 @@
     </Actions>
 </AdminPageHeader>
 
-<div class="alert alert-info small">
-    <i class="bi bi-info-circle me-1"></i>
-    Only the <code>local</code> method is fully implemented. LDAP/AD/SAML/Radius are placeholders for future iterations.
-</div>
 
 @if (_methods is null) { <p class="text-muted">Loading…</p> }
 else
@@ -27,7 +23,20 @@ else
                 @foreach (UserAuthMethod m in _methods)
                 {
                     <tr>
-                        <td><code>@m.Type</code></td>
+                        <td>
+                            @{
+                                var (icon, label) = m.Type switch {
+                                    "local"  => ("bi-hdd",          "Local"),
+                                    "http"   => ("bi-globe",        "HTTP"),
+                                    "LDAP"   => ("bi-diagram-3",    "LDAP"),
+                                    "AD"     => ("bi-microsoft",    "Active Directory"),
+                                    "Radius" => ("bi-hdd-network",  "RADIUS"),
+                                    "SAML2"  => ("bi-key",          "SAML 2.0"),
+                                    _        => ("bi-shield-lock",  m.Type),
+                                };
+                            }
+                            <i class="bi @icon me-1 text-muted"></i><code>@label</code>
+                        </td>
                         <td class="text-muted">@m.Description</td>
                         <td>@(string.Equals(m.Protected, "Yes", StringComparison.OrdinalIgnoreCase) ? "Yes" : "No")</td>
                         <td class="text-end">
