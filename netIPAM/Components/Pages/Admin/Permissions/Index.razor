@@ -11,7 +11,7 @@
     @* ── Colonne gauche : sélection du sujet ────────────────────────── *@
     <div class="col-lg-3">
         <div class="phpipam-card">
-            <div class="phpipam-card-header">Groupes</div>
+            <div class="phpipam-card-header">@T("permissions.groups")</div>
             <div style="max-height:220px;overflow-y:auto">
                 @foreach (UserGroup g in _groups)
                 {
@@ -29,13 +29,13 @@
                 }
                 @if (_groups.Count == 0)
                 {
-                    <div class="p-3 text-muted small">Aucun groupe.</div>
+                    <div class="p-3 text-muted small">@T("permissions.noGroups")</div>
                 }
             </div>
         </div>
 
         <div class="phpipam-card mt-3">
-            <div class="phpipam-card-header">Utilisateurs</div>
+            <div class="phpipam-card-header">@T("permissions.users")</div>
             <div style="max-height:260px;overflow-y:auto">
                 @foreach (User u in _users)
                 {
@@ -78,7 +78,7 @@
                     </span>
                     @if (_saved)
                     {
-                        <span class="text-success small"><i class="bi bi-check-circle me-1"></i>Enregistré</span>
+                        <span class="text-success small"><i class="bi bi-check-circle me-1"></i>@T("common.saved")</span>
                     }
                 </div>
                 <div class="phpipam-card-body">
@@ -110,16 +110,16 @@
                         List<ResourceRow> rows = GetCurrentRows();
                         @if (rows.Count == 0)
                         {
-                            <p class="text-muted small">Aucune ressource de ce type.</p>
+                            <p class="text-muted small">@T("permissions.noResource")</p>
                         }
                         else
                         {
                             <table class="phpipam-table">
                                 <thead>
                                     <tr>
-                                        <th>Ressource</th>
-                                        <th>Détails</th>
-                                        <th style="width:160px">Accès</th>
+                                        <th>@T("common.resource")</th>
+                                        <th>@T("logs.details")</th>
+                                        <th style="width:160px">@T("common.access")</th>
                                     </tr>
                                 </thead>
                                 <tbody>

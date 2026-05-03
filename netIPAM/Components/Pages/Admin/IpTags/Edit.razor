@@ -19,16 +19,16 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Background color</label>
+                        <label class="form-label">@T("ipTags.bgColor")</label>
                         <input type="color" class="form-control form-control-color" @bind="_tag.BgColor" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Foreground color</label>
+                        <label class="form-label">@T("ipTags.fgColor")</label>
                         <input type="color" class="form-control form-control-color" @bind="_tag.FgColor" />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Show in lists</label>
+                    <label class="form-label">@T("ipTags.showInLists")</label>
                     <InputSelect class="form-select" @bind-Value="_tag.ShowTag">
                         <option value="0">No</option>
                         <option value="1">Yes</option>
@@ -36,7 +36,7 @@
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="updateTag" @bind-Value="_tag.UpdateTag" />
-                    <label class="form-check-label" for="updateTag">Update tag for matching IPs automatically</label>
+                    <label class="form-check-label" for="updateTag">@T("ipTags.updateAuto")</label>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> @T("common.save")</button>
                 <a class="btn btn-link" href="/admin/iptags">Cancel</a>

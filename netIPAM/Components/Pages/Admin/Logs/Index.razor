@@ -7,7 +7,7 @@
 <AdminPageHeader Title="Logs" Icon="bi bi-list-ul">
     <Actions>
         <select class="form-select form-select-sm" style="width:auto;display:inline-block" @bind="_severity">
-            <option value="">All severities</option>
+            <option value="">@T("logs.allSeverities")</option>
             <option value="0">0 — Info</option>
             <option value="1">1 — Warning</option>
             <option value="2">2 — Error</option>
@@ -27,11 +27,11 @@ else if (_logs.Count == 0)
 }
 else
 {
-    <p class="text-muted small">Showing latest @_logs.Count of @_total entries.</p>
+    <p class="text-muted small">@T("logs.showingLatest") @_logs.Count of @_total entries.</p>
     <div class="phpipam-card">
         <table class="phpipam-table">
             <thead>
-                <tr><th>Date</th><th>User</th><th>IP</th><th>Severity</th><th>Command</th><th>Details</th></tr>
+                <tr><th>@T("common.date")</th><th>@T("common.username")</th><th>IP</th><th>@T("common.severity")</th><th>@T("common.command")</th><th>@T("logs.details")</th></tr>
             </thead>
             <tbody>
                 @foreach (Log l in _logs)

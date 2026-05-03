@@ -15,7 +15,7 @@
 @if (_groups is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_groups.Count == 0)
 {
-    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No groups defined.</div></div>
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">@T("groups.noGroups")</div></div>
 }
 else
 {

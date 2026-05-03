@@ -14,16 +14,16 @@
 
         @* ── Bloc commun ── *@
         <div class="phpipam-card mb-4">
-            <div class="phpipam-card-header"><i class="bi bi-sliders me-2"></i>General</div>
+            <div class="phpipam-card-header"><i class="bi bi-sliders me-2"></i>@T("authMethods.general")</div>
             <div class="phpipam-card-body">
                 <div class="row">
                     <div class="col-md-4 mb-3">
                         <label class="form-label">Type <span class="text-danger">*</span></label>
                         <InputSelect class="form-select" @bind-Value="_method.Type" @bind-Value:after="OnTypeChanged">
-                            <option value="local">Local</option>
-                            <option value="http">HTTP (web server)</option>
+                            <option value="local">@T("authMethods.typeLocal")</option>
+                            <option value="http">@T("authMethods.typeHttp")</option>
                             <option value="LDAP">LDAP</option>
-                            <option value="AD">Active Directory</option>
+                            <option value="AD">@T("authMethods.typeAd")</option>
                             <option value="Radius">RADIUS</option>
                             <option value="SAML2">SAML 2.0</option>
                         </InputSelect>
@@ -65,7 +65,7 @@
                         No credentials are entered in netIPAM.
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Auto-create users</label>
+                        <label class="form-label">@T("authMethods.autoCreate")</label>
                         <InputSelect class="form-select form-select-sm" style="max-width:220px"
                                      @bind-Value="_http.AutoCreate">
                             <option value="false">No — manual provisioning</option>
@@ -74,7 +74,7 @@
                         <div class="form-text">Whether to create a local user record on first successful authentication.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Default role for new users</label>
+                        <label class="form-label">@T("authMethods.defaultRole")</label>
                         <InputSelect class="form-select form-select-sm" style="max-width:180px"
                                      @bind-Value="_http.DefaultRole">
                             <option value="Guest">Guest</option>
@@ -122,16 +122,16 @@
             </div>
 
             <div class="phpipam-card mb-4">
-                <div class="phpipam-card-header"><i class="bi bi-person-badge me-2"></i>Bind account</div>
+                <div class="phpipam-card-header"><i class="bi bi-person-badge me-2"></i>@T("authMethods.bindSection")</div>
                 <div class="phpipam-card-body">
                     <div class="mb-3">
-                        <label class="form-label">Bind DN</label>
+                        <label class="form-label">@T("authMethods.bindDn")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ldap.BindDn"
                                    placeholder="cn=svc-netipam,ou=ServiceAccounts,dc=example,dc=com" />
                         <div class="form-text">Service account used to query the directory. Leave empty for anonymous bind.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Bind password</label>
+                        <label class="form-label">@T("authMethods.bindPassword")</label>
                         <input type="password" class="form-control" @bind="_ldap.BindPass"
                                autocomplete="new-password" />
                     </div>
@@ -139,7 +139,7 @@
             </div>
 
             <div class="phpipam-card mb-4">
-                <div class="phpipam-card-header"><i class="bi bi-search me-2"></i>User search</div>
+                <div class="phpipam-card-header"><i class="bi bi-search me-2"></i>@T("authMethods.searchSection")</div>
                 <div class="phpipam-card-body">
                     <div class="mb-3">
                         <label class="form-label">User base DN <span class="text-danger">*</span></label>
@@ -148,19 +148,19 @@
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Username attribute</label>
+                            <label class="form-label">@T("authMethods.usernameAttr")</label>
                             <InputText class="form-control font-monospace" @bind-Value="_ldap.UserAttr"
                                        placeholder="uid" />
                             <div class="form-text">Attribute that holds the login name (<code>uid</code>, <code>cn</code>…).</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Email attribute</label>
+                            <label class="form-label">@T("authMethods.emailAttr")</label>
                             <InputText class="form-control font-monospace" @bind-Value="_ldap.MailAttr"
                                        placeholder="mail" />
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Additional user filter</label>
+                        <label class="form-label">@T("authMethods.userFilter")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ldap.UserFilter"
                                    placeholder="(objectClass=inetOrgPerson)" />
                         <div class="form-text">Optional LDAP filter appended to the search. Use <code>{user}</code> as login placeholder.</div>
@@ -175,25 +175,25 @@
                 </div>
                 <div class="phpipam-card-body">
                     <div class="mb-3">
-                        <label class="form-label">Group base DN</label>
+                        <label class="form-label">@T("authMethods.groupBaseDn")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ldap.GroupBaseDn"
                                    placeholder="ou=Groups,dc=example,dc=com" />
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Group name attribute</label>
+                            <label class="form-label">@T("authMethods.groupAttr")</label>
                             <InputText class="form-control font-monospace" @bind-Value="_ldap.GroupAttr"
                                        placeholder="cn" />
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Member attribute</label>
+                            <label class="form-label">@T("authMethods.memberAttr")</label>
                             <InputText class="form-control font-monospace" @bind-Value="_ldap.MemberAttr"
                                        placeholder="memberUid" />
                             <div class="form-text"><code>memberUid</code> (POSIX) · <code>member</code> (standard).</div>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Admin group DN</label>
+                        <label class="form-label">@T("authMethods.adminGroup")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ldap.AdminGroup"
                                    placeholder="cn=netipam-admins,ou=Groups,dc=example,dc=com" />
                         <div class="form-text">Members of this group receive the Administrator role automatically.</div>
@@ -228,7 +228,7 @@
                             <div class="form-text">Used to build the UPN suffix <code>user@corp.example.com</code>.</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">NetBIOS name</label>
+                            <label class="form-label">@T("authMethods.netbios")</label>
                             <InputText class="form-control" @bind-Value="_ad.NetBiosName" placeholder="CORP" />
                             <div class="form-text">Required for <code>DOMAIN\username</code> logins.</div>
                         </div>
@@ -256,7 +256,7 @@
                         <div class="form-text">UPN (<code>user@domain</code>) or DN format.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Bind password</label>
+                        <label class="form-label">@T("authMethods.bindPassword")</label>
                         <input type="password" class="form-control" @bind="_ad.BindPass"
                                autocomplete="new-password" />
                     </div>
@@ -264,7 +264,7 @@
             </div>
 
             <div class="phpipam-card mb-4">
-                <div class="phpipam-card-header"><i class="bi bi-search me-2"></i>User &amp; group lookup</div>
+                <div class="phpipam-card-header"><i class="bi bi-search me-2"></i>@T("authMethods.searchSection")</div>
                 <div class="phpipam-card-body">
                     <div class="mb-3">
                         <label class="form-label">Base DN <span class="text-danger">*</span></label>
@@ -272,19 +272,19 @@
                                    placeholder="DC=corp,DC=example,DC=com" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Users OU</label>
+                        <label class="form-label">@T("authMethods.usersOu")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ad.UserOu"
                                    placeholder="OU=Users,DC=corp,DC=example,DC=com" />
                         <div class="form-text">Optional — restricts user search to this OU subtree.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Additional user filter</label>
+                        <label class="form-label">@T("authMethods.userFilter")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ad.UserFilter"
                                    placeholder="(memberOf=CN=VPN-Users,OU=Groups,DC=corp,DC=example,DC=com)" />
                         <div class="form-text">Extra LDAP filter to restrict which AD accounts may log in.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Admin group DN</label>
+                        <label class="form-label">@T("authMethods.adminGroup")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_ad.AdminGroup"
                                    placeholder="CN=netIPAM-Admins,OU=Groups,DC=corp,DC=example,DC=com" />
                         <div class="form-text">Members receive the Administrator role automatically.</div>
@@ -319,15 +319,15 @@
                     </div>
                     <div class="row">
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Timeout (s)</label>
+                            <label class="form-label">@T("authMethods.timeout")</label>
                             <InputNumber class="form-control" @bind-Value="_radius.Timeout" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Retries</label>
+                            <label class="form-label">@T("authMethods.retries")</label>
                             <InputNumber class="form-control" @bind-Value="_radius.Retry" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Protocol</label>
+                            <label class="form-label">@T("authMethods.protocol")</label>
                             <InputSelect class="form-select" @bind-Value="_radius.Protocol">
                                 <option value="PAP">PAP</option>
                                 <option value="CHAP">CHAP</option>
@@ -346,18 +346,18 @@
                 <div class="phpipam-card-body">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">NAS Identifier</label>
+                            <label class="form-label">@T("authMethods.nasId")</label>
                             <InputText class="form-control" @bind-Value="_radius.NasId" placeholder="netipam" />
                             <div class="form-text">Sent as the <code>NAS-Identifier</code> attribute.</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">NAS IP address</label>
+                            <label class="form-label">@T("authMethods.nasIp")</label>
                             <InputText class="form-control" @bind-Value="_radius.NasIp"
                                        placeholder="192.168.1.100" />
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Backup server</label>
+                        <label class="form-label">@T("authMethods.backupServer")</label>
                         <InputText class="form-control" @bind-Value="_radius.FailoverHostname"
                                    placeholder="radius-backup.example.com" />
                         <div class="form-text">Used automatically when the primary server is unreachable.</div>
@@ -384,7 +384,7 @@
                         <div class="form-text">Single Sign-On endpoint (HTTP-Redirect or HTTP-POST binding).</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">SLO URL</label>
+                        <label class="form-label">@T("authMethods.sloUrl")</label>
                         <InputText class="form-control font-monospace" @bind-Value="_saml.IdpSloUrl"
                                    placeholder="https://idp.example.com/saml2/slo" />
                         <div class="form-text">Single Logout endpoint. Leave empty to disable SLO.</div>
@@ -414,14 +414,14 @@
                         <div class="form-text">Assertion Consumer Service URL — register this in your IdP.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">SP certificate</label>
+                        <label class="form-label">@T("authMethods.spCertificate")</label>
                         <InputTextArea class="form-control font-monospace" rows="4"
                                        @bind-Value="_saml.SpCert"
                                        placeholder="MIICxDCCAaygAwIBAgIBADANBgkq..." />
                         <div class="form-text">Optional — only required if the IdP expects signed/encrypted requests.</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">SP private key</label>
+                        <label class="form-label">@T("authMethods.spPrivateKey")</label>
                         <InputTextArea class="form-control font-monospace" rows="4"
                                        @bind-Value="_saml.SpPrivateKey"
                                        placeholder="MIIEvgIBADANBgkqhkiG9w0BAQEF..." />
@@ -440,25 +440,25 @@
                                        placeholder="uid" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Email attribute</label>
+                            <label class="form-label">@T("authMethods.emailAttr")</label>
                             <InputText class="form-control font-monospace" @bind-Value="_saml.AttrEmail"
                                        placeholder="mail" />
                         </div>
                         <div class="col-md-4 mb-3">
-                            <label class="form-label">Groups attribute</label>
+                            <label class="form-label">@T("authMethods.groupsAttr")</label>
                             <InputText class="form-control font-monospace" @bind-Value="_saml.AttrGroups"
                                        placeholder="memberOf" />
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Admin group value</label>
+                            <label class="form-label">@T("authMethods.adminGroupVal")</label>
                             <InputText class="form-control" @bind-Value="_saml.AdminGroupValue"
                                        placeholder="netipam-admins" />
                             <div class="form-text">If the groups attribute contains this value, the user gets the Administrator role.</div>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Name ID format</label>
+                            <label class="form-label">@T("authMethods.nameIdFormat")</label>
                             <InputSelect class="form-select" @bind-Value="_saml.NameIdFormat">
                                 <option value="urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified">Unspecified</option>
                                 <option value="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress">Email address</option>

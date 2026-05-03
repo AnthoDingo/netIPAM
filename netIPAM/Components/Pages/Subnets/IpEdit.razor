@@ -22,23 +22,23 @@
                         <InputText class="form-control" @bind-Value="_ip.Hostname" />
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">State</label>
+                        <label class="form-label">@T("common.status")</label>
                         <InputSelect class="form-select" @bind-Value="_ip.State">
                             <option value="0">@T("ipAddresses.offline")</option>
-                            <option value="1">Active</option>
-                            <option value="2">Used</option>
-                            <option value="3">Reserved</option>
+                            <option value="1">@T("common.active")</option>
+                            <option value="2">@T("ipAddresses.used")</option>
+                            <option value="3">@T("ipAddresses.reserved")</option>
                             <option value="4">@T("ipAddresses.dhcp")</option>
                         </InputSelect>
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Description</label>
+                    <label class="form-label">@T("common.description")</label>
                     <InputText class="form-control" @bind-Value="_ip.Description" />
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">MAC</label>
+                        <label class="form-label">@T("ipAddresses.mac")</label>
                         <InputText class="form-control" @bind-Value="_ip.Mac" placeholder="aa:bb:cc:dd:ee:ff" />
                     </div>
                     <div class="col-md-6 mb-3">
@@ -51,7 +51,7 @@
                     <label class="form-check-label" for="gw">@T("ipAddresses.gateway")</label>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Note</label>
+                    <label class="form-label">@T("common.note")</label>
                     <InputTextArea class="form-control" rows="2" @bind-Value="_ip.Note" />
                 </div>
 

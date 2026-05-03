@@ -43,7 +43,28 @@
     "actions": "Azioni",
     "required": "Obbligatorio",
     "new": "Nuovo",
-    "type": "Tipo"
+    "type": "Tipo",
+    "none": "(nessuno)",
+    "default": "predefinito",
+    "update": "Aggiorna",
+    "role": "Ruolo",
+    "lastName": "Ultimo accesso",
+    "disabled": "Disabilitato",
+    "realName": "Nome completo",
+    "color": "Colore",
+    "latitude": "Latitudine",
+    "longitude": "Longitudine",
+    "postcode": "CAP",
+    "contactPerson": "Nome contatto",
+    "number": "Numero",
+    "date": "Data",
+    "severity": "Gravità",
+    "command": "Comando",
+    "resource": "Risorsa",
+    "access": "Accesso",
+    "saved": "Salvato",
+    "create": "Crea",
+    "or": "o"
   },
   "navigation": {
     "admin": "Admin",
@@ -57,7 +78,10 @@
     "dashboard": "Pannello",
     "network": "Rete",
     "business": "Business",
-    "myPreferences": "Le mie preferenze"
+    "myPreferences": "Le mie preferenze",
+    "routing": "Routing",
+    "l2domains": "Domini L2",
+    "vrfs": "VRFs"
   },
   "admin": {
     "title": "Amministrazione",
@@ -98,7 +122,11 @@
     "addSubnet": "Aggiungi sottorete",
     "findSubnet": "Trova sottorete",
     "vlan": "VLAN",
-    "addIp": "Aggiungi IP"
+    "addIp": "Aggiungi IP",
+    "columnSubnet": "Sottorete",
+    "columnVlan": "VLAN",
+    "columnUsage": "Utilizzo",
+    "noSubnetsFolder": "Nessuna sottorete in questa sezione."
   },
   "ipAddresses": {
     "title": "Indirizzi IP",
@@ -120,7 +148,11 @@
     "ipRequired": "IP richiesto.",
     "invalidCidr": "CIDR non valido:",
     "addIp": "Aggiungi IP",
-    "noAddresses": "Nessun indirizzo IP registrato."
+    "noAddresses": "Nessun indirizzo IP registrato.",
+    "columnIp": "IP",
+    "columnHostname": "Hostname",
+    "columnState": "Stato",
+    "note": "Nota"
   },
   "customers": {
     "title": "Clienti",
@@ -130,7 +162,8 @@
     "contactPerson": "Nome contatto",
     "contactPhone": "Telefono",
     "contactMail": "Email",
-    "postcode": "CAP"
+    "postcode": "CAP",
+    "noCustomers": "Nessun cliente."
   },
   "devices": {
     "title": "Dispositivi",
@@ -138,7 +171,12 @@
     "editDevice": "Modifica dispositivo",
     "devices": "Dispositivi",
     "type": "Tipo",
-    "location": "Posizione"
+    "location": "Posizione",
+    "ipAddress": "Indirizzo IP",
+    "snmp": "SNMP (opzionale)",
+    "snmpCommunity": "Comunità SNMP",
+    "snmpVersion": "Versione SNMP",
+    "noDevices": "Nessun dispositivo."
   },
   "locations": {
     "title": "Posizioni",
@@ -150,21 +188,33 @@
     "title": "Gruppi di utenti",
     "newGroup": "Nuovo gruppo",
     "editGroup": "Modifica gruppo",
-    "groups": "Gruppi"
+    "groups": "Gruppi",
+    "information": "Informazioni",
+    "members": "Membri",
+    "noGroups": "Nessun gruppo definito."
   },
   "users": {
     "title": "Utenti",
     "newUser": "Nuovo utente",
     "editUser": "Modifica utente",
     "users": "Utenti",
-    "resetPassword": "Reimposta password"
+    "resetPassword": "Reimposta password",
+    "roleAdmin": "Amministratore",
+    "roleOperator": "Operatore",
+    "roleGuest": "Ospite",
+    "initialPassword": "Password iniziale",
+    "passwordHint": "Salvato come BCrypt. L'utente può cambiarlo dopo il primo accesso.",
+    "resetFor": "Reimposta password per",
+    "newPassword": "Nuova password"
   },
   "vlans": {
     "title": "VLAN",
     "newVlan": "Nuovo VLAN",
     "editVlan": "Modifica VLAN",
     "vlans": "VLAN",
-    "number": "Numero VLAN"
+    "number": "Numero VLAN",
+    "l2domain": "Dominio L2",
+    "noVlans": "Nessun VLAN definito."
   },
   "vlanDomains": {
     "title": "Domini VLAN",
@@ -176,17 +226,27 @@
     "title": "Server dei nomi",
     "newNameserver": "Nuovo server dei nomi",
     "editNameserver": "Modifica server dei nomi",
-    "nameservers": "Server dei nomi"
+    "nameservers": "Server dei nomi",
+    "serverAddresses": "Indirizzi server"
   },
   "ipTags": {
     "title": "Tag IP",
     "newIpTag": "Nuovo tag IP",
     "editIpTag": "Modifica tag IP",
-    "ipTags": "Tag IP"
+    "ipTags": "Tag IP",
+    "bgColor": "Colore di sfondo",
+    "fgColor": "Colore del testo",
+    "showInLists": "Mostra nelle liste",
+    "updateAuto": "Aggiorna tag automaticamente",
+    "noTags": "Nessun tag IP definito."
   },
   "permissions": {
     "title": "Autorizzazioni",
-    "permissions": "Autorizzazioni"
+    "permissions": "Autorizzazioni",
+    "groups": "Gruppi",
+    "noGroups": "Nessun gruppo.",
+    "users": "Utenti",
+    "noResource": "Nessuna risorsa di questo tipo."
   },
   "logs": {
     "title": "Registri",
@@ -194,7 +254,9 @@
     "timestamp": "Timestamp",
     "action": "Azione",
     "user": "Utente",
-    "details": "Dettagli"
+    "details": "Dettagli",
+    "allSeverities": "Tutte le gravità",
+    "showingLatest": "Visualizzazione ultimi"
   },
   "errors": {
     "invalidMask": "Maschera non valida.",
@@ -211,5 +273,170 @@
     "invalidPhone": "Numero di telefono non valido",
     "tooShort": "Troppo breve",
     "tooLong": "Troppo lungo"
+  },
+  "layout": {
+    "maintenanceActive": "Modalità manutenzione attiva",
+    "maintenanceDisable": "Disabilita",
+    "notFound": "Pagina non trovata",
+    "notFoundText": "Spiacenti, nessuna pagina a questo indirizzo."
+  },
+  "dashboard": {
+    "title": "Pannello",
+    "sections": "Sezioni",
+    "subnets": "Sottoreti",
+    "ipAddresses": "Indirizzi IP",
+    "vlans": "VLAN",
+    "vrfs": "VRFs",
+    "devices": "Dispositivi",
+    "users": "Utenti"
+  },
+  "sections": {
+    "title": "Sezioni",
+    "noSections": "Nessuna sezione.",
+    "createOne": "Creane una",
+    "subnetOrdering": "Ordine sottoreti",
+    "displayOrder": "Ordine di visualizzazione",
+    "strictMode": "Modalità rigorosa (no sovrapposizioni)",
+    "showVlan": "Mostra colonna VLAN",
+    "showVrf": "Mostra colonna VRF"
+  },
+  "authMethods": {
+    "general": "Generale",
+    "typeLocal": "Locale",
+    "typeHttp": "HTTP (server web)",
+    "typeAd": "Active Directory",
+    "serverSection": "Server",
+    "bindSection": "Account bind",
+    "searchSection": "Ricerca utente",
+    "groupSection": "Mapping gruppi",
+    "nasSection": "NAS e failover",
+    "idpSection": "Identity Provider (IdP)",
+    "spSection": "Service Provider (SP)",
+    "attrSection": "Mapping attributi",
+    "optional": "Opzionale",
+    "hostname": "Hostname / IP",
+    "port": "Porta",
+    "useSsl": "Usa SSL (LDAPS)",
+    "useStartTls": "Usa STARTTLS",
+    "verifyCert": "Verifica certificato",
+    "bindDn": "Bind DN",
+    "bindPassword": "Password bind",
+    "userBaseDn": "DN base utenti",
+    "usernameAttr": "Attributo username",
+    "emailAttr": "Attributo email",
+    "userFilter": "Filtro utente aggiuntivo",
+    "groupBaseDn": "DN base gruppi",
+    "groupAttr": "Attributo nome gruppo",
+    "memberAttr": "Attributo membro",
+    "adminGroup": "DN gruppo admin",
+    "domain": "Dominio",
+    "netbios": "Nome NetBIOS",
+    "bindAccount": "Account bind",
+    "baseDn": "DN base",
+    "usersOu": "OU utenti",
+    "loginFilter": "Filtro di accesso",
+    "sharedSecret": "Segreto condiviso",
+    "timeout": "Timeout (s)",
+    "retries": "Tentativi",
+    "protocol": "Protocollo",
+    "nasId": "Identificatore NAS",
+    "nasIp": "Indirizzo IP NAS",
+    "backupServer": "Server di backup",
+    "entityId": "ID entità",
+    "ssoUrl": "URL SSO",
+    "sloUrl": "URL SLO",
+    "certificate": "Certificato X.509",
+    "acsUrl": "URL ACS",
+    "spCertificate": "Certificato SP",
+    "spPrivateKey": "Chiave privata SP",
+    "groupsAttr": "Attributo gruppi",
+    "adminGroupVal": "Valore gruppo admin",
+    "nameIdFormat": "Formato Name ID",
+    "autoCreate": "Crea utenti automaticamente",
+    "defaultRole": "Ruolo predefinito per nuovi utenti"
+  },
+  "settings": {
+    "siteIdentity": "Identità del sito",
+    "siteTitle": "Titolo del sito",
+    "siteUrl": "URL del sito",
+    "adminName": "Nome admin",
+    "adminMail": "Email admin",
+    "siteDomain": "Dominio del sito",
+    "loginText": "Testo di accesso",
+    "modules": "Moduli",
+    "maintenance": "Manutenzione",
+    "maintenanceMode": "Modalità manutenzione"
+  },
+  "vrfs": {
+    "rd": "RD (Route Distinguisher)",
+    "sections": "Sezioni (ID separati da virgola)",
+    "sectionsHint": "Lascia vuoto per tutte.",
+    "noVrfs": "Nessun VRF definito."
+  },
+  "ipcalc": {
+    "title": "Calcolatore IP",
+    "input": "Ingresso",
+    "cidrHint": "CIDR (IPv4 o IPv6)",
+    "version": "Versione",
+    "networkAddress": "Indirizzo di rete",
+    "firstUsable": "Primo utilizzabile",
+    "lastUsable": "Ultimo utilizzabile",
+    "usableHosts": "Host utilizzabili",
+    "totalAddresses": "Totale indirizzi"
+  },
+  "profile": {
+    "title": "Il mio profilo",
+    "tabInfo": "Informazioni",
+    "tabDisplay": "Visualizzazione",
+    "tabNotifications": "Notifiche",
+    "tabPassword": "Password",
+    "personalInfo": "Informazioni personali",
+    "usernameReadOnly": "Il nome utente non può essere modificato.",
+    "fullName": "Nome completo",
+    "displayPrefs": "Preferenze di visualizzazione",
+    "language": "Lingua",
+    "theme": "Tema",
+    "themeLight": "Chiaro",
+    "themeDark": "Scuro",
+    "themeSystem": "Sistema",
+    "navigation": "Navigazione",
+    "menuType": "Tipo di menu",
+    "compactMenu": "Menu compatto",
+    "subnetPrefs": "Sottoreti",
+    "hideFreeRange": "Nascondi intervalli liberi",
+    "compressActions": "Comprimi pulsanti azione",
+    "notifSettings": "Impostazioni notifiche",
+    "noEmail": "nessuna email configurata",
+    "addEmail": "Aggiungi un indirizzo email →",
+    "ipNotify": "Notifiche modifiche IP",
+    "ipNotifyDesc": "Ricevi un'email quando un IP viene aggiunto, modificato o eliminato.",
+    "changelog": "Riepilogo modifiche",
+    "changelogDesc": "Ricevi un riepilogo giornaliero di tutte le modifiche.",
+    "changePassword": "Cambia password",
+    "currentPassword": "Password attuale",
+    "newPassword": "Nuova password",
+    "confirmPassword": "Conferma nuova password",
+    "minChars": "Minimo 8 caratteri.",
+    "savedSuccess": "Preferenze salvate con successo.",
+    "pwdChanged": "Password modificata con successo."
+  },
+  "scan": {
+    "mode": "Modalità",
+    "fullSubnet": "Sottorete completa",
+    "dhcpRange": "Intervallo DHCP",
+    "ipStart": "IP iniziale",
+    "ipEnd": "IP finale",
+    "maxThreads": "Thread massimi",
+    "timeoutMs": "Timeout (ms)",
+    "dnsResolution": "Risoluzione DNS",
+    "start": "Avvia scansione",
+    "scanning": "Scansione in corso…"
+  },
+  "login": {
+    "username": "Nome utente",
+    "password": "Password",
+    "signIn": "Accedi",
+    "invalidCreds": "Credenziali non valide.",
+    "defaultHint": "Predefinito: Admin / ipamadmin (cambiare dopo il primo accesso)"
   }
 }

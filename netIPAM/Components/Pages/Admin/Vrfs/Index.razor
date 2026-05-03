@@ -13,7 +13,7 @@
 @if (_vrfs is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_vrfs.Count == 0)
 {
-    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No VRFs defined.</div></div>
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">@T("vrfs.noVrfs")</div></div>
 }
 else
 {

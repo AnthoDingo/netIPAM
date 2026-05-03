@@ -20,7 +20,7 @@ else
                 @foreach (VlanDomain d in _domains)
                 {
                     <tr>
-                        <td><strong>@d.Name</strong> @if (d.Id == 1) { <span class="badge bg-secondary ms-1">default</span> }</td>
+                        <td><strong>@d.Name</strong> @if (d.Id == 1) { <span class="badge bg-secondary ms-1">@T("common.default")</span> }</td>
                         <td class="text-muted">@d.Description</td>
                         <td class="text-end">
                             <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/l2domains/{d.Id}/edit")"><i class="bi bi-pencil"></i></a>

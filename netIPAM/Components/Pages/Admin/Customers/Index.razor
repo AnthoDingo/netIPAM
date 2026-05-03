@@ -13,7 +13,7 @@
 @if (_customers is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_customers.Count == 0)
 {
-    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No customers yet.</div></div>
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">@T("customers.noCustomers")</div></div>
 }
 else
 {

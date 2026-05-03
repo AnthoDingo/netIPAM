@@ -16,10 +16,10 @@
                 <div class="col-md-3">
                     <label class="form-label form-label-sm">Mode</label>
                     <select class="form-select form-select-sm" @bind="_mode">
-                        <option value="full">Subnet complet</option>
+                        <option value="full">@T("scan.fullSubnet")</option>
                         @if (IsPool)
                         {
-                            <option value="range">Plage DHCP</option>
+                            <option value="range">@T("scan.dhcpRange")</option>
                         }
                     </select>
                 </div>
@@ -85,7 +85,7 @@
                     {
                         <span class="badge bg-success">
                             <span class="spinner-border spinner-border-sm me-1" style="width:.6rem;height:.6rem"></span>
-                            Scan en cours…
+                            @T("scan.scanning")…
                         </span>
                         <button class="btn btn-danger btn-sm" @onclick="StopScan">
                             <i class="bi bi-stop-fill me-1"></i>Arrêter

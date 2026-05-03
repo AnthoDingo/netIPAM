@@ -19,20 +19,20 @@
                         <InputText class="form-control" @bind-Value="_device.Hostname" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">IP address (presentation)</label>
+                        <label class="form-label">@T("devices.ipAddress")</label>
                         <input type="text" class="form-control" @bind="_form.IpPresentation" placeholder="192.168.1.1" />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Type</label>
+                        <label class="form-label">@T("common.type")</label>
                         <InputSelect class="form-select" @bind-Value="_device.Type">
                             <option value="0">(none)</option>
                             @if (_types is not null) { @foreach (DeviceType t in _types) { <option value="@t.Tid">@t.Tname</option> } }
                         </InputSelect>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Location</label>
+                        <label class="form-label">@T("common.state")</label>
                         <InputSelect class="form-select" @bind-Value="_device.Location">
                             <option value="">(none)</option>
                             @if (_locations is not null) { @foreach (Location l in _locations) { <option value="@l.Id">@l.Name</option> } }
@@ -43,14 +43,14 @@
                     <label class="form-label">@T("common.description")</label>
                     <InputText class="form-control" @bind-Value="_device.Description" />
                 </div>
-                <div class="phpipam-card-header mb-3 small text-muted">SNMP (optional)</div>
+                <div class="phpipam-card-header mb-3 small text-muted">@T("devices.snmp")</div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">SNMP community</label>
+                        <label class="form-label">@T("devices.snmpCommunity")</label>
                         <InputText class="form-control" @bind-Value="_device.SnmpCommunity" />
                     </div>
                     <div class="col-md-3 mb-3">
-                        <label class="form-label">Version</label>
+                        <label class="form-label">@T("devices.snmpVersion")</label>
                         <InputSelect class="form-select" @bind-Value="_device.SnmpVersion">
                             <option value="0">(none)</option>
                             <option value="1">v1</option>

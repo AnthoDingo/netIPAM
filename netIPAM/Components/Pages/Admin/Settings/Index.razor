@@ -11,35 +11,35 @@ else
 {
     <EditForm Model="_settings" OnValidSubmit="Save" FormName="setEdit">
         <div class="phpipam-card">
-            <div class="phpipam-card-header">Site identity</div>
+            <div class="phpipam-card-header">@T("settings.siteIdentity")</div>
             <div class="phpipam-card-body">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Site title</label>
+                        <label class="form-label">@T("settings.siteTitle")</label>
                         <InputText class="form-control" @bind-Value="_settings.SiteTitle" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Site URL</label>
+                        <label class="form-label">@T("settings.siteUrl")</label>
                         <InputText class="form-control" @bind-Value="_settings.SiteUrl" />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Admin name</label>
+                        <label class="form-label">@T("settings.adminName")</label>
                         <InputText class="form-control" @bind-Value="_settings.SiteAdminName" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Admin mail</label>
+                        <label class="form-label">@T("settings.adminMail")</label>
                         <InputText class="form-control" @bind-Value="_settings.SiteAdminMail" />
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Site domain</label>
+                        <label class="form-label">@T("settings.siteDomain")</label>
                         <InputText class="form-control" @bind-Value="_settings.SiteDomain" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Login text</label>
+                        <label class="form-label">@T("settings.loginText")</label>
                         <InputText class="form-control" @bind-Value="_settings.SiteLoginText" />
                     </div>
                 </div>
@@ -47,7 +47,7 @@ else
         </div>
 
         <div class="phpipam-card">
-            <div class="phpipam-card-header">Modules</div>
+            <div class="phpipam-card-header">@T("settings.modules")</div>
             <div class="phpipam-card-body">
                 <div class="row">
                     <div class="col-md-4">

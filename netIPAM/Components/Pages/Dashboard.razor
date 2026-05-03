@@ -5,7 +5,7 @@
 
 <PageTitle>Dashboard — netIPAM</PageTitle>
 
-<h1 class="h3 mb-4"><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
+<h1 class="h3 mb-4"><i class="bi bi-speedometer2 me-2"></i>@T("dashboard.title")</h1>
 
 @if (_stats is null)
 {
@@ -19,7 +19,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#3498db"><i class="bi bi-folder2-open"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.Sections</div>
-                    <div class="phpipam-stat-label">Sections</div>
+                    <div class="phpipam-stat-label">@T("dashboard.sections")</div>
                 </div>
             </div>
         </div>
@@ -28,7 +28,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#2ecc71"><i class="bi bi-diagram-3"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.Subnets</div>
-                    <div class="phpipam-stat-label">Subnets</div>
+                    <div class="phpipam-stat-label">@T("dashboard.subnets")</div>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#9b59b6"><i class="bi bi-hdd-network"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.IpAddresses</div>
-                    <div class="phpipam-stat-label">IP addresses</div>
+                    <div class="phpipam-stat-label">@T("dashboard.ipAddresses")</div>
                 </div>
             </div>
         </div>
@@ -46,7 +46,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#e67e22"><i class="bi bi-tag"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.Vlans</div>
-                    <div class="phpipam-stat-label">VLANs</div>
+                    <div class="phpipam-stat-label">@T("dashboard.vlans")</div>
                 </div>
             </div>
         </div>
@@ -55,7 +55,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#16a085"><i class="bi bi-share"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.Vrfs</div>
-                    <div class="phpipam-stat-label">VRFs</div>
+                    <div class="phpipam-stat-label">@T("dashboard.vrfs")</div>
                 </div>
             </div>
         </div>
@@ -64,7 +64,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#34495e"><i class="bi bi-router"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.Devices</div>
-                    <div class="phpipam-stat-label">Devices</div>
+                    <div class="phpipam-stat-label">@T("dashboard.devices")</div>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@ else
                 <div class="phpipam-stat-icon" style="background:#c0392b"><i class="bi bi-people"></i></div>
                 <div>
                     <div class="phpipam-stat-value">@_stats.Users</div>
-                    <div class="phpipam-stat-label">Users</div>
+                    <div class="phpipam-stat-label">@T("dashboard.users")</div>
                 </div>
             </div>
         </div>

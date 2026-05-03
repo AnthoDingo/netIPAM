@@ -20,7 +20,7 @@
                         <InputText class="form-control" @bind-Value="_user.Username" disabled="@(!_isNew)" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Real name</label>
+                        <label class="form-label">@T("common.realName")</label>
                         <InputText class="form-control" @bind-Value="_user.RealName" />
                     </div>
                 </div>
@@ -30,19 +30,19 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Role</label>
+                        <label class="form-label">@T("common.role")</label>
                         <InputSelect class="form-select" @bind-Value="_user.Role">
                             <option value="">(none)</option>
-                            <option value="Administrator">Administrator</option>
-                            <option value="Operator">Operator</option>
-                            <option value="Guest">Guest</option>
+                            <option value="Administrator">@T("users.roleAdmin")</option>
+                            <option value="Operator">@T("users.roleOperator")</option>
+                            <option value="Guest">@T("users.roleGuest")</option>
                         </InputSelect>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">@T("common.status")</label>
                         <InputSelect class="form-select" @bind-Value="_user.Disabled">
                             <option value="No">@T("common.active")</option>
-                            <option value="Yes">Disabled</option>
+                            <option value="Yes">@T("common.disabled")</option>
                         </InputSelect>
                     </div>
                 </div>
@@ -50,9 +50,9 @@
                 @if (_isNew)
                 {
                     <div class="mb-3">
-                        <label class="form-label">Initial password *</label>
+                        <label class="form-label">@T("users.initialPassword") *</label>
                         <input type="password" class="form-control" @bind="_form.Password" />
-                        <small class="text-muted">Stored as BCrypt hash. The user can change it after first login.</small>
+                        <small class="text-muted">@T("users.passwordHint")</small>
                     </div>
                 }
 

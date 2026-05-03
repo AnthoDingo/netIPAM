@@ -13,7 +13,7 @@
 @if (_vlans is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_vlans.Count == 0)
 {
-    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No VLANs defined.</div></div>
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">@T("vlans.noVlans")</div></div>
 }
 else
 {

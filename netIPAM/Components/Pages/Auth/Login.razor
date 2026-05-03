@@ -16,20 +16,20 @@
             <input type="hidden" name="returnUrl" value="@ReturnUrl" />
 
             <div class="mb-3">
-                <label class="form-label">Username</label>
+                <label class="form-label">@T("login.username")</label>
                 <input name="username" type="text" class="form-control"
                        autocomplete="username" required />
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Password</label>
+                <label class="form-label">@T("login.password")</label>
                 <input name="password" type="password" class="form-control"
                        autocomplete="current-password" required />
             </div>
 
             @if (Error)
             {
-                <div class="alert alert-danger py-2">Invalid username or password.</div>
+                <div class="alert alert-danger py-2">@T("login.invalidCreds")</div>
             }
 
             <button type="submit" class="btn btn-primary w-100">

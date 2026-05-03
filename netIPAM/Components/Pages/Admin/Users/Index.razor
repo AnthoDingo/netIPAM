@@ -22,12 +22,12 @@ else
         <table class="phpipam-table">
             <thead>
                 <tr>
-                    <th>Username</th>
-                    <th>Real name</th>
-                    <th>Email</th>
-                    <th>Role</th>
+                    <th>@T("common.username")</th>
+                    <th>@T("common.realName")</th>
+                    <th>@T("common.email")</th>
+                    <th>@T("common.role")</th>
                     <th>@T("common.status")</th>
-                    <th>Last login</th>
+                    <th>@T("common.lastName")</th>
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
@@ -42,11 +42,11 @@ else
                         <td>
                             @if (string.Equals(u.Disabled, "Yes", StringComparison.OrdinalIgnoreCase))
                             {
-                                <span class="badge bg-danger">Disabled</span>
+                                <span class="badge bg-danger">@T("common.disabled")</span>
                             }
                             else
                             {
-                                <span class="badge bg-success">Active</span>
+                                <span class="badge bg-success">@T("common.active")</span>
                             }
                         </td>
                         <td class="text-muted">@(u.LastLogin?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>

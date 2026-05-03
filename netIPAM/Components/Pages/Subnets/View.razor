@@ -55,9 +55,9 @@
                         <div class="phpipam-card-header">@T("subnets.properties")</div>
                         <div class="phpipam-card-body">
                             <dl class="row mb-0" style="font-size:.875rem">
-                                <dt class="col-5 text-muted">Network</dt>
+                                <dt class="col-5 text-muted">@T("subnets.network")</dt>
                                 <dd class="col-7"><code>@_info?.Network</code></dd>
-                                <dt class="col-5 text-muted">Broadcast</dt>
+                                <dt class="col-5 text-muted">@T("subnets.broadcast")</dt>
                                 <dd class="col-7"><code>@_info?.Broadcast</code></dd>
                                 <dt class="col-5 text-muted">@T("subnets.firstUsable")</dt>
                                 <dd class="col-7"><code>@_info?.FirstUsable</code></dd>
@@ -67,7 +67,7 @@
                                 <dd class="col-7">@_info?.UsableHosts</dd>
                                 @if (_subnet.Vlan is not null)
                                 {
-                                    <dt class="col-5 text-muted">VLAN</dt>
+                                    <dt class="col-5 text-muted">@T("subnets.columnVlan")</dt>
                                     <dd class="col-7">
                                         <span class="badge bg-warning text-dark">
                                             @_subnet.Vlan.Name (@_subnet.Vlan.Number)
@@ -103,7 +103,7 @@
                         @if (_addresses is null || _addresses.Count == 0)
                         {
                             <div class="phpipam-card-body text-center text-muted py-4">
-                                Aucune adresse IP enregistrée.
+                                @T("ipAddresses.noAddresses")
                             </div>
                         }
                         else
@@ -112,9 +112,9 @@
                                 <thead>
                                     <tr>
                                         <th>IP</th>
-                                        <th>Hostname</th>
-                                        <th>État</th>
-                                        <th>Description</th>
+                                        <th>@T("ipAddresses.hostname")</th>
+                                        <th>@T("ipAddresses.columnState")</th>
+                                        <th>@T("common.description")</th>
                                         <th class="text-end">Actions</th>
                                     </tr>
                                 </thead>

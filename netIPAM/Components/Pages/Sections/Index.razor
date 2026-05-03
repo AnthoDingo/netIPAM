@@ -7,7 +7,7 @@
 <PageTitle>Sections — netIPAM</PageTitle>
 
 <div class="d-flex align-items-center justify-content-between mb-3">
-    <h1 class="h3 mb-0"><i class="bi bi-folder2-open me-2"></i>Sections</h1>
+    <h1 class="h3 mb-0"><i class="bi bi-folder2-open me-2"></i>@T("sections.title")</h1>
     <a class="btn btn-primary btn-sm" href="/sections/new">
         <i class="bi bi-plus-lg"></i> New section
     </a>
@@ -22,7 +22,7 @@ else if (_sections.Count == 0)
     <div class="phpipam-card">
         <div class="phpipam-card-body text-center text-muted py-5">
             <i class="bi bi-folder2 d-block mb-2" style="font-size: 2rem;"></i>
-            No sections yet. <a href="/sections/new">Create one</a>.
+            @T("sections.noSections") <a href="/sections/new">@T("sections.createOne")</a>.
         </div>
     </div>
 }

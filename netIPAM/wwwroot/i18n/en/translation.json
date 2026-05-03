@@ -43,7 +43,28 @@
     "actions": "Actions",
     "required": "Required",
     "new": "New",
-    "type": "Type"
+    "type": "Type",
+    "none": "(none)",
+    "default": "default",
+    "update": "Update",
+    "role": "Role",
+    "lastName": "Last login",
+    "disabled": "Disabled",
+    "realName": "Real name",
+    "color": "Color",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "postcode": "Postcode",
+    "contactPerson": "Contact name",
+    "number": "Number",
+    "date": "Date",
+    "severity": "Severity",
+    "command": "Command",
+    "resource": "Resource",
+    "access": "Access",
+    "saved": "Saved",
+    "create": "Create",
+    "or": "or"
   },
   "navigation": {
     "admin": "Admin",
@@ -57,7 +78,10 @@
     "dashboard": "Dashboard",
     "network": "Network",
     "business": "Business",
-    "myPreferences": "My preferences"
+    "myPreferences": "My preferences",
+    "routing": "Routing",
+    "l2domains": "L2 domains",
+    "vrfs": "VRFs"
   },
   "admin": {
     "title": "Administration",
@@ -98,7 +122,11 @@
     "addSubnet": "Add subnet",
     "findSubnet": "Find subnet",
     "vlan": "VLAN",
-    "addIp": "Add IP"
+    "addIp": "Add IP",
+    "columnSubnet": "Subnet",
+    "columnVlan": "VLAN",
+    "columnUsage": "Usage",
+    "noSubnetsFolder": "No subnets in this section."
   },
   "ipAddresses": {
     "title": "IP Addresses",
@@ -120,7 +148,11 @@
     "ipRequired": "IP required.",
     "invalidCidr": "Invalid CIDR:",
     "addIp": "Add IP",
-    "noAddresses": "No IP addresses registered."
+    "noAddresses": "No IP addresses registered.",
+    "columnIp": "IP",
+    "columnHostname": "Hostname",
+    "columnState": "État",
+    "note": "Note"
   },
   "customers": {
     "title": "Customers",
@@ -130,7 +162,8 @@
     "contactPerson": "Contact name",
     "contactPhone": "Phone",
     "contactMail": "Email",
-    "postcode": "Postcode"
+    "postcode": "Postcode",
+    "noCustomers": "No customers yet."
   },
   "devices": {
     "title": "Devices",
@@ -138,7 +171,12 @@
     "editDevice": "Edit device",
     "devices": "Devices",
     "type": "Type",
-    "location": "Location"
+    "location": "Location",
+    "ipAddress": "IP address (presentation)",
+    "snmp": "SNMP (optional)",
+    "snmpCommunity": "SNMP community",
+    "snmpVersion": "SNMP version",
+    "noDevices": "No devices yet."
   },
   "locations": {
     "title": "Locations",
@@ -150,21 +188,33 @@
     "title": "User Groups",
     "newGroup": "New group",
     "editGroup": "Edit group",
-    "groups": "Groups"
+    "groups": "Groups",
+    "information": "Information",
+    "members": "Members",
+    "noGroups": "No groups defined."
   },
   "users": {
     "title": "Users",
     "newUser": "New user",
     "editUser": "Edit user",
     "users": "Users",
-    "resetPassword": "Reset password"
+    "resetPassword": "Reset password",
+    "roleAdmin": "Administrator",
+    "roleOperator": "Operator",
+    "roleGuest": "Guest",
+    "initialPassword": "Initial password",
+    "passwordHint": "Stored as BCrypt hash. The user can change it after first login.",
+    "resetFor": "Reset password for",
+    "newPassword": "New password"
   },
   "vlans": {
     "title": "VLANs",
     "newVlan": "New VLAN",
     "editVlan": "Edit VLAN",
     "vlans": "VLANs",
-    "number": "VLAN Number"
+    "number": "VLAN Number",
+    "l2domain": "L2 domain",
+    "noVlans": "No VLANs defined."
   },
   "vlanDomains": {
     "title": "VLAN Domains",
@@ -176,17 +226,27 @@
     "title": "Nameservers",
     "newNameserver": "New nameserver",
     "editNameserver": "Edit nameserver",
-    "nameservers": "Nameservers"
+    "nameservers": "Nameservers",
+    "serverAddresses": "Server addresses"
   },
   "ipTags": {
     "title": "IP Tags",
     "newIpTag": "New IP Tag",
     "editIpTag": "Edit IP Tag",
-    "ipTags": "IP Tags"
+    "ipTags": "IP Tags",
+    "bgColor": "Background color",
+    "fgColor": "Foreground color",
+    "showInLists": "Show in lists",
+    "updateAuto": "Update tag for matching IPs automatically",
+    "noTags": "No IP tags defined."
   },
   "permissions": {
     "title": "Permissions",
-    "permissions": "Permissions"
+    "permissions": "Permissions",
+    "groups": "Groups",
+    "noGroups": "No groups.",
+    "users": "Users",
+    "noResource": "No resource of this type."
   },
   "logs": {
     "title": "Logs",
@@ -194,7 +254,9 @@
     "timestamp": "Timestamp",
     "action": "Action",
     "user": "User",
-    "details": "Details"
+    "details": "Details",
+    "allSeverities": "All severities",
+    "showingLatest": "Showing latest"
   },
   "errors": {
     "invalidMask": "Invalid mask.",
@@ -211,5 +273,170 @@
     "invalidPhone": "Invalid phone number",
     "tooShort": "Too short",
     "tooLong": "Too long"
+  },
+  "layout": {
+    "maintenanceActive": "Maintenance mode active",
+    "maintenanceDisable": "Disable",
+    "notFound": "Not found",
+    "notFoundText": "Sorry, there is no page at this address."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "sections": "Sections",
+    "subnets": "Subnets",
+    "ipAddresses": "IP addresses",
+    "vlans": "VLANs",
+    "vrfs": "VRFs",
+    "devices": "Devices",
+    "users": "Users"
+  },
+  "sections": {
+    "title": "Sections",
+    "noSections": "No sections yet.",
+    "createOne": "Create one",
+    "subnetOrdering": "Subnet ordering",
+    "displayOrder": "Display order",
+    "strictMode": "Strict mode (no overlapping subnets)",
+    "showVlan": "Show VLAN column",
+    "showVrf": "Show VRF column"
+  },
+  "authMethods": {
+    "general": "General",
+    "typeLocal": "Local",
+    "typeHttp": "HTTP (web server)",
+    "typeAd": "Active Directory",
+    "serverSection": "Server",
+    "bindSection": "Bind account",
+    "searchSection": "User search",
+    "groupSection": "Group mapping",
+    "nasSection": "NAS & failover",
+    "idpSection": "Identity Provider (IdP)",
+    "spSection": "Service Provider (SP)",
+    "attrSection": "Attribute mapping",
+    "optional": "Optional",
+    "hostname": "Hostname / IP",
+    "port": "Port",
+    "useSsl": "Use SSL (LDAPS)",
+    "useStartTls": "Use STARTTLS",
+    "verifyCert": "Verify certificate",
+    "bindDn": "Bind DN",
+    "bindPassword": "Bind password",
+    "userBaseDn": "User base DN",
+    "usernameAttr": "Username attribute",
+    "emailAttr": "Email attribute",
+    "userFilter": "Additional user filter",
+    "groupBaseDn": "Group base DN",
+    "groupAttr": "Group name attribute",
+    "memberAttr": "Member attribute",
+    "adminGroup": "Admin group DN",
+    "domain": "Domain",
+    "netbios": "NetBIOS name",
+    "bindAccount": "Bind account",
+    "baseDn": "Base DN",
+    "usersOu": "Users OU",
+    "loginFilter": "Additional user filter",
+    "sharedSecret": "Shared secret",
+    "timeout": "Timeout (s)",
+    "retries": "Retries",
+    "protocol": "Protocol",
+    "nasId": "NAS Identifier",
+    "nasIp": "NAS IP address",
+    "backupServer": "Backup server",
+    "entityId": "Entity ID",
+    "ssoUrl": "SSO URL",
+    "sloUrl": "SLO URL",
+    "certificate": "X.509 certificate",
+    "acsUrl": "ACS URL",
+    "spCertificate": "SP certificate",
+    "spPrivateKey": "SP private key",
+    "groupsAttr": "Groups attribute",
+    "adminGroupVal": "Admin group value",
+    "nameIdFormat": "Name ID format",
+    "autoCreate": "Auto-create users",
+    "defaultRole": "Default role for new users"
+  },
+  "settings": {
+    "siteIdentity": "Site identity",
+    "siteTitle": "Site title",
+    "siteUrl": "Site URL",
+    "adminName": "Admin name",
+    "adminMail": "Admin email",
+    "siteDomain": "Site domain",
+    "loginText": "Login text",
+    "modules": "Modules",
+    "maintenance": "Maintenance",
+    "maintenanceMode": "Maintenance mode"
+  },
+  "vrfs": {
+    "rd": "RD (Route Distinguisher)",
+    "sections": "Sections (comma-separated IDs)",
+    "sectionsHint": "Leave empty to apply to all.",
+    "noVrfs": "No VRFs defined."
+  },
+  "ipcalc": {
+    "title": "IP Calculator",
+    "input": "Input",
+    "cidrHint": "CIDR (IPv4 or IPv6)",
+    "version": "Version",
+    "networkAddress": "Network address",
+    "firstUsable": "First usable",
+    "lastUsable": "Last usable",
+    "usableHosts": "Usable hosts",
+    "totalAddresses": "Total addresses"
+  },
+  "profile": {
+    "title": "My Profile",
+    "tabInfo": "Information",
+    "tabDisplay": "Display",
+    "tabNotifications": "Notifications",
+    "tabPassword": "Password",
+    "personalInfo": "Personal information",
+    "usernameReadOnly": "Username cannot be changed.",
+    "fullName": "Full name",
+    "displayPrefs": "Display preferences",
+    "language": "Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "navigation": "Navigation",
+    "menuType": "Menu type",
+    "compactMenu": "Compact menu",
+    "subnetPrefs": "Subnets",
+    "hideFreeRange": "Hide free address ranges",
+    "compressActions": "Compress action buttons",
+    "notifSettings": "Notification settings",
+    "noEmail": "no email configured",
+    "addEmail": "Add an email address →",
+    "ipNotify": "IP change notifications",
+    "ipNotifyDesc": "Receive an email when an IP address is added, modified or deleted.",
+    "changelog": "Changelog digest",
+    "changelogDesc": "Receive a daily digest of all changes made in the application.",
+    "changePassword": "Change password",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm new password",
+    "minChars": "Minimum 8 characters.",
+    "savedSuccess": "Preferences saved successfully.",
+    "pwdChanged": "Password changed successfully."
+  },
+  "scan": {
+    "mode": "Mode",
+    "fullSubnet": "Full subnet",
+    "dhcpRange": "DHCP range",
+    "ipStart": "Start IP",
+    "ipEnd": "End IP",
+    "maxThreads": "Max threads",
+    "timeoutMs": "Timeout (ms)",
+    "dnsResolution": "DNS resolution",
+    "start": "Start scan",
+    "scanning": "Scanning…"
+  },
+  "login": {
+    "username": "Username",
+    "password": "Password",
+    "signIn": "Sign in",
+    "invalidCreds": "Invalid username or password.",
+    "defaultHint": "Default: Admin / ipamadmin (change after first login)"
   }
 }

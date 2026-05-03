@@ -2,7 +2,7 @@
 @attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inherits LocalizedComponentBase
 
-<PageTitle>My Profile</PageTitle>
+<PageTitle>@T("profile.title")</PageTitle>
 
 <div class="d-flex align-items-center mb-4 gap-3">
     <div class="phpipam-avatar">
@@ -17,7 +17,7 @@
 @if (_saved)
 {
     <div class="alert alert-success alert-dismissible py-2 mb-3" role="alert">
-        <i class="bi bi-check-circle me-2"></i>Preferences saved successfully.
+        <i class="bi bi-check-circle me-2"></i>@T("profile.savedSuccess")
         <button type="button" class="btn-close btn-sm" @onclick="() => _saved = false"></button>
     </div>
 }
@@ -31,7 +31,7 @@
 @if (_user is not null)
 {
     <div class="phpipam-profile-tabs mb-4">
-        @foreach (var tab in new[] { ("info", "bi-person", "Information"), ("display", "bi-palette", "Display"), ("notifications", "bi-bell", "Notifications"), ("password", "bi-key", "Password") })
+        @foreach (var tab in new[] { ("info", "bi-person", @T("profile.tabInfo")), ("display", "bi-palette", @T("profile.tabDisplay")), ("notifications", "bi-bell", @T("profile.tabNotifications")), ("password", "bi-key", @T("profile.tabPassword")) })
         {
             <button class="phpipam-profile-tab @(_activeTab == tab.Item1 ? "active" : "")"
                     @onclick="() => _activeTab = tab.Item1">
@@ -44,20 +44,20 @@
     @if (_activeTab == "info")
     {
         <div class="phpipam-card" style="max-width:640px">
-            <div class="phpipam-card-header"><i class="bi bi-person me-2"></i>Personal information</div>
+            <div class="phpipam-card-header"><i class="bi bi-person me-2"></i>@T("profile.personalInfo")</div>
             <div class="phpipam-card-body">
                 <EditForm Model="_user" OnValidSubmit="SaveInfo" FormName="profileInfo">
                     <div class="mb-3">
-                        <label class="form-label">Username</label>
+                        <label class="form-label">@T("common.username")</label>
                         <input class="form-control" value="@_user.Username" disabled />
-                        <div class="form-text">Username cannot be changed.</div>
+                        <div class="form-text">@T("profile.usernameReadOnly")</div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Full name</label>
+                        <label class="form-label">@T("profile.fullName")</label>
                         <InputText class="form-control" @bind-Value="_user.RealName" placeholder="Your full name" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">@T("common.email")</label>
                         <InputText type="email" class="form-control" @bind-Value="_user.Email" placeholder="your@email.com" />
                     </div>
                     <button type="submit" class="btn btn-primary">
@@ -72,12 +72,12 @@
     @if (_activeTab == "display")
     {
         <div class="phpipam-card" style="max-width:640px">
-            <div class="phpipam-card-header"><i class="bi bi-palette me-2"></i>Display preferences</div>
+            <div class="phpipam-card-header"><i class="bi bi-palette me-2"></i>@T("profile.displayPrefs")</div>
             <div class="phpipam-card-body">
                 <EditForm Model="_user" OnValidSubmit="SaveDisplay" FormName="profileDisplay">
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Language</label>
+                        <label class="form-label fw-semibold">@T("profile.language")</label>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach (var (code, flag, label) in _languages)
                             {
@@ -94,7 +94,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-semibold">Theme</label>
                         <div class="d-flex gap-3">
-                            @foreach (var (val, icon, label) in new[] { ("light", "bi-sun", "Light"), ("dark", "bi-moon-stars", "Dark"), ("auto", "bi-circle-half", "System") })
+                            @foreach (var (val, icon, label) in new[] { ("light", "bi-sun", "@T("profile.themeLight")"), ("dark", "bi-moon-stars", "@T("profile.themeDark")"), ("auto", "bi-circle-half", "@T("profile.themeSystem")") })
                             {
                                 <label class="phpipam-theme-option @(_user.Theme == val ? "active" : "")">
                                     <input type="radio" name="theme" value="@val" class="visually-hidden"
@@ -108,7 +108,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Navigation</label>
+                        <label class="form-label fw-semibold">@T("profile.navigation")</label>
                         <div class="mb-2">
                             <label class="form-label small text-muted">Menu type</label>
                             <InputSelect class="form-select form-select-sm" style="max-width:200px" @bind-Value="_user.MenuType">
@@ -118,19 +118,19 @@
                         </div>
                         <div class="form-check">
                             <InputCheckbox class="form-check-input" id="menuCompact" @bind-Value="_user.MenuCompact" />
-                            <label class="form-check-label" for="menuCompact">Compact menu</label>
+                            <label class="form-check-label" for="menuCompact">@T("profile.compactMenu")</label>
                         </div>
                     </div>
 
                     <div class="mb-4">
-                        <label class="form-label fw-semibold">Subnets</label>
+                        <label class="form-label fw-semibold">@T("profile.subnetPrefs")</label>
                         <div class="form-check">
                             <InputCheckbox class="form-check-input" id="hideFree" @bind-Value="_user.HideFreeRange" />
-                            <label class="form-check-label" for="hideFree">Hide free address ranges</label>
+                            <label class="form-check-label" for="hideFree">@T("profile.hideFreeRange")</label>
                         </div>
                         <div class="form-check mt-2">
                             <InputCheckbox class="form-check-input" id="compressActions" @bind-Value="_user.CompressActions" />
-                            <label class="form-check-label" for="compressActions">Compress action buttons</label>
+                            <label class="form-check-label" for="compressActions">@T("profile.compressActions")</label>
                         </div>
                     </div>
 
@@ -146,11 +146,11 @@
     @if (_activeTab == "notifications")
     {
         <div class="phpipam-card" style="max-width:640px">
-            <div class="phpipam-card-header"><i class="bi bi-bell me-2"></i>Notification settings</div>
+            <div class="phpipam-card-header"><i class="bi bi-bell me-2"></i>@T("profile.notifSettings")</div>
             <div class="phpipam-card-body">
                 <EditForm Model="_user" OnValidSubmit="SaveNotifications" FormName="profileNotif">
                     <p class="text-muted small mb-3">
-                        Email notifications are sent to <strong>@(string.IsNullOrEmpty(_user.Email) ? "no email configured" : _user.Email)</strong>.
+                        Email notifications are sent to <strong>@(string.IsNullOrEmpty(_user.Email) ? "@T("profile.noEmail")" : _user.Email)</strong>.
                         @if (string.IsNullOrEmpty(_user.Email))
                         {
                             <a href="#" @onclick:preventDefault @onclick='() => _activeTab = "info"'> Add an email address →</a>
@@ -161,8 +161,8 @@
                                checked='@(_user.MailNotify == "Yes")'
                                @onchange='e => _user.MailNotify = ((bool)e.Value!) ? "Yes" : "No"' />
                         <label class="form-check-label" for="mailNotify">
-                            <strong>IP change notifications</strong>
-                            <div class="text-muted small">Receive an email when an IP address is added, modified or deleted.</div>
+                            <strong>@T("profile.ipNotify")</strong>
+                            <div class="text-muted small">@T("profile.ipNotifyDesc")</div>
                         </label>
                     </div>
                     <div class="form-check mb-4">
@@ -170,8 +170,8 @@
                                checked='@(_user.MailChangelog == "Yes")'
                                @onchange='e => _user.MailChangelog = ((bool)e.Value!) ? "Yes" : "No"' />
                         <label class="form-check-label" for="mailChangelog">
-                            <strong>Changelog digest</strong>
-                            <div class="text-muted small">Receive a daily digest of all changes made in the application.</div>
+                            <strong>@T("profile.changelog")</strong>
+                            <div class="text-muted small">@T("profile.changelogDesc")</div>
                         </label>
                     </div>
                     <button type="submit" class="btn btn-primary">
@@ -186,27 +186,27 @@
     @if (_activeTab == "password")
     {
         <div class="phpipam-card" style="max-width:480px">
-            <div class="phpipam-card-header"><i class="bi bi-key me-2"></i>Change password</div>
+            <div class="phpipam-card-header"><i class="bi bi-key me-2"></i>@T("profile.changePassword")</div>
             <div class="phpipam-card-body">
                 <EditForm Model="_pwdForm" OnValidSubmit="SavePassword" FormName="profilePwd">
                     <DataAnnotationsValidator />
                     <div class="mb-3">
-                        <label class="form-label">Current password</label>
+                        <label class="form-label">@T("profile.currentPassword")</label>
                         <input type="password" class="form-control" @bind="_pwdForm.Current" autocomplete="current-password" />
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">New password</label>
+                        <label class="form-label">@T("profile.newPassword")</label>
                         <input type="password" class="form-control" @bind="_pwdForm.New" autocomplete="new-password" />
-                        <div class="form-text">Minimum 8 characters.</div>
+                        <div class="form-text">@T("profile.minChars")</div>
                     </div>
                     <div class="mb-4">
-                        <label class="form-label">Confirm new password</label>
+                        <label class="form-label">@T("profile.confirmPassword")</label>
                         <input type="password" class="form-control" @bind="_pwdForm.Confirm" autocomplete="new-password" />
                     </div>
                     @if (_pwdSaved)
                     {
                         <div class="alert alert-success py-2 mb-3">
-                            <i class="bi bi-check-circle me-2"></i>Password changed successfully.
+                            <i class="bi bi-check-circle me-2"></i>@T("profile.pwdChanged")
                         </div>
                     }
                     @if (!string.IsNullOrEmpty(_pwdError))

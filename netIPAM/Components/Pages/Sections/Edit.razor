@@ -19,12 +19,12 @@
                     <InputText class="form-control" @bind-Value="_section.Name" />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Description</label>
+                    <label class="form-label">@T("common.description")</label>
                     <InputTextArea class="form-control" rows="3" @bind-Value="_section.Description" />
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Subnet ordering</label>
+                        <label class="form-label">@T("sections.subnetOrdering")</label>
                         <InputSelect class="form-select" @bind-Value="_section.SubnetOrdering">
                             <option value="">(default)</option>
                             <option value="subnet,asc">subnet,asc</option>
@@ -33,21 +33,21 @@
                         </InputSelect>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Display order</label>
+                        <label class="form-label">@T("sections.displayOrder")</label>
                         <InputNumber class="form-control" @bind-Value="_section.Order" />
                     </div>
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="strict" @bind-Value="_section.StrictMode" />
-                    <label class="form-check-label" for="strict">Strict mode (no overlapping subnets)</label>
+                    <label class="form-check-label" for="strict">@T("sections.strictMode")</label>
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="showVlan" @bind-Value="_section.ShowVlan" />
-                    <label class="form-check-label" for="showVlan">Show VLAN column</label>
+                    <label class="form-check-label" for="showVlan">@T("sections.showVlan")</label>
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="showVrf" @bind-Value="_section.ShowVrf" />
-                    <label class="form-check-label" for="showVrf">Show VRF column</label>
+                    <label class="form-check-label" for="showVrf">@T("sections.showVrf")</label>
                 </div>
 
                 <button type="submit" class="btn btn-primary">

@@ -19,7 +19,7 @@
                         <InputText class="form-control" @bind-Value="_vrf.Name" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">RD (Route Distinguisher)</label>
+                        <label class="form-label">@T("vrfs.rd")</label>
                         <InputText class="form-control" @bind-Value="_vrf.Rd" placeholder="65000:1" />
                     </div>
                 </div>
@@ -28,9 +28,9 @@
                     <InputTextArea class="form-control" rows="3" @bind-Value="_vrf.Description" />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Sections (comma-separated IDs)</label>
+                    <label class="form-label">@T("vrfs.sections")</label>
                     <InputText class="form-control" @bind-Value="_vrf.Sections" />
-                    <small class="text-muted">Leave empty to apply to all.</small>
+                    <small class="text-muted">@T("vrfs.sectionsHint")</small>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> @T("common.save")</button>
                 <a class="btn btn-link" href="/admin/vrfs">Cancel</a>
