@@ -32,7 +32,7 @@ public class VrfService
 
     public async Task DeleteAsync(int vrfId, CancellationToken ct = default)
     {
-        var v = await _db.Vrfs.FindAsync(new object?[] { vrfId }, ct);
+        Vrfs? v = await _db.Vrfs.FindAsync(new object?[] { vrfId }, ct);
         if (v is null) return;
         _db.Vrfs.Remove(v);
         await _db.SaveChangesAsync(ct);

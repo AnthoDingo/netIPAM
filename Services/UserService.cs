@@ -32,7 +32,7 @@ public class UserService
     /// </summary>
     public async Task<User?> AuthenticateLocalAsync(string username, string password, CancellationToken ct = default)
     {
-        var user = await FindByUsernameAsync(username, ct);
+        User? user = await FindByUsernameAsync(username, ct);
         if (user is null) return null;
         if (string.Equals(user.Disabled, "Yes", StringComparison.OrdinalIgnoreCase)) return null;
         if (string.IsNullOrEmpty(user.Password)) return null;
@@ -63,12 +63,12 @@ public class UserService
 
     public async Task DeleteAsync(int userId, CancellationToken ct = default)
     {
-        var u = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        Users? u = await _db.Users.FindAsync(new object?[] { userId }, ct);
         if (u is null) return;
         // Garde-fou : on ne supprime pas le dernier Administrator
         if (string.Equals(u.Role, "Administrator", StringComparison.OrdinalIgnoreCase))
         {
-            var adminCount = await _db.Users.CountAsync(x => x.Role == "Administrator", ct);
+            int adminCount = await _db.Users.CountAsync(x => x.Role == "Administrator", ct);
             if (adminCount <= 1) return;
         }
         _db.Users.Remove(u);
@@ -77,7 +77,7 @@ public class UserService
 
     public async Task ResetPasswordAsync(int userId, string newPassword, CancellationToken ct = default)
     {
-        var user = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        Users? user = await _db.Users.FindAsync(new object?[] { userId }, ct);
         if (user is null) return;
         user.Password = _hasher.Hash(newPassword);
         user.EditDate = DateTime.UtcNow;
@@ -96,7 +96,7 @@ public class UserService
         if (string.IsNullOrWhiteSpace(user.Groups)) return [];
         try
         {
-            var dict = JsonSerializer.Deserialize<Dictionary<string, string>>(user.Groups);
+            Dictionary<string, string>? dict = JsonSerializer.Deserialize<Dictionary<string, string>>(user.Groups);
             return dict?.Keys
                 .Select(k => int.TryParse(k, out var id) ? id : -1)
                 .Where(id => id > 0)
@@ -111,21 +111,21 @@ public class UserService
     /// </summary>
     public async Task SetGroupIdsAsync(int userId, List<int> groupIds, CancellationToken ct = default)
     {
-        var user = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        Users? user = await _db.Users.FindAsync(new object?[] { userId }, ct);
         if (user is null) return;
 
         // Reconstruire le JSON en préservant les levels existants
-        var existing = new Dictionary<string, string>();
+        Dictionary<string, string> existing = new();
         if (!string.IsNullOrWhiteSpace(user.Groups))
         {
             try { existing = JsonSerializer.Deserialize<Dictionary<string, string>>(user.Groups) ?? []; }
             catch { /* ignore format invalide */ }
         }
 
-        var newDict = new Dictionary<string, string>();
-        foreach (var gId in groupIds)
+        Dictionary<string, string> newDict = new();
+        foreach (int gId in groupIds)
         {
-            var key = gId.ToString();
+            string key = gId.ToString();
             newDict[key] = existing.TryGetValue(key, out var level) ? level : "1";
         }
 
@@ -137,8 +137,8 @@ public class UserService
     /// <summary>Retourne tous les utilisateurs appartenant à un groupe donné.</summary>
     public async Task<List<User>> GetMembersOfGroupAsync(int groupId, CancellationToken ct = default)
     {
-        var all = await _db.Users.ToListAsync(ct);
-        var gKey = $"\"{groupId}\"";
+        List<Users> all = await _db.Users.ToListAsync(ct);
+        string gKey = $"\"{groupId}\"";
         // On cherche la clé dans le JSON sans désérialiser en masse
         return all.Where(u => u.Groups != null && u.Groups.Contains(gKey)).ToList();
     }

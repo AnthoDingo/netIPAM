@@ -30,7 +30,7 @@ public class SetupService
 
     public AppDbContext BuildContext(string provider, string connectionString)
     {
-        var opt = new DbContextOptionsBuilder<AppDbContext>();
+        DbContextOptionsBuilder<AppDbContext> opt = new();
         if (string.Equals(provider, "SqlServer", StringComparison.OrdinalIgnoreCase))
             opt.UseSqlServer(connectionString, b => b.MigrationsAssembly("netIPAM"));
         else
@@ -45,13 +45,13 @@ public class SetupService
     {
         try
         {
-            await using var db = BuildContext(provider, connectionString);
+            await using AppDbContext db = BuildContext(provider, connectionString);
             bool canConnect = await db.Database.CanConnectAsync();
             if (!canConnect)
                 return new TestConnectionResult(false, "Impossible de se connecter. Vérifiez la chaîne de connexion.", null);
 
             // Récupérer la version du serveur pour affichage
-            var version = db.Database.ProviderName ?? provider;
+            string version = db.Database.ProviderName ?? provider;
             return new TestConnectionResult(true, null, version);
         }
         catch (Exception ex)
@@ -71,7 +71,7 @@ public class SetupService
     {
         yield return "Connexion à la base de données…";
 
-        await using var db = BuildContext(provider, connectionString);
+        await using AppDbContext db = BuildContext(provider, connectionString);
 
         IEnumerable<string> pending;
         try
@@ -84,7 +84,7 @@ public class SetupService
             yield break;
         }
 
-        var migrations = pending.ToList();
+        List<string> migrations = pending.ToList();
         if (migrations.Count == 0)
         {
             yield return "✓ Aucune migration en attente — base déjà à jour.";
@@ -92,7 +92,7 @@ public class SetupService
         }
 
         yield return $"{migrations.Count} migration(s) à appliquer :";
-        foreach (var m in migrations)
+        foreach (string m in migrations)
             yield return $"  → {m}";
 
         yield return "Application des migrations…";
@@ -121,8 +121,8 @@ public class SetupService
     {
         try
         {
-            await using var db = BuildContext(provider, connectionString);
-            var hasher = new BCryptPasswordHasher();
+            await using AppDbContext db = BuildContext(provider, connectionString);
+            BCryptPasswordHasher hasher = new();
 
             if (await db.Users.AnyAsync(u => u.Username == username))
                 return $"L'utilisateur « {username} » existe déjà.";
@@ -191,12 +191,12 @@ public class SetupService
     /// </summary>
     public void WriteAppSettings(string provider, string connectionString)
     {
-        var path = Path.Combine(_env.ContentRootPath, "appsettings.json");
+        string path = Path.Combine(_env.ContentRootPath, "appsettings.json");
 
         JsonNode root;
         if (File.Exists(path))
         {
-            var raw = File.ReadAllText(path);
+            string raw = File.ReadAllText(path);
             root = JsonNode.Parse(raw) ?? new JsonObject();
         }
         else
@@ -221,7 +221,7 @@ public class SetupService
         }
         setupSection["Completed"] = true;
 
-        var options = new JsonSerializerOptions { WriteIndented = true };
+        JsonSerializerOptions options = new{ WriteIndented = true };
         File.WriteAllText(path, root.ToJsonString(options));
     }
 
@@ -229,20 +229,20 @@ public class SetupService
 
     public bool IsSetupRequired(IConfiguration config)
     {
-        var conn = config["Database:ConnectionString"];
-        var done = config["Setup:Completed"];
+        string? conn = config["Database:ConnectionString"];
+        string? done = config["Setup:Completed"];
         return string.IsNullOrWhiteSpace(conn)
             || !string.Equals(done, "true", StringComparison.OrdinalIgnoreCase);
     }
 }
     {
-        var migrations = await db.Database.GetPendingMigrationsAsync();
-        var list = migrations.ToList();
+        IEnumerable<string> migrations = await db.Database.GetPendingMigrationsAsync();
+        List<string> list = migrations.ToList();
 
         if (list.Count == 0) { yield return "✓ Base de données déjà à jour."; yield break; }
 
         yield return $"{list.Count} migration(s) à appliquer :";
-        foreach (var m in list) yield return $"  → {m}";
+        foreach (string m in list) yield return $"  → {m}";
         yield return "";
         yield return "Application en cours…";
 

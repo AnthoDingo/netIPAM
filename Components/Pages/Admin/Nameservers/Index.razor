@@ -19,7 +19,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Name</th><th>Servers</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var n in _nameservers)
+                @foreach (Nameserver n in _nameservers)
                 {
                     <tr>
                         <td><strong>@n.Name</strong></td>

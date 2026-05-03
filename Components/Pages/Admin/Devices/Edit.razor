@@ -32,14 +32,14 @@
                         <label class="form-label">Type</label>
                         <InputSelect class="form-select" @bind-Value="_device.Type">
                             <option value="0">(none)</option>
-                            @if (_types is not null) { @foreach (var t in _types) { <option value="@t.Tid">@t.Tname</option> } }
+                            @if (_types is not null) { @foreach (DeviceType t in _types) { <option value="@t.Tid">@t.Tname</option> } }
                         </InputSelect>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Location</label>
                         <InputSelect class="form-select" @bind-Value="_device.Location">
                             <option value="">(none)</option>
-                            @if (_locations is not null) { @foreach (var l in _locations) { <option value="@l.Id">@l.Name</option> } }
+                            @if (_locations is not null) { @foreach (Location l in _locations) { <option value="@l.Id">@l.Name</option> } }
                         </InputSelect>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
         {
             _device = await Devices.GetAsync(Id!.Value);
             if (_device is null) { Nav.NavigateTo("/admin/devices"); return; }
-            try { var v = IpConverter.GuessVersion(_device.IpAddr ?? "0"); _form.IpPresentation = string.IsNullOrEmpty(_device.IpAddr) ? "" : IpConverter.ToPresentation(_device.IpAddr, v); }
+            try { IpVersion v = IpConverter.GuessVersion(_device.IpAddr ?? "0"); _form.IpPresentation = string.IsNullOrEmpty(_device.IpAddr) ? "" : IpConverter.ToPresentation(_device.IpAddr, v); }
             catch { _form.IpPresentation = _device.IpAddr ?? ""; }
         }
     }

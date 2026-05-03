@@ -25,7 +25,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var g in _groups)
+                @foreach (UserGroup g in _groups)
                 {
                     <tr>
                         <td><strong>@g.GName</strong></td>

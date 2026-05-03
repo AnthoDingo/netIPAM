@@ -71,10 +71,10 @@
             _error = "Enter a CIDR like 192.168.1.0/24 or 2001:db8::/64";
             return;
         }
-        var parts = _input.Trim().Split('/');
+        string[] parts = _input.Trim().Split('/');
         try
         {
-            var dec = IpConverter.ToDecimal(parts[0]);
+            string dec = IpConverter.ToDecimal(parts[0]);
             if (!int.TryParse(parts[1], out var mask)) { _error = "Mask must be an integer."; return; }
             _info = SubnetCalculator.Describe(dec, mask);
         }

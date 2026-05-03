@@ -8,10 +8,10 @@ public class SqliteDesignTimeFactory : IDesignTimeDbContextFactory<AppDbContext>
 {
     public AppDbContext CreateDbContext(string[] args)
     {
-        var conn = Environment.GetEnvironmentVariable("PHPIPAM_SQLITE")
+        string? conn = Environment.GetEnvironmentVariable("PHPIPAM_SQLITE")
                    ?? "Data Source=phpipam_net.db";
 
-        var options = new DbContextOptionsBuilder<AppDbContext>()
+        DbContextOptionsBuilder<AppDbContext> options = new()
             .UseSqlite(conn, b => b.MigrationsAssembly("netIPAM"))
             .Options;
 

@@ -24,9 +24,9 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>((sp, opt) =>
         {
             // Lecture live — supporte le rechargement de IConfiguration après setup
-            var cfg        = sp.GetRequiredService<IConfiguration>();
-            var provider   = cfg["Database:Provider"] ?? "Sqlite";
-            var connection = cfg["Database:ConnectionString"];
+            IConfiguration cfg        = sp.GetRequiredService<IConfiguration>();
+            string? provider   = cfg["Database:Provider"] ?? "Sqlite";
+            string? connection = cfg["Database:ConnectionString"];
 
             if (string.IsNullOrWhiteSpace(connection))
             {

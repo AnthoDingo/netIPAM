@@ -32,7 +32,7 @@ public class SectionService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var s = await _db.Sections.FindAsync(new object?[] { id }, ct);
+        Sections? s = await _db.Sections.FindAsync(new object?[] { id }, ct);
         if (s is null) return;
         _db.Sections.Remove(s);
         await _db.SaveChangesAsync(ct);

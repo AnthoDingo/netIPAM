@@ -54,7 +54,7 @@ public class SubnetService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var s = await _db.Subnets.FindAsync(new object?[] { id }, ct);
+        Subnets? s = await _db.Subnets.FindAsync(new object?[] { id }, ct);
         if (s is null) return;
         _db.Subnets.Remove(s);
         await _db.SaveChangesAsync(ct);
@@ -63,15 +63,15 @@ public class SubnetService
     /// <summary>Statistiques d'occupation d'un sous-réseau (% utilisé).</summary>
     public async Task<(long total, long used, double percentUsed)> UsageAsync(int subnetId, CancellationToken ct = default)
     {
-        var subnet = await GetAsync(subnetId, ct);
+        Subnet? subnet = await GetAsync(subnetId, ct);
         if (subnet is null || string.IsNullOrEmpty(subnet.SubnetAddress) || string.IsNullOrEmpty(subnet.Mask))
             return (0, 0, 0d);
 
         if (!int.TryParse(subnet.Mask, out var maskBits)) return (0, 0, 0d);
-        var info = SubnetCalculator.Describe(subnet.SubnetAddress, maskBits);
-        var total = (long)info.UsableHosts;
-        var used = await CountIpsAsync(subnetId, ct);
-        var pct = total == 0 ? 0d : 100.0 * used / total;
+        SubnetCalculator.SubnetInfo info = SubnetCalculator.Describe(subnet.SubnetAddress, maskBits);
+        long total = (long)info.UsableHosts;
+        int used = await CountIpsAsync(subnetId, ct);
+        double pct = total == 0 ? 0d : 100.0 * used / total;
         return (total, used, pct);
     }
 }

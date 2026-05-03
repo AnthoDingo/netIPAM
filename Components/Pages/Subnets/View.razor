@@ -85,8 +85,8 @@
                         <div class="phpipam-card-header">Usage</div>
                         <div class="phpipam-card-body">
                             @{
-                                var pct = _usage.percentUsed;
-                                var cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
+                                double pct = _usage.percentUsed;
+                                string cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
                             }
                             <div class="phpipam-usage" style="height:24px">
                                 <div class="phpipam-usage-fill @cls" style="width:@($"{pct:0.#}")%"></div>
@@ -122,7 +122,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var ip in _addresses)
+                                    @foreach (IpAddress ip in _addresses)
                                     {
                                         <tr>
                                             <td>
@@ -188,7 +188,7 @@
     {
         try
         {
-            var v = IpConverter.GuessVersion(ip.IpAddr);
+            IpVersion v = IpConverter.GuessVersion(ip.IpAddr);
             return IpConverter.ToPresentation(ip.IpAddr, v);
         }
         catch { return ip.IpAddr; }

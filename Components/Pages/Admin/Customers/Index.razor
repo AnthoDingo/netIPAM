@@ -23,7 +23,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Title</th><th>City</th><th>Contact</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var c in _customers)
+                @foreach (Customer c in _customers)
                 {
                     <tr>
                         <td><strong>@c.Title</strong></td>

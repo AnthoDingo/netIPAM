@@ -51,7 +51,7 @@ public class ScanService
     /// <summary>Génère toutes les adresses hôtes utilisables d'un sous-réseau (FirstUsable → LastUsable).</summary>
     public IReadOnlyList<string> GetSubnetAddresses(string networkDecimal, int mask)
     {
-        var info = SubnetCalculator.Describe(networkDecimal, mask);
+        SubnetCalculator.SubnetInfo info = SubnetCalculator.Describe(networkDecimal, mask);
         return GenerateRange(
             IpConverter.ToDecimal(info.FirstUsable),
             IpConverter.ToDecimal(info.LastUsable));
@@ -67,8 +67,8 @@ public class ScanService
             !BigInteger.TryParse(endDecimal,   out var end)   || end < start)
             return [];
 
-        var list = new List<string>((int)Math.Min((long)(end - start + 1), 65536));
-        for (var i = start; i <= end; i++)
+        List<string> list = new((int)Math.Min((long)(end - start + 1), 65536));
+        for (BigInteger i = start; i <= end; i++)
             list.Add(i.ToString());
         return list;
     }
@@ -88,18 +88,18 @@ public class ScanService
         if (addresses.Count == 0) yield break;
 
         // Canal borné : backpressure naturelle, évite d'exploser la RAM
-        var channel = Channel.CreateBounded<ScanHostResult>(
+        Channel<ScanHostResult> channel = Channel.CreateBounded<ScanHostResult>(
             new BoundedChannelOptions(options.MaxParallel * 4) { SingleReader = true });
 
-        var producer = Task.Run(async () =>
+        Task producer = Task.Run(async () =>
         {
-            var sem = new SemaphoreSlim(options.MaxParallel);
-            var tasks = addresses.Select(async decimalAddr =>
+            SemaphoreSlim sem = new(options.MaxParallel);
+            IEnumerable<Task> tasks = addresses.Select(async decimalAddr =>
             {
                 await sem.WaitAsync(ct).ConfigureAwait(false);
                 try
                 {
-                    var result = await ScanOneHostAsync(decimalAddr, options, ct).ConfigureAwait(false);
+                    ScanHostResult result = await ScanOneHostAsync(decimalAddr, options, ct).ConfigureAwait(false);
                     await channel.Writer.WriteAsync(result, ct).ConfigureAwait(false);
                 }
                 finally { sem.Release(); }
@@ -109,7 +109,7 @@ public class ScanService
             channel.Writer.Complete();
         }, ct);
 
-        await foreach (var result in channel.Reader.ReadAllAsync(ct))
+        await foreach (ScanHostResult result in channel.Reader.ReadAllAsync(ct))
             yield return result;
 
         await producer; // propage les exceptions du producteur
@@ -127,11 +127,11 @@ public class ScanService
         CancellationToken ct = default)
     {
         options ??= new ScanOptions();
-        var total   = addresses.Count;
-        var scanned = 0;
-        var alive   = 0;
+        int total   = addresses.Count;
+        int scanned = 0;
+        int alive   = 0;
 
-        await foreach (var result in ScanAsync(addresses, options, ct))
+        await foreach (ScanHostResult result in ScanAsync(addresses, options, ct))
         {
             scanned++;
             if (result.IsAlive)
@@ -143,7 +143,7 @@ public class ScanService
         }
 
         // Mettre à jour lastScan sur le subnet
-        var subnet = await _db.Subnets.FindAsync(new object?[] { subnetId }, ct);
+        Subnets? subnet = await _db.Subnets.FindAsync(new object?[] { subnetId }, ct);
         if (subnet is not null)
         {
             subnet.LastScan = DateTime.UtcNow;
@@ -158,14 +158,14 @@ public class ScanService
     /// <summary>Retourne vrai si le scan est activé globalement (ScanMaxThreads > 0).</summary>
     public async Task<bool> IsGloballyEnabledAsync(CancellationToken ct = default)
     {
-        var s = await _db.Settings.FirstOrDefaultAsync(ct);
+        Settings? s = await _db.Settings.FirstOrDefaultAsync(ct);
         return s is not null && s.ScanMaxThreads > 0;
     }
 
     /// <summary>Retourne les options de scan depuis la configuration globale.</summary>
     public async Task<ScanOptions> GetOptionsFromSettingsAsync(CancellationToken ct = default)
     {
-        var s = await _db.Settings.FirstOrDefaultAsync(ct);
+        Settings? s = await _db.Settings.FirstOrDefaultAsync(ct);
         if (s is null) return new ScanOptions();
         return new ScanOptions(
             MaxParallel = Math.Clamp(s.ScanMaxThreads, 1, 256),
@@ -178,7 +178,7 @@ public class ScanService
     private static async Task<ScanHostResult> ScanOneHostAsync(
         string decimalAddr, ScanOptions options, CancellationToken ct)
     {
-        var version = IpConverter.GuessVersion(decimalAddr);
+        IpVersion version = IpConverter.GuessVersion(decimalAddr);
         string presentation;
         try   { presentation = IpConverter.ToPresentation(decimalAddr, version); }
         catch { return new ScanHostResult(decimalAddr, decimalAddr, false, null, 0, DateTime.UtcNow); }
@@ -193,8 +193,8 @@ public class ScanService
             if (ct.IsCancellationRequested) break;
             try
             {
-                using var ping  = new Ping();
-                var reply = await ping.SendPingAsync(presentation, options.TimeoutMs).ConfigureAwait(false);
+                using Ping ping = new();
+                PingReply reply = await ping.SendPingAsync(presentation, options.TimeoutMs).ConfigureAwait(false);
                 if (reply.Status == IPStatus.Success)
                 {
                     alive = true;
@@ -209,7 +209,7 @@ public class ScanService
         {
             try
             {
-                var entry = await Dns.GetHostEntryAsync(presentation, ct).ConfigureAwait(false);
+                IPHostEntry entry = await Dns.GetHostEntryAsync(presentation, ct).ConfigureAwait(false);
                 hostname  = entry.HostName;
                 // Supprimer le FQDN complet si c'est juste l'IP qui revient
                 if (hostname == presentation) hostname = null;
@@ -222,7 +222,7 @@ public class ScanService
 
     private async Task UpsertIpAddressAsync(int subnetId, ScanHostResult result, CancellationToken ct)
     {
-        var existing = await _db.IpAddresses
+        IpAddress? existing = await _db.IpAddresses
             .FirstOrDefaultAsync(i => i.SubnetId == subnetId && i.IpAddr == result.IpDecimal, ct);
 
         if (existing is null)

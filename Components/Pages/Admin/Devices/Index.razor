@@ -24,7 +24,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Hostname</th><th>IP</th><th>Type</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var d in _devices)
+                @foreach (Device d in _devices)
                 {
                     <tr>
                         <td><strong>@d.Hostname</strong></td>
@@ -49,7 +49,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        var types = await Types.ListAsync();
+        List<DeviceType> types = await Types.ListAsync();
         _types = types.ToDictionary(t => t.Tid, t => t.Tname ?? "—");
         await Reload();
     }
@@ -60,7 +60,7 @@ else
     private static string FormatIp(string? raw)
     {
         if (string.IsNullOrEmpty(raw)) return "";
-        try { var v = IpConverter.GuessVersion(raw); return IpConverter.ToPresentation(raw, v); }
+        try { IpVersion v = IpConverter.GuessVersion(raw); return IpConverter.ToPresentation(raw, v); }
         catch { return raw; }
     }
 }

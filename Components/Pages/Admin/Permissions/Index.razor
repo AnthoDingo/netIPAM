@@ -20,9 +20,9 @@
         <div class="phpipam-card">
             <div class="phpipam-card-header">Groupes</div>
             <div style="max-height:220px;overflow-y:auto">
-                @foreach (var g in _groups)
+                @foreach (UserGroup g in _groups)
                 {
-                    var counts = _subjectCounts.GetValueOrDefault((SubjectTypes.Group, g.GId));
+                    Dictionary<string, int>? counts = _subjectCounts.GetValueOrDefault((SubjectTypes.Group, g.GId));
                     <div class="phpipam-subject-row @(IsSelected(SubjectTypes.Group, g.GId) ? "active" : "")"
                          @onclick="() => SelectSubject(SubjectTypes.Group, g.GId, g.GName ?? $"Groupe {g.GId}")">
                         <i class="bi bi-people-fill me-2"></i>
@@ -43,9 +43,9 @@
         <div class="phpipam-card mt-3">
             <div class="phpipam-card-header">Utilisateurs</div>
             <div style="max-height:260px;overflow-y:auto">
-                @foreach (var u in _users)
+                @foreach (User u in _users)
                 {
-                    var counts = _subjectCounts.GetValueOrDefault((SubjectTypes.User, u.Id));
+                    Dictionary<string, int>? counts = _subjectCounts.GetValueOrDefault((SubjectTypes.User, u.Id));
                     <div class="phpipam-subject-row @(IsSelected(SubjectTypes.User, u.Id) ? "active" : "")"
                          @onclick="() => SelectSubject(SubjectTypes.User, u.Id, u.Username)">
                         <i class="bi bi-person me-2"></i>
@@ -91,7 +91,7 @@
 
                     @* Tabs des types de ressources *@
                     <ul class="nav nav-tabs mb-3">
-                        @foreach (var tab in _tabs)
+                        @foreach (TabDef tab in _tabs)
                         {
                             <li class="nav-item">
                                 <button class="nav-link @(_activeTab == tab.Key ? "active" : "")"
@@ -113,7 +113,7 @@
                     }
                     else
                     {
-                        var rows = GetCurrentRows();
+                        List<ResourceRow> rows = GetCurrentRows();
                         @if (rows.Count == 0)
                         {
                             <p class="text-muted small">Aucune ressource de ce type.</p>
@@ -129,10 +129,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach (var row in rows)
+                                    @foreach (ResourceRow row in rows)
                                     {
-                                        var key  = (_activeTab, row.EntityId);
-                                        var level = _draft.TryGetValue(key, out var l) ? l : 0;
+                                        (string, int) key  = (_activeTab, row.EntityId);
+                                        int level = _draft.TryGetValue(key, out var l) ? l : 0;
                                         <tr>
                                             <td><strong>@row.Name</strong></td>
                                             <td class="text-muted small">@row.Detail</td>
@@ -174,9 +174,9 @@
                     </div>
                     <div class="phpipam-card-body small text-muted">
                         Cet utilisateur appartient aux groupes :
-                        @foreach (var gId in _userGroupIds)
+                        @foreach (int gId in _userGroupIds)
                         {
-                            var g = _groups.FirstOrDefault(x => x.GId == gId);
+                            UserGroup? g = _groups.FirstOrDefault(x => x.GId == gId);
                             <span class="badge bg-secondary me-1">@(g?.GName ?? $"#{gId}")</span>
                         }
                         <br />Les permissions de ces groupes s'ajoutent aux permissions directes (la valeur la plus haute l'emporte).
@@ -243,14 +243,14 @@
         _devs    = await Devices.ListAsync();
 
         // Pré-calculer les compteurs par sujet
-        foreach (var g in _groups)
+        foreach (UserGroup g in _groups)
         {
-            var counts = await PermSvc.GetPermissionCountsAsync(SubjectTypes.Group, g.GId);
+            Dictionary<string, int> counts = await PermSvc.GetPermissionCountsAsync(SubjectTypes.Group, g.GId);
             if (counts.Values.Sum() > 0) _subjectCounts[(SubjectTypes.Group, g.GId)] = counts;
         }
-        foreach (var u in _users)
+        foreach (User u in _users)
         {
-            var counts = await PermSvc.GetPermissionCountsAsync(SubjectTypes.User, u.Id);
+            Dictionary<string, int> counts = await PermSvc.GetPermissionCountsAsync(SubjectTypes.User, u.Id);
             if (counts.Values.Sum() > 0) _subjectCounts[(SubjectTypes.User, u.Id)] = counts;
         }
     }
@@ -268,7 +268,7 @@
 
         if (type == SubjectTypes.User)
         {
-            var u = await Users.FindByIdAsync(id);
+            User? u = await Users.FindByIdAsync(id);
             _userGroupIds = u is not null ? Users.GetGroupIds(u) : [];
         }
         else _userGroupIds = [];
@@ -281,11 +281,11 @@
         _loading = true; StateHasChanged();
         _draft.Clear();
 
-        foreach (var tab in _tabs)
+        foreach (TabDef tab in _tabs)
         {
-            var perms = await PermSvc.GetForSubjectAsync(
+            List<EntityPermission> perms = await PermSvc.GetForSubjectAsync(
                 _selectedSubjectType!, _selectedSubjectId, tab.Key);
-            foreach (var p in perms)
+            foreach (EntityPermission p in perms)
                 _draft[(tab.Key, p.EntityId)] = p.Level;
         }
 
@@ -295,7 +295,7 @@
 
     private void SetDraft(int entityId, int level)
     {
-        var key = (_activeTab, entityId);
+        (string, int) key = (_activeTab, entityId);
         if (level == 0) _draft.Remove(key);
         else _draft[key] = level;
         RefreshDraftCounts();
@@ -310,14 +310,14 @@
 
     private async Task SaveCurrentTab()
     {
-        var perms = GetCurrentRows()
+        IEnumerable<(int, int)> perms = GetCurrentRows()
             .Select(r => (r.EntityId, _draft.TryGetValue((_activeTab, r.EntityId), out var l) ? l : 0));
 
         await PermSvc.SetBulkAsync(
             _selectedSubjectType!, _selectedSubjectId, _activeTab, perms);
 
         // Rafraîchir le compteur global
-        var counts = await PermSvc.GetPermissionCountsAsync(_selectedSubjectType!, _selectedSubjectId);
+        Dictionary<string, int> counts = await PermSvc.GetPermissionCountsAsync(_selectedSubjectType!, _selectedSubjectId);
         if (counts.Values.Sum() > 0)
             _subjectCounts[(_selectedSubjectType!, _selectedSubjectId)] = counts;
         else
@@ -331,7 +331,7 @@
 
     private async Task ClearCurrentTab()
     {
-        foreach (var row in GetCurrentRows())
+        foreach (ResourceRow row in GetCurrentRows())
             _draft.Remove((_activeTab, row.EntityId));
         RefreshDraftCounts();
         await SaveCurrentTab();

@@ -35,7 +35,7 @@ else
                 <tr><th>Date</th><th>User</th><th>IP</th><th>Severity</th><th>Command</th><th>Details</th></tr>
             </thead>
             <tbody>
-                @foreach (var l in _logs)
+                @foreach (Log l in _logs)
                 {
                     <tr>
                         <td class="text-muted"><small>@l.Date</small></td>

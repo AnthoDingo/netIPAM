@@ -47,9 +47,9 @@
                     else
                     {
                         <div class="phpipam-card-body" style="max-height:380px;overflow-y:auto">
-                            @foreach (var u in _allUsers)
+                            @foreach (User u in _allUsers)
                             {
-                                var isMember = _members.Any(m => m.Id == u.Id);
+                                bool isMember = _members.Any(m => m.Id == u.Id);
                                 <div class="d-flex align-items-center justify-content-between py-2
                                             border-bottom" style="border-color:var(--bs-border-color)!important">
                                     <div>
@@ -116,9 +116,9 @@
 
     private async Task AddMember(int userId)
     {
-        var user     = await Users.FindByIdAsync(userId);
+        User? user     = await Users.FindByIdAsync(userId);
         if (user is null) return;
-        var groupIds = Users.GetGroupIds(user);
+        List<int> groupIds = Users.GetGroupIds(user);
         if (!groupIds.Contains(Id!.Value)) groupIds.Add(Id.Value);
         await Users.SetGroupIdsAsync(userId, groupIds);
         _memberMsg = $"✓ Membre ajouté.";
@@ -127,9 +127,9 @@
 
     private async Task RemoveMember(int userId)
     {
-        var user     = await Users.FindByIdAsync(userId);
+        User? user     = await Users.FindByIdAsync(userId);
         if (user is null) return;
-        var groupIds = Users.GetGroupIds(user).Where(g => g != Id!.Value).ToList();
+        List<int> groupIds = Users.GetGroupIds(user).Where(g => g != Id!.Value).ToList();
         await Users.SetGroupIdsAsync(userId, groupIds);
         _memberMsg = $"✓ Membre retiré.";
         await ReloadMembers();

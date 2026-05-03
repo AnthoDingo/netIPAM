@@ -32,7 +32,7 @@ public class UserGroupService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var g = await _db.UserGroups.FindAsync(new object?[] { id }, ct);
+        UserGroups? g = await _db.UserGroups.FindAsync(new object?[] { id }, ct);
         if (g is null) return;
         _db.UserGroups.Remove(g);
         await _db.SaveChangesAsync(ct);

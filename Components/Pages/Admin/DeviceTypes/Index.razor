@@ -19,7 +19,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var t in _types)
+                @foreach (DeviceType t in _types)
                 {
                     <tr>
                         <td><strong>@t.Tname</strong></td>

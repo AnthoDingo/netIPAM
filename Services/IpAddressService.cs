@@ -35,7 +35,7 @@ public class IpAddressService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var ip = await _db.IpAddresses.FindAsync(new object?[] { id }, ct);
+        IpAddresses? ip = await _db.IpAddresses.FindAsync(new object?[] { id }, ct);
         if (ip is null) return;
         _db.IpAddresses.Remove(ip);
         await _db.SaveChangesAsync(ct);

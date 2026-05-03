@@ -24,7 +24,7 @@
 
         @* ── Stepper ── *@
         <div class="setup-stepper">
-            @foreach (var (label, idx) in Steps.Select((l, i) => (l, i)))
+            @foreach ((string label, int idx) (label, idx) in Steps.Select((l, i) => (l, i)))
             {
                 <div class="setup-step @(idx == _step ? "active" : idx < _step ? "done" : "")">
                     <div class="step-num">
@@ -209,7 +209,7 @@
                 else
                 {
                     <div class="setup-log">
-                        @foreach (var line in _migrationLog)
+                        @foreach (string line in _migrationLog)
                         {
                             <div class="log-line @(line.StartsWith("✓") ? "ok" : line.StartsWith("❌") ? "err" : "")">
                                 @line
@@ -268,7 +268,7 @@
                            autocomplete="new-password" />
                     @if (!string.IsNullOrEmpty(_adminPassword))
                     {
-                        var strength = PasswordStrength(_adminPassword);
+                        (string css, int pct, string label) strength = PasswordStrength(_adminPassword);
                         <div class="mt-1">
                             <div class="progress" style="height:4px">
                                 <div class="progress-bar @strength.css" style="width:@strength.pct%"></div>
@@ -501,7 +501,7 @@
         _migrationsOk      = false;
         _migrationLog      = [];
 
-        await foreach (var line in SetupSvc.ApplyMigrationsAsync(_provider, _connectionString))
+        await foreach (string line in SetupSvc.ApplyMigrationsAsync(_provider, _connectionString))
         {
             _migrationLog.Add(line);
             StateHasChanged();
@@ -543,7 +543,7 @@
         StateHasChanged();
 
         // Créer le compte admin
-        var error = await SetupSvc.CreateAdminAsync(
+        string? error = await SetupSvc.CreateAdminAsync(
             _provider, _connectionString,
             _adminUsername, _adminEmail, _adminPassword);
 

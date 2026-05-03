@@ -23,7 +23,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Number</th><th>Name</th><th>Domain</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var v in _vlans)
+                @foreach (Vlan v in _vlans)
                 {
                     <tr>
                         <td><strong>@v.Number</strong></td>

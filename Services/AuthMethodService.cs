@@ -34,7 +34,7 @@ public class AuthMethodService
     /// </summary>
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var m = await _db.UserAuthMethods.FindAsync(new object?[] { id }, ct);
+        UserAuthMethods? m = await _db.UserAuthMethods.FindAsync(new object?[] { id }, ct);
         if (m is null) return true;
         if (string.Equals(m.Protected, "Yes", StringComparison.OrdinalIgnoreCase))
             return false;

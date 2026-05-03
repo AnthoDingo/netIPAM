@@ -23,9 +23,9 @@ public static class IpConverter
         if (!System.Net.IPAddress.TryParse(presentation, out var addr))
             throw new FormatException($"Invalid IP address: {presentation}");
 
-        var bytes = addr.GetAddressBytes();
+        byte[] bytes = addr.GetAddressBytes();
         // BigInteger ctor expects little-endian, IP bytes are big-endian → reverse and force unsigned
-        var be = new byte[bytes.Length + 1];
+        byte be = new[bytes.Length + 1];
         for (int i = 0; i < bytes.Length; i++) be[bytes.Length - 1 - i] = bytes[i];
         // last byte is 0 → forces non-negative
         return new BigInteger(be).ToString();
@@ -38,12 +38,12 @@ public static class IpConverter
             throw new FormatException($"Invalid decimal IP: {decimalValue}");
 
         int byteLength = version == IpVersion.V4 ? 4 : 16;
-        var bytes = big.ToByteArray();
+        byte[] bytes = big.ToByteArray();
         // Strip the optional sign byte and pad to required length, then reverse to big-endian
         if (bytes.Length > byteLength && bytes[^1] == 0)
             bytes = bytes[..^1];
 
-        var be = new byte[byteLength];
+        byte be = new[byteLength];
         for (int i = 0; i < bytes.Length && i < byteLength; i++)
             be[byteLength - 1 - i] = bytes[i];
 

@@ -27,11 +27,11 @@ else
     else
     {
         <div class="pi-subnet-tree">
-            @foreach (var (subnet, depth) in _flatTree)
+            @foreach ((Subnet subnet, int depth) in _flatTree)
             {
-                var cidr   = FormatCidr(subnet);
-                var isActive = subnet.Id == ActiveSubnetId;
-                var indent = depth * 14;
+                string cidr   = FormatCidr(subnet);
+                bool isActive = subnet.Id == ActiveSubnetId;
+                int indent = depth * 14;
 
                 <a class="pi-tree-node @(isActive ? "active" : "")"
                    href="@(subnet.IsFolder ? "#" : $"/subnets/{subnet.Id}")"
@@ -63,7 +63,7 @@ else
             <i class="bi bi-tag me-1"></i>VLANs
         </div>
         <div class="pi-vlan-list">
-            @foreach (var v in _vlans)
+            @foreach (Vlan v in _vlans)
             {
                 <a class="pi-tree-node" href="@($"/admin/vlans/{v.VlanId}/edit")">
                     <i class="bi bi-tag pi-tree-icon vlan"></i>
@@ -95,7 +95,7 @@ else
 
     private static void Flatten(List<Node> nodes, List<(Subnet, int)> result)
     {
-        foreach (var n in nodes)
+        foreach (Node n in nodes)
         {
             result.Add((n.Subnet, n.Depth));
             Flatten(n.Children, result);
@@ -105,8 +105,8 @@ else
     protected override async Task OnParametersSetAsync()
     {
         _loading = true;
-        var allSubnets = await SubnetSvc.ForSectionWithVlanAsync(SectionId);
-        var tree       = BuildTree(allSubnets, parentId: 0, depth: 0);
+        List<Subnet> allSubnets = await SubnetSvc.ForSectionWithVlanAsync(SectionId);
+        List<Node> tree       = BuildTree(allSubnets, parentId: 0, depth: 0);
         _flatTree      = [];
         Flatten(tree, _flatTree);
         _vlans   = await VlanSvc.ForSectionAsync(SectionId);
@@ -118,7 +118,7 @@ else
         if (string.IsNullOrEmpty(s.SubnetAddress) || string.IsNullOrEmpty(s.Mask)) return "—";
         try
         {
-            var v = IpConverter.GuessVersion(s.SubnetAddress);
+            IpVersion v = IpConverter.GuessVersion(s.SubnetAddress);
             return $"{IpConverter.ToPresentation(s.SubnetAddress, v)}/{s.Mask}";
         }
         catch { return $"{s.SubnetAddress}/{s.Mask}"; }

@@ -29,16 +29,16 @@ public static class SubnetCalculator
         if (!BigInteger.TryParse(networkDecimal, out var net))
             throw new FormatException("Invalid network decimal");
 
-        var version = IpConverter.GuessVersion(networkDecimal);
+        IpVersion version = IpConverter.GuessVersion(networkDecimal);
         int totalBits = version == IpVersion.V4 ? 32 : 128;
         if (mask < 0 || mask > totalBits)
             throw new ArgumentOutOfRangeException(nameof(mask));
 
-        var hostBits = totalBits - mask;
-        var size = BigInteger.One << hostBits;          // 2^hostBits
-        var maskBig = ((BigInteger.One << totalBits) - 1) ^ (size - 1);
-        var network = net & maskBig;
-        var broadcast = network + size - 1;
+        int hostBits = totalBits - mask;
+        BigInteger size = BigInteger.One << hostBits;          // 2^hostBits
+        BigInteger maskBig = ((BigInteger.One << totalBits) - 1) ^ (size - 1);
+        BigInteger network = net & maskBig;
+        BigInteger broadcast = network + size - 1;
 
         BigInteger first, last, usable;
         if (version == IpVersion.V4 && mask < 31)
@@ -72,17 +72,17 @@ public static class SubnetCalculator
         if (!BigInteger.TryParse(networkDecimal, out var net)) return false;
         if (!BigInteger.TryParse(hostDecimal, out var host)) return false;
 
-        var version = IpConverter.GuessVersion(networkDecimal);
+        IpVersion version = IpConverter.GuessVersion(networkDecimal);
         int totalBits = version == IpVersion.V4 ? 32 : 128;
-        var hostBits = totalBits - mask;
-        var maskBig = ((BigInteger.One << totalBits) - 1) ^ ((BigInteger.One << hostBits) - 1);
+        int hostBits = totalBits - mask;
+        BigInteger maskBig = ((BigInteger.One << totalBits) - 1) ^ ((BigInteger.One << hostBits) - 1);
         return (host & maskBig) == (net & maskBig);
     }
 
     /// <summary>Format CIDR pour affichage.</summary>
     public static string ToCidr(string networkDecimal, int mask)
     {
-        var v = IpConverter.GuessVersion(networkDecimal);
+        IpVersion v = IpConverter.GuessVersion(networkDecimal);
         return $"{IpConverter.ToPresentation(networkDecimal, v)}/{mask}";
     }
 }

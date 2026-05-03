@@ -30,7 +30,7 @@ public class DeviceTypeService
 
     public async Task DeleteAsync(int tid, CancellationToken ct = default)
     {
-        var t = await _db.DeviceTypes.FindAsync(new object?[] { tid }, ct);
+        DeviceTypes? t = await _db.DeviceTypes.FindAsync(new object?[] { tid }, ct);
         if (t is null) return;
         _db.DeviceTypes.Remove(t);
         await _db.SaveChangesAsync(ct);

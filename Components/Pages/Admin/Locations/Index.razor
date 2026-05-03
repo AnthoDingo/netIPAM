@@ -19,7 +19,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Name</th><th>Address</th><th>Coordinates</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var l in _locations)
+                @foreach (Location l in _locations)
                 {
                     <tr>
                         <td><strong>@l.Name</strong></td>

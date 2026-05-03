@@ -11,7 +11,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        var ctx = HttpCtx.HttpContext;
+        HttpContext? ctx = HttpCtx.HttpContext;
         if (ctx is not null)
             await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         Nav.NavigateTo("/login", forceLoad: true);

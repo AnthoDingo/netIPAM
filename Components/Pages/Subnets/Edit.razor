@@ -81,7 +81,7 @@
         if (string.IsNullOrEmpty(s.SubnetAddress) || string.IsNullOrEmpty(s.Mask)) return string.Empty;
         try
         {
-            var v = IpConverter.GuessVersion(s.SubnetAddress);
+            IpVersion v = IpConverter.GuessVersion(s.SubnetAddress);
             return $"{IpConverter.ToPresentation(s.SubnetAddress, v)}/{s.Mask}";
         }
         catch { return $"{s.SubnetAddress}/{s.Mask}"; }
@@ -100,10 +100,10 @@
                 return;
             }
 
-            var parts = _form.Cidr.Trim().Split('/');
+            string[] parts = _form.Cidr.Trim().Split('/');
             try
             {
-                var dec = IpConverter.ToDecimal(parts[0]);
+                string dec = IpConverter.ToDecimal(parts[0]);
                 if (!int.TryParse(parts[1], out var mask)) { _error = "Invalid mask."; return; }
                 _subnet.SubnetAddress = dec;
                 _subnet.Mask = mask.ToString();

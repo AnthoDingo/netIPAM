@@ -32,7 +32,7 @@ public class DeviceService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var d = await _db.Devices.FindAsync(new object?[] { id }, ct);
+        Devices? d = await _db.Devices.FindAsync(new object?[] { id }, ct);
         if (d is null) return;
         _db.Devices.Remove(d);
         await _db.SaveChangesAsync(ct);

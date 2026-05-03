@@ -14,7 +14,7 @@ public class SettingService
 
     public async Task<Setting> GetOrCreateAsync(CancellationToken ct = default)
     {
-        var s = await _db.Settings.FirstOrDefaultAsync(ct);
+        Settings? s = await _db.Settings.FirstOrDefaultAsync(ct);
         if (s is null)
         {
             s = new Setting { SiteTitle = "phpipam IP address management", Theme = "dark" };

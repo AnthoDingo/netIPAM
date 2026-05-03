@@ -30,7 +30,7 @@ public class CustomerService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var c = await _db.Customers.FindAsync(new object?[] { id }, ct);
+        Customers? c = await _db.Customers.FindAsync(new object?[] { id }, ct);
         if (c is null) return;
         _db.Customers.Remove(c);
         await _db.SaveChangesAsync(ct);

@@ -28,7 +28,7 @@
                 <div class="mb-3">
                     <label class="form-label">L2 domain</label>
                     <InputSelect class="form-select" @bind-Value="_vlan.DomainId">
-                        @if (_domains is not null) { @foreach (var d in _domains) { <option value="@d.Id">@d.Name</option> } }
+                        @if (_domains is not null) { @foreach (VlanDomain d in _domains) { <option value="@d.Id">@d.Name</option> } }
                     </InputSelect>
                 </div>
                 <div class="mb-3">

@@ -64,7 +64,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var s in _subnets.Where(x => x.MasterSubnetId == 0))
+                            @foreach (Subnet s in _subnets.Where(x => x.MasterSubnetId == 0))
                             {
                                 @RenderSubnetRow(s, 0)
                             }
@@ -88,16 +88,16 @@
         if (_section is null) return;
         _subnets = await Subnets.ForSectionAsync(SectionId);
         _usage.Clear();
-        foreach (var s in _subnets.Where(x => !x.IsFolder))
+        foreach (Subnet s in _subnets.Where(x => !x.IsFolder))
             _usage[s.Id] = await Subnets.UsageAsync(s.Id);
     }
 
     // Rendu récursif des lignes avec indentation
     private RenderFragment RenderSubnetRow(Subnet s, int depth) => __builder =>
     {
-        var cidr = FormatCidr(s);
-        var u    = _usage.GetValueOrDefault(s.Id);
-        var pad  = depth * 20;
+        string cidr = FormatCidr(s);
+        (long total, long used, double percentUsed) u    = _usage.GetValueOrDefault(s.Id);
+        int pad  = depth * 20;
 
         <tr>
             <td style="padding-left: @(12 + pad)px">
@@ -124,8 +124,8 @@
             <td style="width: 180px;">
                 @if (!s.IsFolder && u.total > 0)
                 {
-                    var pct = u.percentUsed;
-                    var cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
+                    double pct = u.percentUsed;
+                    string cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
                     <div class="phpipam-usage">
                         <div class="phpipam-usage-fill @cls" style="width: @($"{pct:0.#}")%"></div>
                         <div class="phpipam-usage-label">@u.used / @u.total</div>
@@ -151,7 +151,7 @@
         @* Enfants récursifs *@
         @if (_subnets is not null)
         {
-            foreach (var child in _subnets.Where(x => x.MasterSubnetId == s.Id))
+            foreach (Subnet child in _subnets.Where(x => x.MasterSubnetId == s.Id))
             {
                 @RenderSubnetRow(child, depth + 1)
             }
@@ -169,7 +169,7 @@
         if (string.IsNullOrEmpty(s.SubnetAddress) || string.IsNullOrEmpty(s.Mask)) return "—";
         try
         {
-            var v = IpConverter.GuessVersion(s.SubnetAddress);
+            IpVersion v = IpConverter.GuessVersion(s.SubnetAddress);
             return $"{IpConverter.ToPresentation(s.SubnetAddress, v)}/{s.Mask}";
         }
         catch { return $"{s.SubnetAddress}/{s.Mask}"; }

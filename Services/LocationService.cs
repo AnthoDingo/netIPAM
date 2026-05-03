@@ -30,7 +30,7 @@ public class LocationService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        var l = await _db.Locations.FindAsync(new object?[] { id }, ct);
+        Locations? l = await _db.Locations.FindAsync(new object?[] { id }, ct);
         if (l is null) return;
         _db.Locations.Remove(l);
         await _db.SaveChangesAsync(ct);

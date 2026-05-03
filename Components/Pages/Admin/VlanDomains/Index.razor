@@ -19,7 +19,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var d in _domains)
+                @foreach (VlanDomain d in _domains)
                 {
                     <tr>
                         <td><strong>@d.Name</strong> @if (d.Id == 1) { <span class="badge bg-secondary ms-1">default</span> }</td>

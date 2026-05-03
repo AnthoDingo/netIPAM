@@ -52,11 +52,11 @@
                             <i class="bi bi-list-check me-2"></i>Migrations en attente
                         </div>
                         <div class="migrate-pending-list">
-                            @foreach (var m in MigState.Pending)
+                            @foreach (string m in MigState.Pending)
                             {
-                                var parts = m.Split('_', 2);
-                                var ts    = parts.Length > 0 ? parts[0] : m;
-                                var name  = parts.Length > 1 ? parts[1].Replace('_', ' ') : "";
+                                string[] parts = m.Split('_', 2);
+                                string ts    = parts.Length > 0 ? parts[0] : m;
+                                string name  = parts.Length > 1 ? parts[1].Replace('_', ' ') : "";
                                 <div class="migrate-pending-row">
                                     <span class="migrate-pending-ts">@ts</span>
                                     <span class="migrate-pending-name">@name</span>
@@ -71,7 +71,7 @@
                                 <i class="bi bi-terminal me-2"></i>Progression
                             </div>
                             <div class="migrate-log">
-                                @foreach (var line in _log)
+                                @foreach (string line in _log)
                                 {
                                     <div class="log-line @(line.StartsWith("✓") ? "ok" : line.StartsWith("❌") ? "err" : line.StartsWith("  →") ? "indent" : "")">
                                         @line
@@ -261,7 +261,7 @@
 
         try
         {
-            await foreach (var line in SetupSvc.ApplyFromContextAsync(Db))
+            await foreach (string line in SetupSvc.ApplyFromContextAsync(Db))
             {
                 _log.Add(line);
                 StateHasChanged();

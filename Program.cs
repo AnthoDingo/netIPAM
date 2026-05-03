@@ -1,15 +1,17 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using netIPAM;
 using netIPAM.Data;
+using netIPAM.Entities;
 using netIPAM.Services;
 using netIPAM.Components;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // ── Détection setup requis ────────────────────────────────────────
-var setupSvc   = new SetupService(builder.Environment);
-var setupState = new SetupState();
+SetupService setupSvc   = new(builder.Environment);
+SetupState   setupState = new();
 
 if (setupSvc.IsSetupRequired(builder.Configuration))
     setupState.MarkRequired();
@@ -17,12 +19,12 @@ if (setupSvc.IsSetupRequired(builder.Configuration))
 builder.Services.AddSingleton(setupState);
 builder.Services.AddSingleton<SetupService>();
 
-// ── MigrationState (singleton, alimenté après build) ─────────────
-var migrationState = new MigrationState();
+// ── MigrationState ────────────────────────────────────────────────
+MigrationState migrationState = new();
 builder.Services.AddSingleton(migrationState);
 
-// ── MaintenanceState (singleton, alimenté depuis DB après build) ──
-var maintenanceState = new MaintenanceState();
+// ── MaintenanceState ──────────────────────────────────────────────
+MaintenanceState maintenanceState = new();
 builder.Services.AddSingleton(maintenanceState);
 
 // ── Blazor ───────────────────────────────────────────────────────
@@ -58,7 +60,7 @@ builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
 
 // ── Build ─────────────────────────────────────────────────────────
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
@@ -69,7 +71,6 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
-// Middlewares setup et migrate — dans l'ordre
 app.UseMiddleware<SetupMiddleware>();
 app.UseMiddleware<MigrateMiddleware>();
 
@@ -77,7 +78,6 @@ app.UseAntiforgery();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Maintenance : après auth pour pouvoir lire ctx.User.IsInRole
 app.UseMiddleware<MaintenanceMiddleware>();
 
 app.MapRazorComponents<App>()
@@ -86,16 +86,15 @@ app.MapRazorComponents<App>()
 // ── Initialisation post-build ─────────────────────────────────────
 if (!setupState.SetupRequired)
 {
-    using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    using IServiceScope scope = app.Services.CreateScope();
+    AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
     try
     {
-        var pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
+        List<string> pending = (await db.Database.GetPendingMigrationsAsync()).ToList();
 
         if (pending.Count > 0)
         {
-            // Des migrations sont en attente → le middleware redirigera vers /migrate
             migrationState.SetPending(pending);
             app.Logger.LogWarning(
                 "{Count} migration(s) en attente : {Names}",
@@ -104,11 +103,9 @@ if (!setupState.SetupRequired)
         }
         else
         {
-            // Base à jour → seed si nécessaire
             await app.Services.SeedAsync();
 
-            // Charger l'état de maintenance depuis la DB
-            var settings = await db.Settings.FirstOrDefaultAsync();
+            Setting? settings = await db.Settings.FirstOrDefaultAsync();
             if (settings?.MaintenanceMode == true)
             {
                 maintenanceState.Enable();
@@ -118,7 +115,6 @@ if (!setupState.SetupRequired)
     }
     catch (Exception ex)
     {
-        // DB inaccessible (ex. premier démarrage avant setup)
         app.Logger.LogError(ex, "Impossible de vérifier les migrations");
     }
 }

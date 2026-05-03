@@ -103,7 +103,7 @@
             </div>
 
             @{
-                var pct = _total > 0 ? (int)(100.0 * _scanned / _total) : 0;
+                int pct = _total > 0 ? (int)(100.0 * _scanned / _total) : 0;
             }
             <div class="progress" style="height:6px">
                 <div class="progress-bar @(_running ? "progress-bar-animated progress-bar-striped" : "")"
@@ -151,7 +151,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var r in FilteredResults)
+                        @foreach (ScanHostResult r in FilteredResults)
                         {
                             <tr>
                                 <td><code>@r.IpPresentation</code></td>
@@ -245,7 +245,7 @@
         _filter  = "all";
         _cts     = new CancellationTokenSource();
 
-        var options = new ScanOptions(_maxThreads, _timeoutMs, ResolveDns: _resolveDns);
+        ScanOptions options = new(_maxThreads, _timeoutMs, ResolveDns: _resolveDns);
 
         // Lancer le scan dans une tâche de fond
         _ = Task.Run(async () =>
@@ -253,10 +253,10 @@
             try
             {
                 // Utiliser un scope séparé pour le DbContext (scan long-running)
-                using var scope = ScopeFactory.CreateScope();
-                var scanSvc = scope.ServiceProvider.GetRequiredService<ScanService>();
+                using IServiceScope scope = ScopeFactory.CreateScope();
+                ScanService scanSvc = scope.ServiceProvider.GetRequiredService<ScanService>();
 
-                await foreach (var result in scanSvc.ScanAsync(addresses, options, _cts.Token))
+                await foreach (ScanHostResult result in scanSvc.ScanAsync(addresses, options, _cts.Token))
                 {
                     _results.Add(result);
                     _scanned++;
@@ -264,8 +264,8 @@
                     {
                         _alive++;
                         // Persister immédiatement les hôtes actifs
-                        using var scope2 = ScopeFactory.CreateScope();
-                        var s2 = scope2.ServiceProvider.GetRequiredService<ScanService>();
+                        using IServiceScope scope2 = ScopeFactory.CreateScope();
+                        ScanService s2 = scope2.ServiceProvider.GetRequiredService<ScanService>();
                         await s2.ScanAndPersistAsync(SubnetId, [result.IpDecimal], options, cancellationToken: _cts.Token);
                     }
 
@@ -275,9 +275,9 @@
                 }
 
                 // Mettre à jour lastScan sur le subnet
-                using var finalScope = ScopeFactory.CreateScope();
-                var subnetSvc = finalScope.ServiceProvider.GetRequiredService<SubnetService>();
-                var subnet = await subnetSvc.GetAsync(SubnetId);
+                using IServiceScope finalScope = ScopeFactory.CreateScope();
+                SubnetService subnetSvc = finalScope.ServiceProvider.GetRequiredService<SubnetService>();
+                Subnet? subnet = await subnetSvc.GetAsync(SubnetId);
                 if (subnet is not null)
                 {
                     subnet.LastScan = DateTime.UtcNow;
@@ -312,8 +312,8 @@
         if (string.IsNullOrWhiteSpace(_rangeStart) || string.IsNullOrWhiteSpace(_rangeEnd))
             throw new ArgumentException("Entrez les IPs de début et de fin.");
 
-        var startDec = IpConverter.ToDecimal(_rangeStart.Trim());
-        var endDec   = IpConverter.ToDecimal(_rangeEnd.Trim());
+        string startDec = IpConverter.ToDecimal(_rangeStart.Trim());
+        string endDec   = IpConverter.ToDecimal(_rangeEnd.Trim());
         return ScanSvc.GetRangeAddresses(startDec, endDec);
     }
 

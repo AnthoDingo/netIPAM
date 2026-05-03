@@ -32,7 +32,7 @@ public class MigrateMiddleware
     {
         if (_state.HasPending)
         {
-            var path = ctx.Request.Path.Value ?? "/";
+            string? path = ctx.Request.Path.Value ?? "/";
             bool bypass = _bypass.Any(p => path.StartsWith(p, StringComparison.OrdinalIgnoreCase));
 
             if (!bypass)

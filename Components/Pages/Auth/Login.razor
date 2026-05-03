@@ -58,10 +58,10 @@
 
     private async Task HandleLogin()
     {
-        var user = await Users.AuthenticateLocalAsync(_form.Username, _form.Password);
+        User? user = await Users.AuthenticateLocalAsync(_form.Username, _form.Password);
         if (user is null) { _error = "Identifiants invalides."; return; }
 
-        var claims = new List<Claim>
+        List<Claim> claims = new List<Claim>
         {
             new(ClaimTypes.Name,           user.Username),
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -70,7 +70,7 @@
         if (!string.IsNullOrEmpty(user.Role))
             claims.Add(new(ClaimTypes.Role, user.Role));
 
-        var principal = new ClaimsPrincipal(
+        ClaimsPrincipal principal = new(
             new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
 
         await HttpCtx.HttpContext!.SignInAsync(

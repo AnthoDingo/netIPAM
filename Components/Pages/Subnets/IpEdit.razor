@@ -90,7 +90,7 @@
             if (_ip is null) { Nav.NavigateTo($"/subnets/{SubnetId}"); return; }
             try
             {
-                var v = IpConverter.GuessVersion(_ip.IpAddr);
+                IpVersion v = IpConverter.GuessVersion(_ip.IpAddr);
                 _form.Address = IpConverter.ToPresentation(_ip.IpAddr, v);
             }
             catch { _form.Address = _ip.IpAddr; }

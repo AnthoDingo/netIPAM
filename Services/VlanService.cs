@@ -39,7 +39,7 @@ public class VlanService
 
     public async Task DeleteAsync(int vlanId, CancellationToken ct = default)
     {
-        var v = await _db.Vlans.FindAsync(new object?[] { vlanId }, ct);
+        Vlans? v = await _db.Vlans.FindAsync(new object?[] { vlanId }, ct);
         if (v is null) return;
         _db.Vlans.Remove(v);
         await _db.SaveChangesAsync(ct);

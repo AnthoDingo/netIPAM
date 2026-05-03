@@ -26,7 +26,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Type</th><th>Description</th><th>Protected</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var m in _methods)
+                @foreach (UserAuthMethod m in _methods)
                 {
                     <tr>
                         <td><code>@m.Type</code></td>

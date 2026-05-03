@@ -17,14 +17,14 @@ public static class DataSeeder
 {
     public static async Task SeedAsync(this IServiceProvider sp, CancellationToken ct = default)
     {
-        await using var scope = sp.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await using AsyncServiceScope scope = sp.CreateAsyncScope();
+        AppDbContext db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         // En mode InMemory (setup non terminé), on ne seed rien
         if (db.Database.ProviderName?.Contains("InMemory", StringComparison.OrdinalIgnoreCase) == true)
             return;
-        var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DataSeeder");
+        IPasswordHasher hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
+        ILoggerFactory logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DataSeeder");
 
         // Ligne unique de settings
         if (!await db.Settings.AnyAsync(ct))
@@ -52,7 +52,7 @@ public static class DataSeeder
         // Compte Admin par défaut (mot de passe : ipamadmin)
         if (!await db.Users.AnyAsync(u => u.Username == "Admin", ct))
         {
-            var admin = new User
+            User admin = new User
             {
                 Username = "Admin",
                 RealName = "phpIPAM Admin",

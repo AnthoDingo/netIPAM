@@ -23,7 +23,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Name</th><th>RD</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var v in _vrfs)
+                @foreach (Vrf v in _vrfs)
                 {
                     <tr>
                         <td><strong>@v.Name</strong></td>

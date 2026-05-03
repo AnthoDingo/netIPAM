@@ -24,7 +24,7 @@ else
         <table class="phpipam-table">
             <thead><tr><th>Type</th><th>Preview</th><th>Show in lists</th><th>Locked</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
-                @foreach (var t in _tags)
+                @foreach (IpTag t in _tags)
                 {
                     <tr>
                         <td><strong>@t.Type</strong></td>
