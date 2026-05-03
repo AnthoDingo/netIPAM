@@ -1,6 +1,9 @@
 @inherits LayoutComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
 @inject MaintenanceState MaintenanceState
+@inject LocalizationService Localization
+@inject UserService Users
+@inject AuthenticationStateProvider AuthState
 
 <div class="phpipam-app">
     <NavMenu />
@@ -38,3 +41,22 @@
 }
 .maintenance-banner-link:hover { opacity: 1; }
 </style>
+
+@code {
+    // Codes langue dans le même ordre que l'index User.Lang
+    private static readonly string[] LangCodes = ["en", "fr", "it", "es", "de"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var auth = await AuthState.GetAuthenticationStateAsync();
+        var username = auth.User.Identity?.Name;
+        if (string.IsNullOrEmpty(username)) return;
+
+        var user = await Users.FindByUsernameAsync(username);
+        var langCode = user?.Lang is int idx && idx >= 0 && idx < LangCodes.Length
+            ? LangCodes[idx]
+            : "en";
+
+        await Localization.SetLanguageAsync(langCode);
+    }
+}

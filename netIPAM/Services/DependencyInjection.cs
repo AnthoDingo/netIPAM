@@ -60,6 +60,9 @@ public static class DependencyInjection
         services.AddScoped<PermissionService>();
         services.AddTransient<ScanService>();
 
+        // Localisation — Scoped : chaque circuit Blazor Server a sa propre langue
+        services.AddScoped<LocalizationService>();
+
         return services;
     }
 }

@@ -1,167 +1,116 @@
-using System.Globalization;
+using Microsoft.AspNetCore.Hosting;
 using System.Text.Json;
 
 namespace netIPAM.Services
 {
     /// <summary>
-    /// Service de localisation pour gérer les traductions multilingues
+    /// Service de localisation pour Blazor Server.
+    /// Lit les fichiers JSON depuis wwwroot/i18n/{lang}/translation.json.
+    /// Scoped par circuit SignalR — chaque onglet/utilisateur a sa propre instance.
     /// </summary>
     public class LocalizationService
     {
-        private readonly HttpClient _httpClient;
+        private readonly IWebHostEnvironment _env;
+
         private Dictionary<string, JsonElement> _translations = new();
         private string _currentLanguage = "en";
-        
-        // Langues disponibles
-        public static readonly string[] AvailableLanguages = { "en", "fr", "it", "es", "de" };
+        private bool _initialized = false;
+
+        public static readonly string[] AvailableLanguages = ["en", "fr", "it", "es", "de"];
+
         public static readonly Dictionary<string, string> LanguageNames = new()
         {
-            { "en", "English" },
-            { "fr", "Français" },
-            { "it", "Italiano" },
-            { "es", "Español" },
-            { "de", "Deutsch" }
+            ["en"] = "English",
+            ["fr"] = "Français",
+            ["it"] = "Italiano",
+            ["es"] = "Español",
+            ["de"] = "Deutsch",
         };
 
+        /// <summary>Notifie les composants abonnés d'un changement de langue.</summary>
         public event Action? OnLanguageChanged;
 
-        public LocalizationService(HttpClient httpClient)
+        public LocalizationService(IWebHostEnvironment env)
         {
-            _httpClient = httpClient;
+            _env = env;
         }
 
-        /// <summary>
-        /// Initialise le service avec la langue par défaut
-        /// </summary>
-        public async Task InitializeAsync(string language = "en")
-        {
-            // Valider la langue
-            if (!AvailableLanguages.Contains(language))
-            {
-                language = "en";
-            }
+        // ── API publique ───────────────────────────────────────────────────────
 
-            await SetLanguageAsync(language);
-        }
+        public string GetCurrentLanguage() => _currentLanguage;
 
-        /// <summary>
-        /// Change la langue actuelle
-        /// </summary>
         public async Task SetLanguageAsync(string language)
         {
             if (!AvailableLanguages.Contains(language))
-            {
-                throw new ArgumentException($"Language '{language}' is not supported");
-            }
+                language = "en";
 
-            if (_currentLanguage == language && _translations.Count > 0)
-            {
-                return; // Déjà chargée
-            }
+            if (_initialized && _currentLanguage == language)
+                return;
 
             _currentLanguage = language;
-            
-            // Charger les traductions
-            await LoadTranslationsAsync(language);
-            
-            // Mettre à jour la culture globale
-            var cultureInfo = new CultureInfo(language);
-            CultureInfo.CurrentCulture = cultureInfo;
-            CultureInfo.CurrentUICulture = cultureInfo;
-            
+            LoadTranslations(language);
+            _initialized = true;
+
             OnLanguageChanged?.Invoke();
+            await Task.CompletedTask;
         }
 
         /// <summary>
-        /// Charge les traductions depuis le fichier JSON
-        /// </summary>
-        private async Task LoadTranslationsAsync(string language)
-        {
-            try
-            {
-                var response = await _httpClient.GetAsync($"i18n/{language}/translation.json");
-                response.EnsureSuccessStatusCode();
-                
-                var json = await response.Content.ReadAsStringAsync();
-                using var doc = JsonDocument.Parse(json);
-                
-                _translations.Clear();
-                foreach (var prop in doc.RootElement.EnumerateObject())
-                {
-                    _translations[prop.Name] = prop.Value.Clone();
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error loading translations for language '{language}': {ex.Message}");
-                _translations.Clear();
-            }
-        }
-
-        /// <summary>
-        /// Obtient une traduction par clé
+        /// Retourne la traduction pour la clé "section.key".
+        /// Retourne la clé elle-même si introuvable (jamais null, jamais d'exception).
         /// </summary>
         public string Get(string key)
         {
-            return Get(key, key); // Retourner la clé si traduction non trouvée
+            if (!_initialized)
+                LoadTranslations(_currentLanguage);
+
+            if (string.IsNullOrWhiteSpace(key))
+                return key;
+
+            var parts = key.Split('.', 2);
+            if (parts.Length < 2)
+                return key;
+
+            if (!_translations.TryGetValue(parts[0], out var section))
+                return key;
+
+            if (section.TryGetProperty(parts[1], out var value))
+                return value.GetString() ?? key;
+
+            return key;
         }
 
-        /// <summary>
-        /// Obtient une traduction par clé avec valeur par défaut
-        /// </summary>
-        public string Get(string key, string defaultValue)
+        // ── Lecture des fichiers ───────────────────────────────────────────────
+
+        private void LoadTranslations(string language)
         {
+            _translations.Clear();
+
+            var path = Path.Combine(
+                _env.WebRootPath,
+                "i18n", language, "translation.json");
+
+            if (!File.Exists(path))
+            {
+                // Fallback vers l'anglais
+                if (language != "en")
+                    LoadTranslations("en");
+                return;
+            }
+
             try
             {
-                var parts = key.Split('.');
-                if (parts.Length < 2)
-                {
-                    return defaultValue;
-                }
+                var json = File.ReadAllText(path);
+                using var doc = JsonDocument.Parse(json);
 
-                if (!_translations.TryGetValue(parts[0], out var section))
-                {
-                    return defaultValue;
-                }
-
-                var current = section;
-                for (int i = 1; i < parts.Length; i++)
-                {
-                    if (current.ValueKind != JsonValueKind.Object)
-                    {
-                        return defaultValue;
-                    }
-
-                    if (!current.TryGetProperty(parts[i], out var next))
-                    {
-                        return defaultValue;
-                    }
-
-                    current = next;
-                }
-
-                return current.GetString() ?? defaultValue;
+                foreach (var section in doc.RootElement.EnumerateObject())
+                    _translations[section.Name] = section.Value.Clone();
             }
-            catch
+            catch (Exception ex)
             {
-                return defaultValue;
+                System.Diagnostics.Debug.WriteLine(
+                    $"[LocalizationService] Error loading {language}: {ex.Message}");
             }
         }
-
-        /// <summary>
-        /// Obtient la langue actuelle
-        /// </summary>
-        public string GetCurrentLanguage() => _currentLanguage;
-
-        /// <summary>
-        /// Obtient le nom de la langue actuelle
-        /// </summary>
-        public string GetCurrentLanguageName() => 
-            LanguageNames.TryGetValue(_currentLanguage, out var name) ? name : _currentLanguage;
-
-        /// <summary>
-        /// Obtient toutes les langues disponibles
-        /// </summary>
-        public string[] GetAvailableLanguages() => AvailableLanguages;
     }
 }

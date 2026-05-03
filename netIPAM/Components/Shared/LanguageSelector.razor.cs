@@ -1,5 +1,3 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
 namespace netIPAM.Components.Shared
 {
     public partial class LanguageSelector : IAsyncDisposable
@@ -7,7 +5,6 @@ namespace netIPAM.Components.Shared
         [Inject]
         private LocalizationService Localization { get; set; } = default!;
 
-        private string[] AvailableLanguages = LocalizationService.AvailableLanguages;
         private string CurrentLanguage => Localization.GetCurrentLanguage();
 
         protected override async Task OnInitializedAsync()
@@ -21,13 +18,13 @@ namespace netIPAM.Components.Shared
             await Localization.SetLanguageAsync(language);
         }
 
-        private string GetLanguageName(string language) =>
+        private static string GetLanguageName(string language) =>
             LocalizationService.LanguageNames.TryGetValue(language, out var name) ? name : language;
 
         ValueTask IAsyncDisposable.DisposeAsync()
         {
             Localization.OnLanguageChanged -= StateHasChanged;
-            return default;
+            return ValueTask.CompletedTask;
         }
     }
 }

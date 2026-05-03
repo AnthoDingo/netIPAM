@@ -9,6 +9,7 @@ namespace netIPAM.Components.Pages.Profile
         [Inject] private IPasswordHasher Hasher { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthState { get; set; } = default!;
         [Inject] private NavigationManager Nav { get; set; } = default!;
+        [Inject] private LocalizationService Localization { get; set; } = default!;
 
         private User? _user;
         private string _activeTab = "info";
@@ -57,6 +58,9 @@ namespace netIPAM.Components.Pages.Profile
             var idx = Array.FindIndex(_languages, l => l.code == _langCode);
             _user!.Lang = idx >= 0 ? idx : 0;
             await Save();
+
+            // Appliquer immédiatement la langue dans l'interface
+            await Localization.SetLanguageAsync(_langCode);
         }
 
         private async Task SaveNotifications()
