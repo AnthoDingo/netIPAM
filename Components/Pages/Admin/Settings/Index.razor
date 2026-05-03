@@ -1,0 +1,120 @@
+@page "/admin/settings"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
+@inject SettingService SettingsSvc
+@inject NavigationManager Nav
+
+<PageTitle>Settings — admin</PageTitle>
+
+<AdminPageHeader Title="Settings" Icon="bi bi-gear" />
+
+@if (_settings is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <EditForm Model="_settings" OnValidSubmit="Save" FormName="setEdit">
+        <div class="phpipam-card">
+            <div class="phpipam-card-header">Site identity</div>
+            <div class="phpipam-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Site title</label>
+                        <InputText class="form-control" @bind-Value="_settings.SiteTitle" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Site URL</label>
+                        <InputText class="form-control" @bind-Value="_settings.SiteUrl" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Admin name</label>
+                        <InputText class="form-control" @bind-Value="_settings.SiteAdminName" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Admin mail</label>
+                        <InputText class="form-control" @bind-Value="_settings.SiteAdminMail" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Site domain</label>
+                        <InputText class="form-control" @bind-Value="_settings.SiteDomain" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Login text</label>
+                        <InputText class="form-control" @bind-Value="_settings.SiteLoginText" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="phpipam-card">
+            <div class="phpipam-card-header">Modules</div>
+            <div class="phpipam-card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_vrf" @bind-Value="_settings.EnableVrf" /><label class="form-check-label" for="m_vrf">VRF</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_nat" @bind-Value="_settings.EnableNat" /><label class="form-check-label" for="m_nat">NAT</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_rack" @bind-Value="_settings.EnableRack" /><label class="form-check-label" for="m_rack">Racks</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_loc" @bind-Value="_settings.EnableLocations" /><label class="form-check-label" for="m_loc">Locations</label></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_changelog" @bind-Value="_settings.EnableChangelog" /><label class="form-check-label" for="m_changelog">Changelog</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_cust" @bind-Value="_settings.EnableCustomers" /><label class="form-check-label" for="m_cust">Customers</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_circ" @bind-Value="_settings.EnableCircuits" /><label class="form-check-label" for="m_circ">Circuits</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_route" @bind-Value="_settings.EnableRouting" /><label class="form-check-label" for="m_route">Routing</label></div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_dns" @bind-Value="_settings.EnableDnsResolving" /><label class="form-check-label" for="m_dns">DNS resolving</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_dhcp" @bind-Value="_settings.EnableDhcp" /><label class="form-check-label" for="m_dhcp">DHCP</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_snmp" @bind-Value="_settings.EnableSnmp" /><label class="form-check-label" for="m_snmp">SNMP</label></div>
+                        <div class="form-check"><InputCheckbox class="form-check-input" id="m_pstn" @bind-Value="_settings.EnablePstn" /><label class="form-check-label" for="m_pstn">PSTN</label></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="phpipam-card">
+            <div class="phpipam-card-header">Authentication</div>
+            <div class="phpipam-card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Inactivity timeout (s)</label>
+                        <InputNumber class="form-control" @bind-Value="_settings.InactivityTimeout" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Theme</label>
+                        <InputSelect class="form-select" @bind-Value="_settings.Theme">
+                            <option value="dark">dark</option>
+                            <option value="light">light</option>
+                        </InputSelect>
+                    </div>
+                </div>
+                <div class="form-check"><InputCheckbox class="form-check-input" id="dom" @bind-Value="_settings.DomainAuth" /><label class="form-check-label" for="dom">Domain auth</label></div>
+            </div>
+        </div>
+
+        @if (_saved)
+        {
+            <div class="alert alert-success py-2"><i class="bi bi-check-circle me-1"></i> Settings saved.</div>
+        }
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-lg"></i> Save settings
+        </button>
+    </EditForm>
+}
+
+@code {
+    private Setting? _settings;
+    private bool _saved;
+
+    protected override async Task OnInitializedAsync() => _settings = await SettingsSvc.GetOrCreateAsync();
+
+    private async Task Save()
+    {
+        if (_settings is null) return;
+        await SettingsSvc.UpdateAsync(_settings);
+        _saved = true;
+    }
+}

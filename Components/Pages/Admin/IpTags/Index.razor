@@ -1,0 +1,55 @@
+@page "/admin/iptags"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject IpTagService Tags
+@inject NavigationManager Nav
+
+<PageTitle>IP tags — admin</PageTitle>
+
+<AdminPageHeader Title="IP tags" Icon="bi bi-bookmark">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/iptags/new"><i class="bi bi-plus-lg"></i> New tag</a>
+    </Actions>
+</AdminPageHeader>
+
+<div class="alert alert-info small">
+    <i class="bi bi-info-circle me-1"></i>
+    The system tags <code>Offline</code>, <code>Used</code>, <code>Reserved</code>, <code>DHCP</code> are locked and cannot be deleted.
+</div>
+
+@if (_tags is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Type</th><th>Preview</th><th>Show in lists</th><th>Locked</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var t in _tags)
+                {
+                    <tr>
+                        <td><strong>@t.Type</strong></td>
+                        <td>
+                            <span class="phpipam-state" style="@($"background:{t.BgColor};color:{t.FgColor}")">@t.Type</span>
+                        </td>
+                        <td>@(t.ShowTag == 1 ? "Yes" : "No")</td>
+                        <td>@(string.Equals(t.Locked, "Yes", StringComparison.OrdinalIgnoreCase) ? "Yes" : "No")</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/iptags/{t.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            @if (!string.Equals(t.Locked, "Yes", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(t.Id)"><i class="bi bi-trash"></i></button>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<IpTag>? _tags;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _tags = await Tags.ListAsync();
+    private async Task Delete(int id) { await Tags.DeleteAsync(id); await Reload(); }
+}

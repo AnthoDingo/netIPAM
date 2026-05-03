@@ -1,0 +1,321 @@
+@* Panneau de scan réseau (ping + DNS) réutilisable.
+   Paramètres : SubnetId, SubnetAddress, Mask, IsPool.
+   Gère : plage complète OU plage DHCP personnalisée. *@
+@rendermode InteractiveServer
+@inject ScanService ScanSvc
+@inject IServiceScopeFactory ScopeFactory
+
+<div class="pi-scan-panel">
+
+    @* ── Config ── *@
+    @if (!_running)
+    {
+        <div class="pi-scan-config">
+            <div class="row g-2 align-items-end">
+
+                @* Mode scan *@
+                <div class="col-md-3">
+                    <label class="form-label form-label-sm">Mode</label>
+                    <select class="form-select form-select-sm" @bind="_mode">
+                        <option value="full">Subnet complet</option>
+                        @if (IsPool)
+                        {
+                            <option value="range">Plage DHCP</option>
+                        }
+                    </select>
+                </div>
+
+                @* Plage DHCP *@
+                @if (_mode == "range")
+                {
+                    <div class="col-md-2">
+                        <label class="form-label form-label-sm">IP début</label>
+                        <input type="text" class="form-control form-control-sm"
+                               @bind="_rangeStart" placeholder="192.168.1.100" />
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label form-label-sm">IP fin</label>
+                        <input type="text" class="form-control form-control-sm"
+                               @bind="_rangeEnd" placeholder="192.168.1.200" />
+                    </div>
+                }
+
+                @* Options *@
+                <div class="col-md-2">
+                    <label class="form-label form-label-sm">Threads max</label>
+                    <input type="number" class="form-control form-control-sm"
+                           @bind="_maxThreads" min="1" max="256" />
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label form-label-sm">Timeout (ms)</label>
+                    <input type="number" class="form-control form-control-sm"
+                           @bind="_timeoutMs" min="100" max="5000" step="100" />
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check form-check-sm mt-3">
+                        <input class="form-check-input" type="checkbox" id="dns" @bind="_resolveDns" />
+                        <label class="form-check-label" for="dns">Résolution DNS</label>
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <button class="btn btn-success btn-sm w-100" @onclick="StartScan">
+                        <i class="bi bi-play-fill me-1"></i>Lancer le scan
+                    </button>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(_configError))
+            {
+                <div class="alert alert-danger py-1 mt-2 small">@_configError</div>
+            }
+        </div>
+    }
+
+    @* ── Progression ── *@
+    @if (_running || _results.Count > 0)
+    {
+        <div class="pi-scan-progress mt-3">
+            <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="small text-muted">
+                    @_scanned / @_total adresses
+                    @if (_alive > 0) { <span class="text-success ms-2"><i class="bi bi-circle-fill" style="font-size:8px"></i> @_alive actives</span> }
+                </span>
+                <div class="d-flex align-items-center gap-2">
+                    @if (_running)
+                    {
+                        <span class="badge bg-success">
+                            <span class="spinner-border spinner-border-sm me-1" style="width:.6rem;height:.6rem"></span>
+                            Scan en cours…
+                        </span>
+                        <button class="btn btn-danger btn-sm" @onclick="StopScan">
+                            <i class="bi bi-stop-fill me-1"></i>Arrêter
+                        </button>
+                    }
+                    else if (_finished)
+                    {
+                        <span class="badge bg-secondary">Terminé</span>
+                        <button class="btn btn-outline-secondary btn-sm" @onclick="Reset">
+                            <i class="bi bi-arrow-repeat me-1"></i>Nouveau scan
+                        </button>
+                    }
+                </div>
+            </div>
+
+            @{
+                var pct = _total > 0 ? (int)(100.0 * _scanned / _total) : 0;
+            }
+            <div class="progress" style="height:6px">
+                <div class="progress-bar @(_running ? "progress-bar-animated progress-bar-striped" : "")"
+                     style="width:@pct%"></div>
+            </div>
+        </div>
+    }
+
+    @* ── Résultats ── *@
+    @if (_results.Count > 0)
+    {
+        <div class="pi-scan-results mt-3">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="d-flex gap-2">
+                    <button class="btn btn-sm @(_filter == "all" ? "btn-primary" : "btn-outline-secondary")"
+                            @onclick='() => _filter = "all"'>
+                        Tous (@_results.Count)
+                    </button>
+                    <button class="btn btn-sm @(_filter == "alive" ? "btn-success" : "btn-outline-success")"
+                            @onclick='() => _filter = "alive"'>
+                        <i class="bi bi-circle-fill me-1" style="font-size:8px"></i>Actifs (@_alive)
+                    </button>
+                    <button class="btn btn-sm @(_filter == "dead" ? "btn-danger" : "btn-outline-danger")"
+                            @onclick='() => _filter = "dead"'>
+                        Inactifs (@(_results.Count - _alive))
+                    </button>
+                </div>
+                <small class="text-muted">
+                    @if (_finished && _alive > 0)
+                    {
+                        <i class="bi bi-floppy me-1"></i>@_alive enregistrements mis à jour en base
+                    }
+                </small>
+            </div>
+
+            <div class="phpipam-card" style="max-height:400px;overflow-y:auto">
+                <table class="phpipam-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>IP</th>
+                            <th>Statut</th>
+                            <th>Hostname</th>
+                            <th>RTT</th>
+                            <th>Heure</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in FilteredResults)
+                        {
+                            <tr>
+                                <td><code>@r.IpPresentation</code></td>
+                                <td>
+                                    @if (r.IsAlive)
+                                    {
+                                        <span class="phpipam-state phpipam-state-active">Actif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="phpipam-state phpipam-state-offline">Inactif</span>
+                                    }
+                                </td>
+                                <td>@(r.Hostname ?? "—")</td>
+                                <td>@(r.IsAlive ? $"{r.RoundTripMs} ms" : "—")</td>
+                                <td class="text-muted small">@r.ScannedAt.ToString("HH:mm:ss")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int    SubnetId      { get; set; }
+    [Parameter] public string SubnetAddress { get; set; } = string.Empty;
+    [Parameter] public int    Mask          { get; set; }
+    [Parameter] public bool   IsPool        { get; set; }
+
+    // Config scan
+    private string _mode       = "full";
+    private string _rangeStart = string.Empty;
+    private string _rangeEnd   = string.Empty;
+    private int    _maxThreads = 32;
+    private int    _timeoutMs  = 500;
+    private bool   _resolveDns = true;
+    private string? _configError;
+
+    // État
+    private CancellationTokenSource? _cts;
+    private bool _running;
+    private bool _finished;
+    private int  _total;
+    private int  _scanned;
+    private int  _alive;
+    private string _filter = "all";
+
+    private readonly List<ScanHostResult> _results = [];
+
+    private IEnumerable<ScanHostResult> FilteredResults => _filter switch
+    {
+        "alive" => _results.Where(r => r.IsAlive),
+        "dead"  => _results.Where(r => !r.IsAlive),
+        _       => _results,
+    };
+
+    // ──────────────────────────────────────────────────────────────
+
+    private async Task StartScan()
+    {
+        _configError = null;
+        _results.Clear();
+        _scanned = _alive = 0;
+
+        // Calculer les adresses à scanner
+        IReadOnlyList<string> addresses;
+        try
+        {
+            addresses = _mode == "range"
+                ? BuildRangeAddresses()
+                : ScanSvc.GetSubnetAddresses(SubnetAddress, Mask);
+        }
+        catch (Exception ex) { _configError = ex.Message; return; }
+
+        if (addresses.Count == 0)
+        {
+            _configError = "Aucune adresse à scanner.";
+            return;
+        }
+        if (addresses.Count > 65536)
+        {
+            _configError = $"Plage trop grande ({addresses.Count} adresses). Maximum 65 536.";
+            return;
+        }
+
+        _total   = addresses.Count;
+        _running = true;
+        _finished = false;
+        _filter  = "all";
+        _cts     = new CancellationTokenSource();
+
+        var options = new ScanOptions(_maxThreads, _timeoutMs, ResolveDns: _resolveDns);
+
+        // Lancer le scan dans une tâche de fond
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                // Utiliser un scope séparé pour le DbContext (scan long-running)
+                using var scope = ScopeFactory.CreateScope();
+                var scanSvc = scope.ServiceProvider.GetRequiredService<ScanService>();
+
+                await foreach (var result in scanSvc.ScanAsync(addresses, options, _cts.Token))
+                {
+                    _results.Add(result);
+                    _scanned++;
+                    if (result.IsAlive)
+                    {
+                        _alive++;
+                        // Persister immédiatement les hôtes actifs
+                        using var scope2 = ScopeFactory.CreateScope();
+                        var s2 = scope2.ServiceProvider.GetRequiredService<ScanService>();
+                        await s2.ScanAndPersistAsync(SubnetId, [result.IpDecimal], options, cancellationToken: _cts.Token);
+                    }
+
+                    // Mettre à jour l'UI toutes les 5 IP ou si hôte actif
+                    if (_scanned % 5 == 0 || result.IsAlive)
+                        await InvokeAsync(StateHasChanged);
+                }
+
+                // Mettre à jour lastScan sur le subnet
+                using var finalScope = ScopeFactory.CreateScope();
+                var subnetSvc = finalScope.ServiceProvider.GetRequiredService<SubnetService>();
+                var subnet = await subnetSvc.GetAsync(SubnetId);
+                if (subnet is not null)
+                {
+                    subnet.LastScan = DateTime.UtcNow;
+                    await finalScope.ServiceProvider
+                        .GetRequiredService<netIPAM.Data.AppDbContext>()
+                        .SaveChangesAsync();
+                }
+            }
+            catch (OperationCanceledException) { /* arrêt demandé */ }
+            finally
+            {
+                _running  = false;
+                _finished = true;
+                await InvokeAsync(StateHasChanged);
+            }
+        });
+    }
+
+    private void StopScan() => _cts?.Cancel();
+
+    private void Reset()
+    {
+        _results.Clear();
+        _scanned = _alive = _total = 0;
+        _running = _finished = false;
+        _cts?.Dispose();
+        _cts = null;
+    }
+
+    private IReadOnlyList<string> BuildRangeAddresses()
+    {
+        if (string.IsNullOrWhiteSpace(_rangeStart) || string.IsNullOrWhiteSpace(_rangeEnd))
+            throw new ArgumentException("Entrez les IPs de début et de fin.");
+
+        var startDec = IpConverter.ToDecimal(_rangeStart.Trim());
+        var endDec   = IpConverter.ToDecimal(_rangeEnd.Trim());
+        return ScanSvc.GetRangeAddresses(startDec, endDec);
+    }
+
+    public void Dispose() => _cts?.Dispose();
+}

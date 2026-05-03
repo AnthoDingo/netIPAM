@@ -1,0 +1,54 @@
+@page "/admin/nameservers/new"
+@page "/admin/nameservers/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inject NameserverService Nameservers
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New nameserver" : "Edit nameserver")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New nameserver" : "Edit nameserver")" Icon="bi bi-globe"
+                 BackHref="/admin/nameservers" BackLabel="Nameservers" />
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_ns is not null)
+        {
+            <EditForm Model="_ns" OnValidSubmit="Save" FormName="nsEdit">
+                <div class="mb-3">
+                    <label class="form-label">Name *</label>
+                    <InputText class="form-control" @bind-Value="_ns.Name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Server addresses</label>
+                    <InputText class="form-control" @bind-Value="_ns.Namesrv1" placeholder="8.8.8.8;8.8.4.4" />
+                    <small class="text-muted">Multiple addresses separated by ';'.</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" rows="2" @bind-Value="_ns.Description" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/nameservers">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Nameserver? _ns;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _ns = _isNew ? new Nameserver() : await Nameservers.GetAsync(Id!.Value);
+        if (_ns is null) Nav.NavigateTo("/admin/nameservers");
+    }
+
+    private async Task Save()
+    {
+        if (_ns is null) return;
+        if (_isNew) await Nameservers.CreateAsync(_ns); else await Nameservers.UpdateAsync(_ns);
+        Nav.NavigateTo("/admin/nameservers");
+    }
+}

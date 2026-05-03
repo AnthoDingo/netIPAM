@@ -1,0 +1,75 @@
+@page "/admin/logs"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
+@rendermode InteractiveServer
+@inject LogService Logs
+
+<PageTitle>Logs — admin</PageTitle>
+
+<AdminPageHeader Title="Logs" Icon="bi bi-list-ul">
+    <Actions>
+        <select class="form-select form-select-sm" style="width:auto;display:inline-block" @bind="_severity">
+            <option value="">All severities</option>
+            <option value="0">0 — Info</option>
+            <option value="1">1 — Warning</option>
+            <option value="2">2 — Error</option>
+        </select>
+        <button class="btn btn-sm btn-outline-secondary ms-2" @onclick="Reload">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+    </Actions>
+</AdminPageHeader>
+
+@if (_logs is null) { <p class="text-muted">Loading…</p> }
+else if (_logs.Count == 0)
+{
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">
+        <i class="bi bi-list-ul d-block mb-2" style="font-size:2rem;"></i>No logs recorded yet.
+    </div></div>
+}
+else
+{
+    <p class="text-muted small">Showing latest @_logs.Count of @_total entries.</p>
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead>
+                <tr><th>Date</th><th>User</th><th>IP</th><th>Severity</th><th>Command</th><th>Details</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var l in _logs)
+                {
+                    <tr>
+                        <td class="text-muted"><small>@l.Date</small></td>
+                        <td>@l.Username</td>
+                        <td><code>@l.IpAddr</code></td>
+                        <td>@SeverityBadge(l.Severity)</td>
+                        <td>@l.Command</td>
+                        <td><small class="text-muted">@l.Details</small></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Log>? _logs;
+    private int _total;
+    private string _severity = "";
+
+    protected override async Task OnInitializedAsync() => await Reload();
+
+    private async Task Reload()
+    {
+        int? s = int.TryParse(_severity, out var v) ? v : null;
+        _logs = await Logs.ListAsync(severityFilter: s);
+        _total = await Logs.CountAsync();
+    }
+
+    private static MarkupString SeverityBadge(int? sev) => sev switch
+    {
+        0 => new("<span class=\"badge bg-secondary\">Info</span>"),
+        1 => new("<span class=\"badge bg-warning text-dark\">Warning</span>"),
+        2 => new("<span class=\"badge bg-danger\">Error</span>"),
+        _ => new("—")
+    };
+}

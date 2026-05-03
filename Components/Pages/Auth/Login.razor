@@ -1,0 +1,87 @@
+@page "/login"
+@using System.ComponentModel.DataAnnotations
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@inject UserService Users
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpCtx
+@inject NavigationManager Nav
+@layout EmptyLayout
+
+<PageTitle>Login — netIPAM</PageTitle>
+
+<div class="phpipam-login-bg">
+    <div class="phpipam-login-card">
+        <div class="text-center mb-4">
+            <i class="bi bi-diagram-3-fill" style="font-size: 2.4rem; color: #3498db;"></i>
+            <h1 class="h4 mt-2 mb-0">netIPAM</h1>
+            <small class="text-muted">.NET port of phpIPAM</small>
+        </div>
+
+        <EditForm Model="_form" OnValidSubmit="HandleLogin" FormName="login" method="post">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <InputText class="form-control" @bind-Value="_form.Username" autocomplete="username" />
+                <ValidationMessage For="@(() => _form.Username)" class="text-danger small" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <InputText type="password" class="form-control" @bind-Value="_form.Password"
+                           autocomplete="current-password" />
+                <ValidationMessage For="@(() => _form.Password)" class="text-danger small" />
+            </div>
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <div class="alert alert-danger py-2">@_error</div>
+            }
+
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-box-arrow-in-right me-1"></i> Sign in
+            </button>
+        </EditForm>
+
+        <hr class="my-4" />
+        <div class="text-center text-muted small">
+            Default : Admin / ipamadmin (à changer après init)
+        </div>
+    </div>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private LoginForm _form { get; set; } = new();
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    private string? _error;
+
+    private async Task HandleLogin()
+    {
+        var user = await Users.AuthenticateLocalAsync(_form.Username, _form.Password);
+        if (user is null) { _error = "Identifiants invalides."; return; }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name,           user.Username),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new(ClaimTypes.Email,          user.Email ?? string.Empty),
+        };
+        if (!string.IsNullOrEmpty(user.Role))
+            claims.Add(new(ClaimTypes.Role, user.Role));
+
+        var principal = new ClaimsPrincipal(
+            new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+
+        await HttpCtx.HttpContext!.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+        Nav.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+    }
+
+    public class LoginForm
+    {
+        [Required] public string Username { get; set; } = string.Empty;
+        [Required] public string Password { get; set; } = string.Empty;
+    }
+}

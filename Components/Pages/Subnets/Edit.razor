@@ -1,0 +1,129 @@
+@page "/sections/{SectionId:int}/subnets/new"
+@page "/subnets/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject SubnetService Subnets
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New subnet" : "Edit subnet")</PageTitle>
+
+<h1 class="h3 mb-4"><i class="bi bi-diagram-3 me-2"></i>@(_isNew ? "New subnet" : "Edit subnet")</h1>
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_subnet is not null)
+        {
+            <EditForm Model="_form" OnValidSubmit="Save">
+                <div class="row">
+                    <div class="col-md-9 mb-3">
+                        <label class="form-label">Subnet (CIDR notation, e.g. 192.168.1.0/24) *</label>
+                        <input type="text" class="form-control" @bind="_form.Cidr" placeholder="192.168.1.0/24" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputText class="form-control" @bind-Value="_subnet.Description" />
+                </div>
+                <div class="form-check mb-3">
+                    <InputCheckbox class="form-check-input" id="folder" @bind-Value="_subnet.IsFolder" />
+                    <label class="form-check-label" for="folder">Is folder (logical grouping, no actual prefix)</label>
+                </div>
+                <div class="form-check mb-3">
+                    <InputCheckbox class="form-check-input" id="showName" @bind-Value="_subnet.ShowName" />
+                    <label class="form-check-label" for="showName">Show name in lists</label>
+                </div>
+
+                @if (!string.IsNullOrEmpty(_error))
+                {
+                    <div class="alert alert-danger py-2">@_error</div>
+                }
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-lg"></i> Save
+                </button>
+                <a class="btn btn-link" href="@CancelHref">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? SectionId { get; set; }
+    [Parameter] public int? Id { get; set; }
+    private Subnet? _subnet;
+    private FormModel _form = new();
+    private string? _error;
+    private bool _isNew => Id is null;
+
+    private string CancelHref => SectionId is not null
+        ? $"/sections/{SectionId}/subnets"
+        : (_subnet?.SectionId is int sid ? $"/sections/{sid}/subnets" : "/sections");
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (_isNew)
+        {
+            _subnet = new Subnet { SectionId = SectionId };
+            _form = new FormModel();
+        }
+        else
+        {
+            _subnet = await Subnets.GetAsync(Id!.Value);
+            if (_subnet is null) { Nav.NavigateTo("/sections"); return; }
+            _form = new FormModel
+            {
+                Cidr = TryFormatCidr(_subnet)
+            };
+        }
+    }
+
+    private static string TryFormatCidr(Subnet s)
+    {
+        if (string.IsNullOrEmpty(s.SubnetAddress) || string.IsNullOrEmpty(s.Mask)) return string.Empty;
+        try
+        {
+            var v = IpConverter.GuessVersion(s.SubnetAddress);
+            return $"{IpConverter.ToPresentation(s.SubnetAddress, v)}/{s.Mask}";
+        }
+        catch { return $"{s.SubnetAddress}/{s.Mask}"; }
+    }
+
+    private async Task Save()
+    {
+        if (_subnet is null) return;
+        _error = null;
+
+        if (!_subnet.IsFolder)
+        {
+            if (string.IsNullOrWhiteSpace(_form.Cidr) || !_form.Cidr.Contains('/'))
+            {
+                _error = "Please provide CIDR notation (e.g. 10.0.0.0/8).";
+                return;
+            }
+
+            var parts = _form.Cidr.Trim().Split('/');
+            try
+            {
+                var dec = IpConverter.ToDecimal(parts[0]);
+                if (!int.TryParse(parts[1], out var mask)) { _error = "Invalid mask."; return; }
+                _subnet.SubnetAddress = dec;
+                _subnet.Mask = mask.ToString();
+            }
+            catch (Exception ex) { _error = $"Invalid CIDR: {ex.Message}"; return; }
+        }
+        else
+        {
+            _subnet.SubnetAddress = "0";
+            _subnet.Mask = "";
+        }
+
+        if (_isNew) await Subnets.CreateAsync(_subnet);
+        else await Subnets.UpdateAsync(_subnet);
+
+        Nav.NavigateTo(_subnet.SectionId is int sid ? $"/sections/{sid}/subnets" : "/sections");
+    }
+
+    public class FormModel
+    {
+        public string Cidr { get; set; } = string.Empty;
+    }
+}

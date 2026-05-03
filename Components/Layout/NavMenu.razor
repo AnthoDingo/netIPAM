@@ -1,0 +1,159 @@
+@using Microsoft.AspNetCore.Components.Authorization
+
+<nav class="phpipam-navbar navbar navbar-expand-lg">
+    <div class="container-fluid px-3">
+
+        @* ── Brand ── *@
+        <a class="phpipam-brand navbar-brand" href="/">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" class="me-2">
+                <path d="M1 1h6v6H1zm10 0h6v6h-6zM1 11h6v6H1zm10 2h2v2h2v2h-2v2h-2v-2H9v-2h2z"/>
+            </svg>
+            phpIPAM<span class="phpipam-brand-net">.net</span>
+        </a>
+
+        @* ── Toggle mobile ── *@
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#phpipamNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="phpipamNav">
+
+            @* ── Navigation principale (gauche) ── *@
+            <ul class="navbar-nav me-auto">
+
+                @* Dashboard *@
+                <li class="nav-item">
+                    <NavLink class="nav-link phpipam-nav-link" href="" Match="NavLinkMatch.All">
+                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                    </NavLink>
+                </li>
+
+                @* Sections *@
+                <li class="nav-item">
+                    <NavLink class="nav-link phpipam-nav-link" href="sections">
+                        <i class="bi bi-folder2-open me-1"></i>Sections
+                    </NavLink>
+                </li>
+
+                @* IP Calculator *@
+                <li class="nav-item">
+                    <NavLink class="nav-link phpipam-nav-link" href="tools/ipcalc">
+                        <i class="bi bi-calculator me-1"></i>IP Calculator
+                    </NavLink>
+                </li>
+
+                @* Network (Operator+) *@
+                <AuthorizeView Policy="Operator">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link phpipam-nav-link dropdown-toggle"
+                           href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-diagram-3 me-1"></i>Network
+                        </a>
+                        <ul class="dropdown-menu phpipam-dropdown">
+                            <li><h6 class="dropdown-header">VLANs</h6></li>
+                            <li><a class="dropdown-item" href="admin/vlans">
+                                <i class="bi bi-tag me-2"></i>VLANs
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/l2domains">
+                                <i class="bi bi-layers me-2"></i>L2 domains
+                            </a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><h6 class="dropdown-header">Routing</h6></li>
+                            <li><a class="dropdown-item" href="admin/vrfs">
+                                <i class="bi bi-share me-2"></i>VRFs
+                            </a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><h6 class="dropdown-header">Devices</h6></li>
+                            <li><a class="dropdown-item" href="admin/devices">
+                                <i class="bi bi-router me-2"></i>Devices
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/devicetypes">
+                                <i class="bi bi-pc-display me-2"></i>Device types
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/nameservers">
+                                <i class="bi bi-globe me-2"></i>Nameservers
+                            </a></li>
+                        </ul>
+                    </li>
+
+                    @* Business *@
+                    <li class="nav-item dropdown">
+                        <a class="nav-link phpipam-nav-link dropdown-toggle"
+                           href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-building me-1"></i>Business
+                        </a>
+                        <ul class="dropdown-menu phpipam-dropdown">
+                            <li><a class="dropdown-item" href="admin/customers">
+                                <i class="bi bi-building me-2"></i>Customers
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/locations">
+                                <i class="bi bi-geo-alt me-2"></i>Locations
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/iptags">
+                                <i class="bi bi-bookmark me-2"></i>IP tags
+                            </a></li>
+                        </ul>
+                    </li>
+                </AuthorizeView>
+
+            </ul>
+
+            @* ── Droite : utilisateur + Administration ── *@
+            <ul class="navbar-nav ms-auto align-items-center">
+
+                @* Utilisateur connecté *@
+                <AuthorizeView>
+                    <Authorized>
+                        <li class="nav-item me-2">
+                            <span class="phpipam-user">
+                                <i class="bi bi-person-circle me-1"></i>@context.User.Identity?.Name
+                            </span>
+                        </li>
+                    </Authorized>
+                </AuthorizeView>
+
+                @* Bouton Administration (Admin uniquement) *@
+                <AuthorizeView Policy="Admin">
+                    <li class="nav-item dropdown">
+                        <a class="phpipam-admin-btn dropdown-toggle"
+                           href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear-fill me-1"></i>Administration
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end phpipam-dropdown">
+                            <li><h6 class="dropdown-header">Utilisateurs</h6></li>
+                            <li><a class="dropdown-item" href="admin/users">
+                                <i class="bi bi-people me-2"></i>Users
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/groups">
+                                <i class="bi bi-people-fill me-2"></i>Groups
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/permissions">
+                                <i class="bi bi-shield-check me-2"></i>Permissions
+                            </a></li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li><h6 class="dropdown-header">Système</h6></li>
+                            <li><a class="dropdown-item" href="admin/authmethods">
+                                <i class="bi bi-shield-lock me-2"></i>Auth methods
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/settings">
+                                <i class="bi bi-gear me-2"></i>Settings
+                            </a></li>
+                            <li><a class="dropdown-item" href="admin/logs">
+                                <i class="bi bi-list-ul me-2"></i>Logs
+                            </a></li>
+                        </ul>
+                    </li>
+                </AuthorizeView>
+
+                @* Déconnexion *@
+                <li class="nav-item ms-2">
+                    <a class="phpipam-logout" href="/logout" title="Déconnexion">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+                </li>
+
+            </ul>
+        </div>
+    </div>
+</nav>

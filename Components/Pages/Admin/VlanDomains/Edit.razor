@@ -1,0 +1,49 @@
+@page "/admin/l2domains/new"
+@page "/admin/l2domains/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inject VlanDomainService Domains
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New L2 domain" : "Edit L2 domain")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New L2 domain" : "Edit L2 domain")" Icon="bi bi-layers"
+                 BackHref="/admin/l2domains" BackLabel="L2 domains" />
+
+<div class="phpipam-card" style="max-width: 640px;">
+    <div class="phpipam-card-body">
+        @if (_domain is not null)
+        {
+            <EditForm Model="_domain" OnValidSubmit="Save" FormName="domEdit">
+                <div class="mb-3">
+                    <label class="form-label">Name *</label>
+                    <InputText class="form-control" @bind-Value="_domain.Name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" rows="3" @bind-Value="_domain.Description" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/l2domains">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private VlanDomain? _domain;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _domain = _isNew ? new VlanDomain() : await Domains.GetAsync(Id!.Value);
+        if (_domain is null) Nav.NavigateTo("/admin/l2domains");
+    }
+
+    private async Task Save()
+    {
+        if (_domain is null) return;
+        if (_isNew) await Domains.CreateAsync(_domain); else await Domains.UpdateAsync(_domain);
+        Nav.NavigateTo("/admin/l2domains");
+    }
+}

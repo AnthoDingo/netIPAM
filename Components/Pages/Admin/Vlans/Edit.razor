@@ -1,0 +1,64 @@
+@page "/admin/vlans/new"
+@page "/admin/vlans/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inject VlanService Vlans
+@inject VlanDomainService Domains
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New VLAN" : "Edit VLAN")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New VLAN" : "Edit VLAN")" Icon="bi bi-tag"
+                 BackHref="/admin/vlans" BackLabel="VLANs" />
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_vlan is not null)
+        {
+            <EditForm Model="_vlan" OnValidSubmit="Save" FormName="vlanEdit">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Number *</label>
+                        <InputNumber class="form-control" @bind-Value="_vlan.Number" />
+                    </div>
+                    <div class="col-md-9 mb-3">
+                        <label class="form-label">Name *</label>
+                        <InputText class="form-control" @bind-Value="_vlan.Name" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">L2 domain</label>
+                    <InputSelect class="form-select" @bind-Value="_vlan.DomainId">
+                        @if (_domains is not null) { @foreach (var d in _domains) { <option value="@d.Id">@d.Name</option> } }
+                    </InputSelect>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" rows="3" @bind-Value="_vlan.Description" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/vlans">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Vlan? _vlan;
+    private List<VlanDomain>? _domains;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _domains = await Domains.ListAsync();
+        _vlan = _isNew ? new Vlan { DomainId = 1 } : await Vlans.GetAsync(Id!.Value);
+        if (_vlan is null) Nav.NavigateTo("/admin/vlans");
+    }
+
+    private async Task Save()
+    {
+        if (_vlan is null) return;
+        if (_isNew) await Vlans.CreateAsync(_vlan); else await Vlans.UpdateAsync(_vlan);
+        Nav.NavigateTo("/admin/vlans");
+    }
+}

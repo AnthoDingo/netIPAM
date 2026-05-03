@@ -1,0 +1,63 @@
+@page "/admin/locations/new"
+@page "/admin/locations/{Id:int}/edit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@inject LocationService Locations
+@inject NavigationManager Nav
+
+<PageTitle>@(_isNew ? "New location" : "Edit location")</PageTitle>
+
+<AdminPageHeader Title="@(_isNew ? "New location" : "Edit location")" Icon="bi bi-geo-alt"
+                 BackHref="/admin/locations" BackLabel="Locations" />
+
+<div class="phpipam-card" style="max-width: 720px;">
+    <div class="phpipam-card-body">
+        @if (_loc is not null)
+        {
+            <EditForm Model="_loc" OnValidSubmit="Save" FormName="locEdit">
+                <div class="mb-3">
+                    <label class="form-label">Name *</label>
+                    <InputText class="form-control" @bind-Value="_loc.Name" />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Address</label>
+                    <InputText class="form-control" @bind-Value="_loc.Address" />
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Latitude</label>
+                        <InputText class="form-control" @bind-Value="_loc.Lat" placeholder="48.8566" />
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Longitude</label>
+                        <InputText class="form-control" @bind-Value="_loc.Long" placeholder="2.3522" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <InputTextArea class="form-control" rows="3" @bind-Value="_loc.Description" />
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <a class="btn btn-link" href="/admin/locations">Cancel</a>
+            </EditForm>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Location? _loc;
+    private bool _isNew => Id is null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loc = _isNew ? new Location() : await Locations.GetAsync(Id!.Value);
+        if (_loc is null) Nav.NavigateTo("/admin/locations");
+    }
+
+    private async Task Save()
+    {
+        if (_loc is null) return;
+        if (_isNew) await Locations.CreateAsync(_loc); else await Locations.UpdateAsync(_loc);
+        Nav.NavigateTo("/admin/locations");
+    }
+}

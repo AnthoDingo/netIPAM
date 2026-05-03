@@ -1,0 +1,48 @@
+@page "/admin/vrfs"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject VrfService Vrfs
+@inject NavigationManager Nav
+
+<PageTitle>VRFs — admin</PageTitle>
+
+<AdminPageHeader Title="VRFs" Icon="bi bi-share">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/vrfs/new"><i class="bi bi-plus-lg"></i> New VRF</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_vrfs is null) { <p class="text-muted">Loading…</p> }
+else if (_vrfs.Count == 0)
+{
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No VRFs defined.</div></div>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Name</th><th>RD</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var v in _vrfs)
+                {
+                    <tr>
+                        <td><strong>@v.Name</strong></td>
+                        <td><code>@v.Rd</code></td>
+                        <td class="text-muted">@v.Description</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/vrfs/{v.VrfId}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(v.VrfId)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Vrf>? _vrfs;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _vrfs = await Vrfs.ListAsync();
+    private async Task Delete(int id) { await Vrfs.DeleteAsync(id); await Reload(); }
+}

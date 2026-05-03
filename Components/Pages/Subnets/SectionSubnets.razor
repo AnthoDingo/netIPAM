@@ -1,0 +1,177 @@
+@page "/sections/{SectionId:int}/subnets"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
+@inject SectionService Sections
+@inject SubnetService Subnets
+@using netIPAM.Components.Shared
+
+<PageTitle>@(_section?.Name ?? "Subnets")</PageTitle>
+
+@* ── Onglets sections ── *@
+<SectionTabs ActiveSectionId="SectionId" />
+
+@* ── Layout 2 colonnes ── *@
+<div class="pi-section-view">
+
+    @* Sidebar *@
+    <aside class="pi-sidebar">
+        <SectionSidebar SectionId="SectionId" ActiveSubnetId="null" />
+    </aside>
+
+    @* Contenu principal *@
+    <div class="pi-section-main">
+
+        @if (_section is null)
+        {
+            <p class="text-muted">Chargement…</p>
+        }
+        else
+        {
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h1 class="h4 mb-0">
+                    <i class="bi bi-folder-fill me-2 text-warning"></i>@_section.Name
+                </h1>
+                <div class="d-flex gap-2">
+                    <a class="btn btn-primary btn-sm" href="@($"/sections/{SectionId}/subnets/new")">
+                        <i class="bi bi-plus-lg me-1"></i>Add subnet
+                    </a>
+                    <a class="btn btn-outline-secondary btn-sm" href="/tools/ipcalc">
+                        <i class="bi bi-search me-1"></i>Find subnet
+                    </a>
+                </div>
+            </div>
+
+            @if (_subnets is null || _subnets.Count == 0)
+            {
+                <div class="phpipam-card">
+                    <div class="phpipam-card-body text-center text-muted py-5">
+                        <i class="bi bi-diagram-3 d-block mb-2" style="font-size: 2rem;"></i>
+                        Aucun subnet dans cette section.
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="phpipam-card">
+                    <table class="phpipam-table">
+                        <thead>
+                            <tr>
+                                <th>Subnet</th>
+                                <th>Description</th>
+                                <th>VLAN</th>
+                                <th>Usage</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in _subnets.Where(x => x.MasterSubnetId == 0))
+                            {
+                                @RenderSubnetRow(s, 0)
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public int SectionId { get; set; }
+    private Section? _section;
+    private List<Subnet>? _subnets;
+    private Dictionary<int, (long total, long used, double percentUsed)> _usage = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _section = await Sections.GetAsync(SectionId);
+        if (_section is null) return;
+        _subnets = await Subnets.ForSectionAsync(SectionId);
+        _usage.Clear();
+        foreach (var s in _subnets.Where(x => !x.IsFolder))
+            _usage[s.Id] = await Subnets.UsageAsync(s.Id);
+    }
+
+    // Rendu récursif des lignes avec indentation
+    private RenderFragment RenderSubnetRow(Subnet s, int depth) => __builder =>
+    {
+        var cidr = FormatCidr(s);
+        var u    = _usage.GetValueOrDefault(s.Id);
+        var pad  = depth * 20;
+
+        <tr>
+            <td style="padding-left: @(12 + pad)px">
+                @if (s.IsFolder)
+                {
+                    <i class="bi bi-folder-fill me-1 text-warning"></i>
+                    <span>@(s.Description ?? "Folder")</span>
+                }
+                else
+                {
+                    <a href="@($"/subnets/{s.Id}")" class="text-decoration-none fw-500">
+                        @if (depth > 0) { <i class="bi bi-chevron-right me-1 text-muted" style="font-size:10px"></i> }
+                        <i class="bi bi-diagram-3 me-1 text-muted"></i>@cidr
+                    </a>
+                }
+            </td>
+            <td class="text-muted small">@s.Description</td>
+            <td>
+                @if (s.Vlan is not null)
+                {
+                    <span class="badge bg-warning text-dark">@s.Vlan.Name (@s.Vlan.Number)</span>
+                }
+            </td>
+            <td style="width: 180px;">
+                @if (!s.IsFolder && u.total > 0)
+                {
+                    var pct = u.percentUsed;
+                    var cls = pct >= 90 ? "crit" : pct >= 70 ? "warn" : "";
+                    <div class="phpipam-usage">
+                        <div class="phpipam-usage-fill @cls" style="width: @($"{pct:0.#}")%"></div>
+                        <div class="phpipam-usage-label">@u.used / @u.total</div>
+                    </div>
+                }
+            </td>
+            <td class="text-end">
+                @if (!s.IsFolder)
+                {
+                    <a class="btn btn-sm btn-outline-secondary" href="@($"/subnets/{s.Id}")">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                }
+                <a class="btn btn-sm btn-outline-secondary" href="@($"/subnets/{s.Id}/edit")">
+                    <i class="bi bi-pencil"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(s.Id)">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+
+        @* Enfants récursifs *@
+        @if (_subnets is not null)
+        {
+            foreach (var child in _subnets.Where(x => x.MasterSubnetId == s.Id))
+            {
+                @RenderSubnetRow(child, depth + 1)
+            }
+        }
+    };
+
+    private async Task Delete(int id)
+    {
+        await Subnets.DeleteAsync(id);
+        _subnets = await Subnets.ForSectionAsync(SectionId);
+    }
+
+    private static string FormatCidr(Subnet s)
+    {
+        if (string.IsNullOrEmpty(s.SubnetAddress) || string.IsNullOrEmpty(s.Mask)) return "—";
+        try
+        {
+            var v = IpConverter.GuessVersion(s.SubnetAddress);
+            return $"{IpConverter.ToPresentation(s.SubnetAddress, v)}/{s.Mask}";
+        }
+        catch { return $"{s.SubnetAddress}/{s.Mask}"; }
+    }
+}

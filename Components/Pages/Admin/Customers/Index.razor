@@ -1,0 +1,57 @@
+@page "/admin/customers"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject CustomerService Customers
+@inject NavigationManager Nav
+
+<PageTitle>Customers — admin</PageTitle>
+
+<AdminPageHeader Title="Customers" Icon="bi bi-building">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/customers/new"><i class="bi bi-plus-lg"></i> New customer</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_customers is null) { <p class="text-muted">Loading…</p> }
+else if (_customers.Count == 0)
+{
+    <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No customers yet.</div></div>
+}
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Title</th><th>City</th><th>Contact</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var c in _customers)
+                {
+                    <tr>
+                        <td><strong>@c.Title</strong></td>
+                        <td class="text-muted">@c.City</td>
+                        <td>@c.ContactMail</td>
+                        <td>@StatusBadge(c.Status)</td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/customers/{c.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(c.Id)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Customer>? _customers;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _customers = await Customers.ListAsync();
+    private async Task Delete(int id) { await Customers.DeleteAsync(id); await Reload(); }
+
+    private static MarkupString StatusBadge(string? s) => s switch
+    {
+        "Active"   => new("<span class=\"badge bg-success\">Active</span>"),
+        "Reserved" => new("<span class=\"badge bg-warning text-dark\">Reserved</span>"),
+        "Inactive" => new("<span class=\"badge bg-secondary\">Inactive</span>"),
+        _ => new("—")
+    };
+}

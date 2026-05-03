@@ -1,0 +1,44 @@
+@page "/admin/locations"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
+@rendermode InteractiveServer
+@inject LocationService Locations
+@inject NavigationManager Nav
+
+<PageTitle>Locations — admin</PageTitle>
+
+<AdminPageHeader Title="Locations" Icon="bi bi-geo-alt">
+    <Actions>
+        <a class="btn btn-primary btn-sm" href="/admin/locations/new"><i class="bi bi-plus-lg"></i> New location</a>
+    </Actions>
+</AdminPageHeader>
+
+@if (_locations is null) { <p class="text-muted">Loading…</p> }
+else
+{
+    <div class="phpipam-card">
+        <table class="phpipam-table">
+            <thead><tr><th>Name</th><th>Address</th><th>Coordinates</th><th class="text-end">Actions</th></tr></thead>
+            <tbody>
+                @foreach (var l in _locations)
+                {
+                    <tr>
+                        <td><strong>@l.Name</strong></td>
+                        <td class="text-muted">@l.Address</td>
+                        <td><small><code>@l.Lat, @l.Long</code></small></td>
+                        <td class="text-end">
+                            <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/locations/{l.Id}/edit")"><i class="bi bi-pencil"></i></a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(l.Id)"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    private List<Location>? _locations;
+    protected override async Task OnInitializedAsync() => await Reload();
+    private async Task Reload() => _locations = await Locations.ListAsync();
+    private async Task Delete(int id) { await Locations.DeleteAsync(id); await Reload(); }
+}
