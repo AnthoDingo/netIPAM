@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace netIPAM.Components.Pages.Admin.Permissions
+﻿namespace netIPAM.Components.Pages.Admin.Permissions
 {
     public partial class Index
     {
@@ -9,19 +7,19 @@ namespace netIPAM.Components.Pages.Admin.Permissions
 
         [Inject]
         private UserService Users { get; set; } = default!;
-        
+
         [Inject]
         private UserGroupService Groups { get; set; } = default!;
-        
+
         [Inject]
         private VlanService Vlans { get; set; } = default!;
-        
+
         [Inject]
         private VlanDomainService L2Domains { get; set; } = default!;
-        
+
         [Inject]
         private VrfService Vrfs { get; set; } = default!;
-        
+
         [Inject]
         private DeviceService Devices { get; set; } = default!;
 

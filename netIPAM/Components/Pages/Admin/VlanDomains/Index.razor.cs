@@ -2,10 +2,10 @@
 {
     public partial class Index
     {
-        [Inject] 
+        [Inject]
         private VlanDomainService Domains { get; set; } = default!;
-        
-        [Inject] 
+
+        [Inject]
         private NavigationManager Nav { get; set; } = default!;
 
         private List<VlanDomain>? _domains;

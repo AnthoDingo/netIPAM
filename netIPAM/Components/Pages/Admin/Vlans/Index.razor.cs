@@ -1,13 +1,11 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace netIPAM.Components.Pages.Admin.Vlans
+﻿namespace netIPAM.Components.Pages.Admin.Vlans
 {
     public partial class Index
     {
-        [Inject] 
+        [Inject]
         private VlanService Vlans { get; set; } = default!;
 
-        [Inject] 
+        [Inject]
         private NavigationManager Nav { get; set; } = default!;
 
         private List<Vlan>? _vlans;

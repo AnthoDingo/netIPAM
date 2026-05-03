@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace netIPAM.Components.Pages.Admin.Settings
+﻿namespace netIPAM.Components.Pages.Admin.Settings
 {
     public partial class Index
     {
@@ -11,7 +9,7 @@ namespace netIPAM.Components.Pages.Admin.Settings
         private MaintenanceState MaintenanceState { get; set; } = default!;
 
         [Inject]
-        private NavigationManager Nav {  get; set; } = default!;
+        private NavigationManager Nav { get; set; } = default!;
 
         private Setting? _settings;
         private bool _saved;

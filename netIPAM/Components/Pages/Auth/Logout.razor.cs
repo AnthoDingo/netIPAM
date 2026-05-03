@@ -1,15 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace netIPAM.Components.Pages.Auth
 {
     public partial class Logout
     {
-        [Inject] 
+        [Inject]
         private IHttpContextAccessor HttpCtx { get; set; } = default!;
-        
-        [Inject] 
+
+        [Inject]
         private NavigationManager Nav { get; set; } = default!;
 
         protected override async Task OnInitializedAsync()

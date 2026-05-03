@@ -1,13 +1,11 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace netIPAM.Components.Pages.Admin.VlanDomains
+﻿namespace netIPAM.Components.Pages.Admin.VlanDomains
 {
     public partial class Edit
     {
-        [Inject] 
+        [Inject]
         private VlanDomainService Domains { get; set; } = default!;
-        
-        [Inject] 
+
+        [Inject]
         private NavigationManager Nav { get; set; } = default!;
 
         [Parameter] public int? Id { get; set; }

@@ -6,6 +6,11 @@
     <RootNamespace>netIPAM</RootNamespace>
     <UserSecretsId>netipam-dev</UserSecretsId>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="netipam.db" />
+    <None Remove="netipam.db-shm" />
+    <None Remove="netipam.db-wal" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- EF Core -->

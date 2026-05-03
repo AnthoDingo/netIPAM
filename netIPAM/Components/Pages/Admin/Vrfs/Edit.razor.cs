@@ -1,13 +1,11 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace netIPAM.Components.Pages.Admin.Vrfs
+﻿namespace netIPAM.Components.Pages.Admin.Vrfs
 {
     public partial class Edit
     {
-        [Inject] 
+        [Inject]
         private VrfService Vrfs { get; set; } = default!;
 
-        [Inject] 
+        [Inject]
         private NavigationManager Nav { get; set; } = default!;
 
         [Parameter] public int? Id { get; set; }

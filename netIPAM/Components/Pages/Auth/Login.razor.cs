@@ -7,13 +7,13 @@ namespace netIPAM.Components.Pages.Auth
 {
     public partial class Login
     {
-        [Inject] 
+        [Inject]
         private UserService Users { get; set; } = default!;
-        
-        [Inject] 
+
+        [Inject]
         private IHttpContextAccessor HttpCtx { get; set; } = default!;
-        
-        [Inject] 
+
+        [Inject]
         private NavigationManager Nav { get; set; } = default!;
 
         [SupplyParameterFromForm] private LoginForm _form { get; set; } = new();
