@@ -13,11 +13,11 @@
         {
             <EditForm Model="_loc" OnValidSubmit="Save" FormName="locEdit">
                 <div class="mb-3">
-                    <label class="form-label">Name *</label>
+                    <label class="form-label">@T("common.name") *</label>
                     <InputText class="form-control" @bind-Value="_loc.Name" />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Address</label>
+                    <label class="form-label">@T("common.address")</label>
                     <InputText class="form-control" @bind-Value="_loc.Address" />
                 </div>
                 <div class="row">
@@ -31,10 +31,10 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Description</label>
+                    <label class="form-label">@T("common.description")</label>
                     <InputTextArea class="form-control" rows="3" @bind-Value="_loc.Description" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> @T("common.save")</button>
                 <a class="btn btn-link" href="/admin/locations">Cancel</a>
             </EditForm>
         }

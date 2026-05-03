@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Vrfs
 {
-    public partial class Edit
+    public partial class Edit : LocalizedComponentBase
     {
         [Inject]
         private VrfService Vrfs { get; set; } = default!;

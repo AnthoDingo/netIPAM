@@ -14,7 +14,7 @@
 
 @if (_users is null)
 {
-    <p class="text-muted">Loading…</p>
+    <p class="text-muted">@T("common.loading")</p>
 }
 else
 {
@@ -26,7 +26,7 @@ else
                     <th>Real name</th>
                     <th>Email</th>
                     <th>Role</th>
-                    <th>Status</th>
+                    <th>@T("common.status")</th>
                     <th>Last login</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -57,7 +57,7 @@ else
                             <a class="btn btn-sm btn-outline-secondary" href="@($"/admin/users/{u.Id}/password")" title="Reset password">
                                 <i class="bi bi-key"></i>
                             </a>
-                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(u.Id)" title="Delete">
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => Delete(u.Id)" title="@T("common.delete")">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>

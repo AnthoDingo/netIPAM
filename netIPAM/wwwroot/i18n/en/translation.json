@@ -41,7 +41,9 @@
     "name": "Name",
     "title": "Title",
     "actions": "Actions",
-    "required": "Required"
+    "required": "Required",
+    "new": "New",
+    "type": "Type"
   },
   "navigation": {
     "admin": "Admin",
@@ -51,7 +53,11 @@
     "ipAddresses": "IP Addresses",
     "tools": "Tools",
     "ipcalc": "IP Calculator",
-    "migrate": "Migrate"
+    "migrate": "Migrate",
+    "dashboard": "Dashboard",
+    "network": "Network",
+    "business": "Business",
+    "myPreferences": "My preferences"
   },
   "admin": {
     "title": "Administration",
@@ -66,7 +72,10 @@
     "vlanDomains": "VLAN Domains",
     "nameservers": "Nameservers",
     "ipTags": "IP Tags",
-    "logs": "Logs"
+    "logs": "Logs",
+    "usersSection": "Users",
+    "system": "System",
+    "authMethods": "Auth methods"
   },
   "subnets": {
     "title": "Subnets",
@@ -88,7 +97,8 @@
     "noSubnets": "No subnets in this section.",
     "addSubnet": "Add subnet",
     "findSubnet": "Find subnet",
-    "vlan": "VLAN"
+    "vlan": "VLAN",
+    "addIp": "Add IP"
   },
   "ipAddresses": {
     "title": "IP Addresses",
@@ -109,6 +119,7 @@
     "owner": "Owner",
     "ipRequired": "IP required.",
     "invalidCidr": "Invalid CIDR:",
+    "addIp": "Add IP",
     "noAddresses": "No IP addresses registered."
   },
   "customers": {

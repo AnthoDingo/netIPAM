@@ -6,16 +6,16 @@
 
 <AdminPageHeader Title="Locations" Icon="bi bi-geo-alt">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/locations/new"><i class="bi bi-plus-lg"></i> New location</a>
+        <a class="btn btn-primary btn-sm" href="/admin/locations/new"><i class="bi bi-plus-lg"></i> @T("common.new") location</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_locations is null) { <p class="text-muted">Loading…</p> }
+@if (_locations is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Name</th><th>Address</th><th>Coordinates</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.name")</th><th>Address</th><th>Coordinates</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (Location l in _locations)
                 {

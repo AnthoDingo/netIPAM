@@ -6,16 +6,16 @@
 
 <AdminPageHeader Title="L2 domains" Icon="bi bi-layers">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/l2domains/new"><i class="bi bi-plus-lg"></i> New domain</a>
+        <a class="btn btn-primary btn-sm" href="/admin/l2domains/new"><i class="bi bi-plus-lg"></i> @T("common.new") domain</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_domains is null) { <p class="text-muted">Loading…</p> }
+@if (_domains is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.name")</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (VlanDomain d in _domains)
                 {

@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Users
 {
-    public partial class ResetPassword
+    public partial class ResetPassword : LocalizedComponentBase
     {
         [Inject]
         private UserService Users { get; set; } = default!;

@@ -6,11 +6,11 @@
 
 <AdminPageHeader Title="Customers" Icon="bi bi-building">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/customers/new"><i class="bi bi-plus-lg"></i> New customer</a>
+        <a class="btn btn-primary btn-sm" href="/admin/customers/new"><i class="bi bi-plus-lg"></i> @T("common.new") customer</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_customers is null) { <p class="text-muted">Loading…</p> }
+@if (_customers is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_customers.Count == 0)
 {
     <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No customers yet.</div></div>
@@ -19,7 +19,7 @@ else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Title</th><th>City</th><th>Contact</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>Title</th><th>City</th><th>Contact</th><th>@T("common.status")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (Customer c in _customers)
                 {

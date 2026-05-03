@@ -3,13 +3,12 @@ using netIPAM.Identity;
 
 namespace netIPAM.Components.Pages.Profile
 {
-    public partial class Index
+    public partial class Index : LocalizedComponentBase
     {
         [Inject] private UserService Users { get; set; } = default!;
         [Inject] private IPasswordHasher Hasher { get; set; } = default!;
         [Inject] private AuthenticationStateProvider AuthState { get; set; } = default!;
         [Inject] private NavigationManager Nav { get; set; } = default!;
-        [Inject] private LocalizationService Localization { get; set; } = default!;
 
         private User? _user;
         private string _activeTab = "info";

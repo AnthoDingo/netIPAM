@@ -6,11 +6,11 @@
 
 <AdminPageHeader Title="Devices" Icon="bi bi-router">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/devices/new"><i class="bi bi-plus-lg"></i> New device</a>
+        <a class="btn btn-primary btn-sm" href="/admin/devices/new"><i class="bi bi-plus-lg"></i> @T("common.new") device</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_devices is null) { <p class="text-muted">Loading…</p> }
+@if (_devices is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_devices.Count == 0)
 {
     <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No devices yet.</div></div>
@@ -19,7 +19,7 @@ else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Hostname</th><th>IP</th><th>Type</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>Hostname</th><th>IP</th><th>@T("common.type")</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (Device d in _devices)
                 {

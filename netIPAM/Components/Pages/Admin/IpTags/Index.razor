@@ -6,7 +6,7 @@
 
 <AdminPageHeader Title="IP tags" Icon="bi bi-bookmark">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/iptags/new"><i class="bi bi-plus-lg"></i> New tag</a>
+        <a class="btn btn-primary btn-sm" href="/admin/iptags/new"><i class="bi bi-plus-lg"></i> @T("common.new") tag</a>
     </Actions>
 </AdminPageHeader>
 
@@ -15,12 +15,12 @@
     The system tags <code>Offline</code>, <code>Used</code>, <code>Reserved</code>, <code>DHCP</code> are locked and cannot be deleted.
 </div>
 
-@if (_tags is null) { <p class="text-muted">Loading…</p> }
+@if (_tags is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Type</th><th>Preview</th><th>Show in lists</th><th>Locked</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.type")</th><th>Preview</th><th>Show in lists</th><th>Locked</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (IpTag t in _tags)
                 {

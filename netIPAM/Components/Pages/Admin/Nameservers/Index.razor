@@ -6,16 +6,16 @@
 
 <AdminPageHeader Title="Nameservers" Icon="bi bi-globe">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/nameservers/new"><i class="bi bi-plus-lg"></i> New nameserver</a>
+        <a class="btn btn-primary btn-sm" href="/admin/nameservers/new"><i class="bi bi-plus-lg"></i> @T("common.new") nameserver</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_nameservers is null) { <p class="text-muted">Loading…</p> }
+@if (_nameservers is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Name</th><th>Servers</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.name")</th><th>Servers</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (Nameserver n in _nameservers)
                 {

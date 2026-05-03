@@ -1,3 +1,4 @@
+@inherits LocalizedComponentBase
 @* En-tête réutilisable pour les pages d'admin : titre + breadcrumb + slot d'actions à droite. *@
 
 <div class="d-flex align-items-center justify-content-between mb-3">
@@ -5,7 +6,7 @@
         @if (!string.IsNullOrEmpty(BackHref))
         {
             <a href="@BackHref" class="text-decoration-none text-muted small d-block">
-                <i class="bi bi-arrow-left"></i> @BackLabel
+                <i class="bi bi-arrow-left"></i> @(BackLabel ?? T("common.back"))
             </a>
         }
         <h1 class="h3 mb-0">
@@ -25,6 +26,6 @@
     [Parameter] public string Title { get; set; } = string.Empty;
     [Parameter] public string? Icon { get; set; }
     [Parameter] public string? BackHref { get; set; }
-    [Parameter] public string BackLabel { get; set; } = "Back";
+    [Parameter] public string? BackLabel { get; set; }
     [Parameter] public RenderFragment? Actions { get; set; }
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace netIPAM.Components.Pages.Admin.AuthMethods
 {
-    public partial class Edit
+    public partial class Edit : LocalizedComponentBase
     {
         [Inject] private AuthMethodService Methods { get; set; } = default!;
         [Inject] private NavigationManager Nav { get; set; } = default!;

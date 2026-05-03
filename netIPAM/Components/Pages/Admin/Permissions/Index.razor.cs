@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Permissions
 {
-    public partial class Index
+    public partial class Index : LocalizedComponentBase
     {
         [Inject]
         private PermissionService PermSvc { get; set; } = default!;

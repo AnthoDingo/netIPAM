@@ -6,11 +6,11 @@
 
 <AdminPageHeader Title="VLANs" Icon="bi bi-tag">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/vlans/new"><i class="bi bi-plus-lg"></i> New VLAN</a>
+        <a class="btn btn-primary btn-sm" href="/admin/vlans/new"><i class="bi bi-plus-lg"></i> @T("common.new") VLAN</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_vlans is null) { <p class="text-muted">Loading…</p> }
+@if (_vlans is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_vlans.Count == 0)
 {
     <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No VLANs defined.</div></div>
@@ -19,7 +19,7 @@ else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Number</th><th>Name</th><th>Domain</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>Number</th><th>@T("common.name")</th><th>Domain</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (Vlan v in _vlans)
                 {

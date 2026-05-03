@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Users
 {
-    public partial class Edit
+    public partial class Edit : LocalizedComponentBase
     {
         [Inject]
         private UserService Users { get; set; } = default!;

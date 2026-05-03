@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.VlanDomains
 {
-    public partial class Edit
+    public partial class Edit : LocalizedComponentBase
     {
         [Inject]
         private VlanDomainService Domains { get; set; } = default!;

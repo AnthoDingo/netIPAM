@@ -18,7 +18,7 @@
     </Actions>
 </AdminPageHeader>
 
-@if (_logs is null) { <p class="text-muted">Loading…</p> }
+@if (_logs is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_logs.Count == 0)
 {
     <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">

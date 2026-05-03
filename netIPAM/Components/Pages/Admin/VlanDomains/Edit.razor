@@ -14,14 +14,14 @@
         {
             <EditForm Model="_domain" OnValidSubmit="Save" FormName="domEdit">
                 <div class="mb-3">
-                    <label class="form-label">Name *</label>
+                    <label class="form-label">@T("common.name") *</label>
                     <InputText class="form-control" @bind-Value="_domain.Name" />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Description</label>
+                    <label class="form-label">@T("common.description")</label>
                     <InputTextArea class="form-control" rows="3" @bind-Value="_domain.Description" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> @T("common.save")</button>
                 <a class="btn btn-link" href="/admin/l2domains">Cancel</a>
             </EditForm>
         }

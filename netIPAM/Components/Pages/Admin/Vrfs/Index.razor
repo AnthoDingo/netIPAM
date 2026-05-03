@@ -6,11 +6,11 @@
 
 <AdminPageHeader Title="VRFs" Icon="bi bi-share">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/vrfs/new"><i class="bi bi-plus-lg"></i> New VRF</a>
+        <a class="btn btn-primary btn-sm" href="/admin/vrfs/new"><i class="bi bi-plus-lg"></i> @T("common.new") VRF</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_vrfs is null) { <p class="text-muted">Loading…</p> }
+@if (_vrfs is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_vrfs.Count == 0)
 {
     <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No VRFs defined.</div></div>
@@ -19,7 +19,7 @@ else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Name</th><th>RD</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.name")</th><th>RD</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (Vrf v in _vrfs)
                 {

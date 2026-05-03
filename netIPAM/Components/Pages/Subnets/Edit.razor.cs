@@ -1,6 +1,6 @@
 namespace netIPAM.Components.Pages.Subnets
 {
-    public partial class Edit
+    public partial class Edit : LocalizedComponentBase
     {
         [Inject]
         private SubnetService Subnets { get; set; } = default!;

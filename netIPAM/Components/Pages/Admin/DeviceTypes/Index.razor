@@ -6,16 +6,16 @@
 
 <AdminPageHeader Title="Device types" Icon="bi bi-pc-display">
     <Actions>
-        <a class="btn btn-primary btn-sm" href="/admin/devicetypes/new"><i class="bi bi-plus-lg"></i> New type</a>
+        <a class="btn btn-primary btn-sm" href="/admin/devicetypes/new"><i class="bi bi-plus-lg"></i> @T("common.new") type</a>
     </Actions>
 </AdminPageHeader>
 
-@if (_types is null) { <p class="text-muted">Loading…</p> }
+@if (_types is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.name")</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (DeviceType t in _types)
                 {

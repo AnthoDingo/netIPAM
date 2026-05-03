@@ -6,7 +6,7 @@
 
 <AdminPageHeader Title="Settings" Icon="bi bi-gear" />
 
-@if (_settings is null) { <p class="text-muted">Loading…</p> }
+@if (_settings is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <EditForm Model="_settings" OnValidSubmit="Save" FormName="setEdit">

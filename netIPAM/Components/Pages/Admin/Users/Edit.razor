@@ -25,7 +25,7 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Email</label>
+                    <label class="form-label">@T("common.email")</label>
                     <InputText class="form-control" @bind-Value="_user.Email" />
                 </div>
                 <div class="row">
@@ -39,9 +39,9 @@
                         </InputSelect>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Status</label>
+                        <label class="form-label">@T("common.status")</label>
                         <InputSelect class="form-select" @bind-Value="_user.Disabled">
-                            <option value="No">Active</option>
+                            <option value="No">@T("common.active")</option>
                             <option value="Yes">Disabled</option>
                         </InputSelect>
                     </div>

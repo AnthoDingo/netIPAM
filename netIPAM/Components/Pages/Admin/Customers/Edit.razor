@@ -13,11 +13,11 @@
         {
             <EditForm Model="_customer" OnValidSubmit="Save" FormName="custEdit">
                 <div class="mb-3">
-                    <label class="form-label">Title *</label>
+                    <label class="form-label">@T("common.title") *</label>
                     <InputText class="form-control" @bind-Value="_customer.Title" />
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Address</label>
+                    <label class="form-label">@T("common.address")</label>
                     <InputText class="form-control" @bind-Value="_customer.Address" />
                 </div>
                 <div class="row">
@@ -26,11 +26,11 @@
                         <InputText class="form-control" @bind-Value="_customer.Postcode" />
                     </div>
                     <div class="col-md-5 mb-3">
-                        <label class="form-label">City</label>
+                        <label class="form-label">@T("common.city")</label>
                         <InputText class="form-control" @bind-Value="_customer.City" />
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">State</label>
+                        <label class="form-label">@T("common.state")</label>
                         <InputText class="form-control" @bind-Value="_customer.State" />
                     </div>
                 </div>
@@ -40,27 +40,27 @@
                         <InputText class="form-control" @bind-Value="_customer.ContactPerson" />
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Phone</label>
+                        <label class="form-label">@T("common.phone")</label>
                         <InputText class="form-control" @bind-Value="_customer.ContactPhone" />
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Email</label>
+                        <label class="form-label">@T("common.email")</label>
                         <InputText class="form-control" @bind-Value="_customer.ContactMail" />
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Status</label>
+                    <label class="form-label">@T("common.status")</label>
                     <InputSelect class="form-select" @bind-Value="_customer.Status">
-                        <option value="Active">Active</option>
-                        <option value="Reserved">Reserved</option>
-                        <option value="Inactive">Inactive</option>
+                        <option value="Active">@T("common.active")</option>
+                        <option value="Reserved">@T("ipAddresses.reserved")</option>
+                        <option value="Inactive">@T("common.inactive")</option>
                     </InputSelect>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Note</label>
+                    <label class="form-label">@T("common.note")</label>
                     <InputTextArea class="form-control" rows="3" @bind-Value="_customer.Note" />
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> Save</button>
+                <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg"></i> @T("common.save")</button>
                 <a class="btn btn-link" href="/admin/customers">Cancel</a>
             </EditForm>
         }

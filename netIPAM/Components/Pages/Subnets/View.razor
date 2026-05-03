@@ -52,18 +52,18 @@
             <div class="row g-3">
                 <div class="col-lg-4">
                     <div class="phpipam-card">
-                        <div class="phpipam-card-header">Properties</div>
+                        <div class="phpipam-card-header">@T("subnets.properties")</div>
                         <div class="phpipam-card-body">
                             <dl class="row mb-0" style="font-size:.875rem">
                                 <dt class="col-5 text-muted">Network</dt>
                                 <dd class="col-7"><code>@_info?.Network</code></dd>
                                 <dt class="col-5 text-muted">Broadcast</dt>
                                 <dd class="col-7"><code>@_info?.Broadcast</code></dd>
-                                <dt class="col-5 text-muted">First usable</dt>
+                                <dt class="col-5 text-muted">@T("subnets.firstUsable")</dt>
                                 <dd class="col-7"><code>@_info?.FirstUsable</code></dd>
-                                <dt class="col-5 text-muted">Last usable</dt>
+                                <dt class="col-5 text-muted">@T("subnets.lastUsable")</dt>
                                 <dd class="col-7"><code>@_info?.LastUsable</code></dd>
-                                <dt class="col-5 text-muted">Hosts</dt>
+                                <dt class="col-5 text-muted">@T("subnets.hosts")</dt>
                                 <dd class="col-7">@_info?.UsableHosts</dd>
                                 @if (_subnet.Vlan is not null)
                                 {
@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="phpipam-card">
-                        <div class="phpipam-card-header">Usage</div>
+                        <div class="phpipam-card-header">@T("subnets.usage")</div>
                         <div class="phpipam-card-body">
                             @{
                                 double pct = _usage.percentUsed;

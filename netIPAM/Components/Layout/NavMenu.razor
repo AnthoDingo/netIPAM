@@ -1,3 +1,4 @@
+@inherits LocalizedComponentBase
 @using Microsoft.AspNetCore.Components.Authorization
 
 <nav class="phpipam-navbar navbar navbar-expand-lg">
@@ -25,7 +26,7 @@
                 @* Dashboard *@
                 <li class="nav-item">
                     <NavLink class="nav-link phpipam-nav-link" href="" Match="NavLinkMatch.All">
-                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        <i class="bi bi-speedometer2 me-1"></i>@T("navigation.dashboard")
                     </NavLink>
                 </li>
 
@@ -64,7 +65,7 @@
                                 <i class="bi bi-share me-2"></i>VRFs
                             </a></li>
                             <li><hr class="dropdown-divider" /></li>
-                            <li><h6 class="dropdown-header">Devices</h6></li>
+                            <li><h6 class="dropdown-header">@T("admin.devices")</h6></li>
                             <li><a class="dropdown-item" href="admin/devices">
                                 <i class="bi bi-router me-2"></i>Devices
                             </a></li>
@@ -135,7 +136,7 @@
                             <i class="bi bi-gear-fill me-1"></i>Administration
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end phpipam-dropdown">
-                            <li><h6 class="dropdown-header">Utilisateurs</h6></li>
+                            <li><h6 class="dropdown-header">@T("admin.usersSection")</h6></li>
                             <li><a class="dropdown-item" href="admin/users">
                                 <i class="bi bi-people me-2"></i>Users
                             </a></li>
@@ -146,7 +147,7 @@
                                 <i class="bi bi-shield-check me-2"></i>Permissions
                             </a></li>
                             <li><hr class="dropdown-divider" /></li>
-                            <li><h6 class="dropdown-header">Système</h6></li>
+                            <li><h6 class="dropdown-header">@T("admin.system")</h6></li>
                             <li><a class="dropdown-item" href="admin/authmethods">
                                 <i class="bi bi-shield-lock me-2"></i>Auth methods
                             </a></li>

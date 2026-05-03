@@ -12,22 +12,22 @@
         {
             <EditForm Model="_form" OnValidSubmit="Save">
                 <div class="mb-3">
-                    <label class="form-label">IP address *</label>
+                    <label class="form-label">@T("ipAddresses.address") *</label>
                     <input type="text" class="form-control" @bind="_form.Address" placeholder="192.168.1.10" />
                 </div>
                 <div class="row">
                     <div class="col-md-8 mb-3">
-                        <label class="form-label">Hostname</label>
+                        <label class="form-label">@T("ipAddresses.hostname")</label>
                         <InputText class="form-control" @bind-Value="_ip.Hostname" />
                     </div>
                     <div class="col-md-4 mb-3">
                         <label class="form-label">State</label>
                         <InputSelect class="form-select" @bind-Value="_ip.State">
-                            <option value="0">Offline</option>
+                            <option value="0">@T("ipAddresses.offline")</option>
                             <option value="1">Active</option>
                             <option value="2">Used</option>
                             <option value="3">Reserved</option>
-                            <option value="4">DHCP</option>
+                            <option value="4">@T("ipAddresses.dhcp")</option>
                         </InputSelect>
                     </div>
                 </div>
@@ -41,13 +41,13 @@
                         <InputText class="form-control" @bind-Value="_ip.Mac" placeholder="aa:bb:cc:dd:ee:ff" />
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Owner</label>
+                        <label class="form-label">@T("ipAddresses.owner")</label>
                         <InputText class="form-control" @bind-Value="_ip.Owner" />
                     </div>
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="gw" @bind-Value="_ip.IsGateway" />
-                    <label class="form-check-label" for="gw">Gateway</label>
+                    <label class="form-check-label" for="gw">@T("ipAddresses.gateway")</label>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Note</label>

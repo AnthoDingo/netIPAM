@@ -1,6 +1,6 @@
 namespace netIPAM.Components.Pages.Subnets
 {
-    public partial class View
+    public partial class View : LocalizedComponentBase
     {
         [Inject]
         private SubnetService Subnets { get; set; } = default!;

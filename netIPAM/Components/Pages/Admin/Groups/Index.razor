@@ -12,7 +12,7 @@
     </Actions>
 </AdminPageHeader>
 
-@if (_groups is null) { <p class="text-muted">Loading…</p> }
+@if (_groups is null) { <p class="text-muted">@T("common.loading")</p> }
 else if (_groups.Count == 0)
 {
     <div class="phpipam-card"><div class="phpipam-card-body text-center text-muted py-5">No groups defined.</div></div>
@@ -21,7 +21,7 @@ else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Name</th><th>Description</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.name")</th><th>@T("common.description")</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (UserGroup g in _groups)
                 {

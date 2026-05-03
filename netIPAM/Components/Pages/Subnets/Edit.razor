@@ -23,11 +23,11 @@
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="folder" @bind-Value="_subnet.IsFolder" />
-                    <label class="form-check-label" for="folder">Is folder (logical grouping, no actual prefix)</label>
+                    <label class="form-check-label" for="folder">@T("subnets.isFolder")</label>
                 </div>
                 <div class="form-check mb-3">
                     <InputCheckbox class="form-check-input" id="showName" @bind-Value="_subnet.ShowName" />
-                    <label class="form-check-label" for="showName">Show name in lists</label>
+                    <label class="form-check-label" for="showName">@T("subnets.showName")</label>
                 </div>
 
                 @if (!string.IsNullOrEmpty(_error))

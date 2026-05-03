@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Locations
 {
-    public partial class Edit
+    public partial class Edit : LocalizedComponentBase
     {
         [Inject]
         private LocationService Locations { get; set; } = default!;

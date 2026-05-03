@@ -13,12 +13,12 @@
 </AdminPageHeader>
 
 
-@if (_methods is null) { <p class="text-muted">Loading…</p> }
+@if (_methods is null) { <p class="text-muted">@T("common.loading")</p> }
 else
 {
     <div class="phpipam-card">
         <table class="phpipam-table">
-            <thead><tr><th>Type</th><th>Description</th><th>Protected</th><th class="text-end">Actions</th></tr></thead>
+            <thead><tr><th>@T("common.type")</th><th>@T("common.description")</th><th>Protected</th><th class="text-end">Actions</th></tr></thead>
             <tbody>
                 @foreach (UserAuthMethod m in _methods)
                 {

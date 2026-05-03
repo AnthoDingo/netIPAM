@@ -1,6 +1,6 @@
 ﻿namespace netIPAM.Components.Pages.Admin.Customers
 {
-    public partial class Index
+    public partial class Index : LocalizedComponentBase
     {
         [Inject]
         private CustomerService Customers { get; set; } = default!;

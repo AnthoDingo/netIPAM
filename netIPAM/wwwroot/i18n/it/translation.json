@@ -41,7 +41,9 @@
     "name": "Nome",
     "title": "Titolo",
     "actions": "Azioni",
-    "required": "Obbligatorio"
+    "required": "Obbligatorio",
+    "new": "Nuovo",
+    "type": "Tipo"
   },
   "navigation": {
     "admin": "Admin",
@@ -51,7 +53,11 @@
     "ipAddresses": "Indirizzi IP",
     "tools": "Strumenti",
     "ipcalc": "Calcolatore IP",
-    "migrate": "Migra"
+    "migrate": "Migra",
+    "dashboard": "Pannello",
+    "network": "Rete",
+    "business": "Business",
+    "myPreferences": "Le mie preferenze"
   },
   "admin": {
     "title": "Amministrazione",
@@ -66,7 +72,10 @@
     "vlanDomains": "Domini VLAN",
     "nameservers": "Server dei nomi",
     "ipTags": "Tag IP",
-    "logs": "Registri"
+    "logs": "Registri",
+    "usersSection": "Utenti",
+    "system": "Sistema",
+    "authMethods": "Metodi di auth"
   },
   "subnets": {
     "title": "Sottoreti",
@@ -88,7 +97,8 @@
     "noSubnets": "Nessuna sottorete in questa sezione.",
     "addSubnet": "Aggiungi sottorete",
     "findSubnet": "Trova sottorete",
-    "vlan": "VLAN"
+    "vlan": "VLAN",
+    "addIp": "Aggiungi IP"
   },
   "ipAddresses": {
     "title": "Indirizzi IP",
@@ -109,6 +119,7 @@
     "owner": "Proprietario",
     "ipRequired": "IP richiesto.",
     "invalidCidr": "CIDR non valido:",
+    "addIp": "Aggiungi IP",
     "noAddresses": "Nessun indirizzo IP registrato."
   },
   "customers": {
