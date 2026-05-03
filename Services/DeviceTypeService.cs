@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -30,7 +29,7 @@ public class DeviceTypeService
 
     public async Task DeleteAsync(int tid, CancellationToken ct = default)
     {
-        DeviceTypes? t = await _db.DeviceTypes.FindAsync(new object?[] { tid }, ct);
+        DeviceType? t = await _db.DeviceTypes.FindAsync(new object?[] { tid }, ct);
         if (t is null) return;
         _db.DeviceTypes.Remove(t);
         await _db.SaveChangesAsync(ct);

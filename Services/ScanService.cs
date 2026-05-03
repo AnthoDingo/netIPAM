@@ -1,12 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using netIPAM.Data;
+using netIPAM.Enums;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
-using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
-using netIPAM.Services;
-using netIPAM.Data;
 
 namespace netIPAM.Services;
 
@@ -14,20 +13,20 @@ namespace netIPAM.Services;
 /// Options de scan réseau.
 /// </summary>
 public record ScanOptions(
-    int MaxParallel  = 32,
-    int TimeoutMs    = 500,
-    int Retries      = 1,
-    bool ResolveDns  = true);
+    int MaxParallel = 32,
+    int TimeoutMs = 500,
+    int Retries = 1,
+    bool ResolveDns = true);
 
 /// <summary>
 /// Résultat du scan pour un hôte.
 /// </summary>
 public record ScanHostResult(
-    string  IpDecimal,
-    string  IpPresentation,
-    bool    IsAlive,
+    string IpDecimal,
+    string IpPresentation,
+    bool IsAlive,
     string? Hostname,
-    long    RoundTripMs,
+    long RoundTripMs,
     DateTime ScannedAt);
 
 /// <summary>
@@ -64,7 +63,7 @@ public class ScanService
     private static IReadOnlyList<string> GenerateRange(string startDecimal, string endDecimal)
     {
         if (!BigInteger.TryParse(startDecimal, out var start) ||
-            !BigInteger.TryParse(endDecimal,   out var end)   || end < start)
+            !BigInteger.TryParse(endDecimal, out var end) || end < start)
             return [];
 
         List<string> list = new((int)Math.Min((long)(end - start + 1), 65536));
@@ -127,9 +126,9 @@ public class ScanService
         CancellationToken ct = default)
     {
         options ??= new ScanOptions();
-        int total   = addresses.Count;
+        int total = addresses.Count;
         int scanned = 0;
-        int alive   = 0;
+        int alive = 0;
 
         await foreach (ScanHostResult result in ScanAsync(addresses, options, ct))
         {
@@ -143,7 +142,7 @@ public class ScanService
         }
 
         // Mettre à jour lastScan sur le subnet
-        Subnets? subnet = await _db.Subnets.FindAsync(new object?[] { subnetId }, ct);
+        Subnet? subnet = await _db.Subnets.FindAsync(new object?[] { subnetId }, ct);
         if (subnet is not null)
         {
             subnet.LastScan = DateTime.UtcNow;
@@ -158,19 +157,20 @@ public class ScanService
     /// <summary>Retourne vrai si le scan est activé globalement (ScanMaxThreads > 0).</summary>
     public async Task<bool> IsGloballyEnabledAsync(CancellationToken ct = default)
     {
-        Settings? s = await _db.Settings.FirstOrDefaultAsync(ct);
+        Setting? s = await _db.Settings.FirstOrDefaultAsync(ct);
         return s is not null && s.ScanMaxThreads > 0;
     }
 
     /// <summary>Retourne les options de scan depuis la configuration globale.</summary>
     public async Task<ScanOptions> GetOptionsFromSettingsAsync(CancellationToken ct = default)
     {
-        Settings? s = await _db.Settings.FirstOrDefaultAsync(ct);
+        Setting? s = await _db.Settings.FirstOrDefaultAsync(ct);
         if (s is null) return new ScanOptions();
         return new ScanOptions(
-            MaxParallel = Math.Clamp(s.ScanMaxThreads, 1, 256),
-            TimeoutMs   = 500,
-            ResolveDns  = s.EnableDnsResolving);
+            MaxParallel: Math.Clamp(s.ScanMaxThreads, 1, 256),
+            TimeoutMs: 500,
+            Retries: 1,
+            ResolveDns: s.EnableDnsResolving);
     }
 
     // ── Implémentation bas niveau ─────────────────────────────────
@@ -180,11 +180,11 @@ public class ScanService
     {
         IpVersion version = IpConverter.GuessVersion(decimalAddr);
         string presentation;
-        try   { presentation = IpConverter.ToPresentation(decimalAddr, version); }
+        try { presentation = IpConverter.ToPresentation(decimalAddr, version); }
         catch { return new ScanHostResult(decimalAddr, decimalAddr, false, null, 0, DateTime.UtcNow); }
 
-        bool   alive    = false;
-        long   rtt      = 0;
+        bool alive = false;
+        long rtt = 0;
         string? hostname = null;
 
         // ── Ping ──
@@ -198,7 +198,7 @@ public class ScanService
                 if (reply.Status == IPStatus.Success)
                 {
                     alive = true;
-                    rtt   = reply.RoundtripTime;
+                    rtt = reply.RoundtripTime;
                 }
             }
             catch { /* hôte inaccessible ou ICMP bloqué */ }
@@ -210,7 +210,7 @@ public class ScanService
             try
             {
                 IPHostEntry entry = await Dns.GetHostEntryAsync(presentation, ct).ConfigureAwait(false);
-                hostname  = entry.HostName;
+                hostname = entry.HostName;
                 // Supprimer le FQDN complet si c'est juste l'IP qui revient
                 if (hostname == presentation) hostname = null;
             }
@@ -229,12 +229,12 @@ public class ScanService
         {
             _db.IpAddresses.Add(new IpAddress
             {
-                SubnetId    = subnetId,
-                IpAddr      = result.IpDecimal,
-                Hostname    = result.Hostname,
-                State       = 2, // Used
-                LastSeen    = result.ScannedAt,
-                EditDate    = result.ScannedAt,
+                SubnetId = subnetId,
+                IpAddr = result.IpDecimal,
+                Hostname = result.Hostname,
+                State = 2, // Used
+                LastSeen = result.ScannedAt,
+                EditDate = result.ScannedAt,
             });
         }
         else

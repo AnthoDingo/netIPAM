@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -14,7 +13,7 @@ public class SettingService
 
     public async Task<Setting> GetOrCreateAsync(CancellationToken ct = default)
     {
-        Settings? s = await _db.Settings.FirstOrDefaultAsync(ct);
+        Setting? s = await _db.Settings.FirstOrDefaultAsync(ct);
         if (s is null)
         {
             s = new Setting { SiteTitle = "phpipam IP address management", Theme = "dark" };

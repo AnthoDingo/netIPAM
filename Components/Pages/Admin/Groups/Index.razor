@@ -1,8 +1,6 @@
 @page "/admin/groups"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
 @rendermode InteractiveServer
-@inject UserGroupService Groups
-@inject NavigationManager Nav
 
 <PageTitle>User groups — admin</PageTitle>
 
@@ -39,11 +37,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<UserGroup>? _groups;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _groups = await Groups.ListAsync();
-    private async Task Delete(int id) { await Groups.DeleteAsync(id); await Reload(); }
 }

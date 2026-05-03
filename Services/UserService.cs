@@ -1,8 +1,7 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 using netIPAM.Identity;
+using System.Text.Json;
 
 namespace netIPAM.Services;
 
@@ -63,7 +62,7 @@ public class UserService
 
     public async Task DeleteAsync(int userId, CancellationToken ct = default)
     {
-        Users? u = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        User? u = await _db.Users.FindAsync(new object?[] { userId }, ct);
         if (u is null) return;
         // Garde-fou : on ne supprime pas le dernier Administrator
         if (string.Equals(u.Role, "Administrator", StringComparison.OrdinalIgnoreCase))
@@ -77,7 +76,7 @@ public class UserService
 
     public async Task ResetPasswordAsync(int userId, string newPassword, CancellationToken ct = default)
     {
-        Users? user = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        User? user = await _db.Users.FindAsync(new object?[] { userId }, ct);
         if (user is null) return;
         user.Password = _hasher.Hash(newPassword);
         user.EditDate = DateTime.UtcNow;
@@ -111,7 +110,7 @@ public class UserService
     /// </summary>
     public async Task SetGroupIdsAsync(int userId, List<int> groupIds, CancellationToken ct = default)
     {
-        Users? user = await _db.Users.FindAsync(new object?[] { userId }, ct);
+        User? user = await _db.Users.FindAsync(new object?[] { userId }, ct);
         if (user is null) return;
 
         // Reconstruire le JSON en préservant les levels existants
@@ -129,7 +128,7 @@ public class UserService
             newDict[key] = existing.TryGetValue(key, out var level) ? level : "1";
         }
 
-        user.Groups   = newDict.Count > 0 ? JsonSerializer.Serialize(newDict) : null;
+        user.Groups = newDict.Count > 0 ? JsonSerializer.Serialize(newDict) : null;
         user.EditDate = DateTime.UtcNow;
         await _db.SaveChangesAsync(ct);
     }
@@ -137,7 +136,7 @@ public class UserService
     /// <summary>Retourne tous les utilisateurs appartenant à un groupe donné.</summary>
     public async Task<List<User>> GetMembersOfGroupAsync(int groupId, CancellationToken ct = default)
     {
-        List<Users> all = await _db.Users.ToListAsync(ct);
+        List<User> all = await _db.Users.ToListAsync(ct);
         string gKey = $"\"{groupId}\"";
         // On cherche la clé dans le JSON sans désérialiser en masse
         return all.Where(u => u.Groups != null && u.Groups.Contains(gKey)).ToList();

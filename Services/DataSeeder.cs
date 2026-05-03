@@ -1,7 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using netIPAM.Entities;
 using netIPAM.Data;
 using netIPAM.Identity;
 
@@ -24,7 +21,8 @@ public static class DataSeeder
         if (db.Database.ProviderName?.Contains("InMemory", StringComparison.OrdinalIgnoreCase) == true)
             return;
         IPasswordHasher hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        ILoggerFactory logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DataSeeder");
+        ILoggerFactory loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+        ILogger logger = loggerFactory.CreateLogger("DataSeeder");
 
         // Ligne unique de settings
         if (!await db.Settings.AnyAsync(ct))
@@ -46,7 +44,7 @@ public static class DataSeeder
         if (!await db.UserAuthMethods.AnyAsync(ct))
         {
             db.UserAuthMethods.Add(new UserAuthMethod { Type = "local", Description = "Local database", Protected = "Yes" });
-            db.UserAuthMethods.Add(new UserAuthMethod { Type = "http",  Description = "HTTP authentication", Protected = "Yes" });
+            db.UserAuthMethods.Add(new UserAuthMethod { Type = "http", Description = "HTTP authentication", Protected = "Yes" });
         }
 
         // Compte Admin par défaut (mot de passe : ipamadmin)
@@ -80,10 +78,10 @@ public static class DataSeeder
         if (!await db.IpTags.AnyAsync(ct))
         {
             db.IpTags.AddRange(
-                new IpTag { Type = "Offline",  ShowTag = 1, BgColor = "#f59c99", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
-                new IpTag { Type = "Used",     ShowTag = 0, BgColor = "#a9c9a4", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
+                new IpTag { Type = "Offline", ShowTag = 1, BgColor = "#f59c99", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
+                new IpTag { Type = "Used", ShowTag = 0, BgColor = "#a9c9a4", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
                 new IpTag { Type = "Reserved", ShowTag = 1, BgColor = "#9ac0cd", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
-                new IpTag { Type = "DHCP",     ShowTag = 1, BgColor = "#c9c9c9", FgColor = "#fff", Locked = "Yes", Compress = "Yes", UpdateTag = true });
+                new IpTag { Type = "DHCP", ShowTag = 1, BgColor = "#c9c9c9", FgColor = "#fff", Locked = "Yes", Compress = "Yes", UpdateTag = true });
         }
 
         await db.SaveChangesAsync(ct);

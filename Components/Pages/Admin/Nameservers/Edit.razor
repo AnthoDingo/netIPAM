@@ -1,8 +1,6 @@
 @page "/admin/nameservers/new"
 @page "/admin/nameservers/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
-@inject NameserverService Nameservers
-@inject NavigationManager Nav
 
 <PageTitle>@(_isNew ? "New nameserver" : "Edit nameserver")</PageTitle>
 
@@ -33,22 +31,3 @@
         }
     </div>
 </div>
-
-@code {
-    [Parameter] public int? Id { get; set; }
-    private Nameserver? _ns;
-    private bool _isNew => Id is null;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _ns = _isNew ? new Nameserver() : await Nameservers.GetAsync(Id!.Value);
-        if (_ns is null) Nav.NavigateTo("/admin/nameservers");
-    }
-
-    private async Task Save()
-    {
-        if (_ns is null) return;
-        if (_isNew) await Nameservers.CreateAsync(_ns); else await Nameservers.UpdateAsync(_ns);
-        Nav.NavigateTo("/admin/nameservers");
-    }
-}

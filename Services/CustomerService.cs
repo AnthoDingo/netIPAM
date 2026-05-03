@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -30,7 +29,7 @@ public class CustomerService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        Customers? c = await _db.Customers.FindAsync(new object?[] { id }, ct);
+        Customer? c = await _db.Customers.FindAsync(new object?[] { id }, ct);
         if (c is null) return;
         _db.Customers.Remove(c);
         await _db.SaveChangesAsync(ct);

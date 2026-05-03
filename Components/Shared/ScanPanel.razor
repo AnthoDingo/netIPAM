@@ -134,7 +134,7 @@
                 <small class="text-muted">
                     @if (_finished && _alive > 0)
                     {
-                        <i class="bi bi-floppy me-1"></i>@_alive enregistrements mis à jour en base
+                        <i class="bi bi-floppy me-1"></i><text>@_alive enregistrements mis à jour en base</text>
                     }
                 </small>
             </div>
@@ -266,7 +266,7 @@
                         // Persister immédiatement les hôtes actifs
                         using IServiceScope scope2 = ScopeFactory.CreateScope();
                         ScanService s2 = scope2.ServiceProvider.GetRequiredService<ScanService>();
-                        await s2.ScanAndPersistAsync(SubnetId, [result.IpDecimal], options, cancellationToken: _cts.Token);
+                        await s2.ScanAndPersistAsync(SubnetId, [result.IpDecimal], options, null, _cts.Token);
                     }
 
                     // Mettre à jour l'UI toutes les 5 IP ou si hôte actif

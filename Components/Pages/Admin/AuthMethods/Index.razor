@@ -1,8 +1,6 @@
 @page "/admin/authmethods"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
 @rendermode InteractiveServer
-@inject AuthMethodService Methods
-@inject NavigationManager Nav
 
 <PageTitle>Auth methods — admin</PageTitle>
 
@@ -44,11 +42,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<UserAuthMethod>? _methods;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _methods = await Methods.ListAsync();
-    private async Task Delete(int id) { await Methods.DeleteAsync(id); await Reload(); }
 }

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -32,7 +31,7 @@ public class NameserverService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        Nameservers? n = await _db.Nameservers.FindAsync(new object?[] { id }, ct);
+        Nameserver? n = await _db.Nameservers.FindAsync(new object?[] { id }, ct);
         if (n is null) return;
         _db.Nameservers.Remove(n);
         await _db.SaveChangesAsync(ct);

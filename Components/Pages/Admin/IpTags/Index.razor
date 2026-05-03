@@ -1,8 +1,6 @@
 @page "/admin/iptags"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
-@inject IpTagService Tags
-@inject NavigationManager Nav
 
 <PageTitle>IP tags — admin</PageTitle>
 
@@ -45,11 +43,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<IpTag>? _tags;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _tags = await Tags.ListAsync();
-    private async Task Delete(int id) { await Tags.DeleteAsync(id); await Reload(); }
 }

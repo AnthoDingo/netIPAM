@@ -1,9 +1,6 @@
 @page "/admin/vlans/new"
 @page "/admin/vlans/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
-@inject VlanService Vlans
-@inject VlanDomainService Domains
-@inject NavigationManager Nav
 
 <PageTitle>@(_isNew ? "New VLAN" : "Edit VLAN")</PageTitle>
 
@@ -41,24 +38,3 @@
         }
     </div>
 </div>
-
-@code {
-    [Parameter] public int? Id { get; set; }
-    private Vlan? _vlan;
-    private List<VlanDomain>? _domains;
-    private bool _isNew => Id is null;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _domains = await Domains.ListAsync();
-        _vlan = _isNew ? new Vlan { DomainId = 1 } : await Vlans.GetAsync(Id!.Value);
-        if (_vlan is null) Nav.NavigateTo("/admin/vlans");
-    }
-
-    private async Task Save()
-    {
-        if (_vlan is null) return;
-        if (_isNew) await Vlans.CreateAsync(_vlan); else await Vlans.UpdateAsync(_vlan);
-        Nav.NavigateTo("/admin/vlans");
-    }
-}

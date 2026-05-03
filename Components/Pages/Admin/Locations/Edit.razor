@@ -1,8 +1,6 @@
 @page "/admin/locations/new"
 @page "/admin/locations/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
-@inject LocationService Locations
-@inject NavigationManager Nav
 
 <PageTitle>@(_isNew ? "New location" : "Edit location")</PageTitle>
 
@@ -42,22 +40,3 @@
         }
     </div>
 </div>
-
-@code {
-    [Parameter] public int? Id { get; set; }
-    private Location? _loc;
-    private bool _isNew => Id is null;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _loc = _isNew ? new Location() : await Locations.GetAsync(Id!.Value);
-        if (_loc is null) Nav.NavigateTo("/admin/locations");
-    }
-
-    private async Task Save()
-    {
-        if (_loc is null) return;
-        if (_isNew) await Locations.CreateAsync(_loc); else await Locations.UpdateAsync(_loc);
-        Nav.NavigateTo("/admin/locations");
-    }
-}

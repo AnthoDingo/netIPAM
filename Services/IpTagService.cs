@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -31,7 +30,7 @@ public class IpTagService
     /// <summary>Les tags marqués Locked = "Yes" (cas des 4 tags système Offline/Used/Reserved/DHCP) ne sont pas supprimables.</summary>
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        IpTags? t = await _db.IpTags.FindAsync(new object?[] { id }, ct);
+        IpTag? t = await _db.IpTags.FindAsync(new object?[] { id }, ct);
         if (t is null) return true;
         if (string.Equals(t.Locked, "Yes", StringComparison.OrdinalIgnoreCase)) return false;
         _db.IpTags.Remove(t);

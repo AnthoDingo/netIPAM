@@ -1,8 +1,6 @@
 @page "/admin/vlans"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
-@inject VlanService Vlans
-@inject NavigationManager Nav
 
 <PageTitle>VLANs — admin</PageTitle>
 
@@ -39,11 +37,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<Vlan>? _vlans;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _vlans = await Vlans.ListAsync();
-    private async Task Delete(int id) { await Vlans.DeleteAsync(id); await Reload(); }
 }

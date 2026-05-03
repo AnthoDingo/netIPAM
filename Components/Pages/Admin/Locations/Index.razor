@@ -1,8 +1,6 @@
 @page "/admin/locations"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
-@inject LocationService Locations
-@inject NavigationManager Nav
 
 <PageTitle>Locations — admin</PageTitle>
 
@@ -34,11 +32,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<Location>? _locations;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _locations = await Locations.ListAsync();
-    private async Task Delete(int id) { await Locations.DeleteAsync(id); await Reload(); }
 }

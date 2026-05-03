@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -25,7 +24,7 @@ public class PermissionService
         string subjectType, int subjectId, string entityType, CancellationToken ct = default)
         => _db.EntityPermissions
               .Where(p => p.SubjectType == subjectType
-                       && p.SubjectId  == subjectId
+                       && p.SubjectId == subjectId
                        && p.EntityType == entityType)
               .ToListAsync(ct);
 
@@ -53,15 +52,15 @@ public class PermissionService
     /// </summary>
     public async Task SetAsync(
         string subjectType, int subjectId,
-        string entityType,  int entityId,
+        string entityType, int entityId,
         int level,
         CancellationToken ct = default)
     {
         EntityPermission? existing = await _db.EntityPermissions
             .FirstOrDefaultAsync(p => p.SubjectType == subjectType
-                                   && p.SubjectId   == subjectId
-                                   && p.EntityType  == entityType
-                                   && p.EntityId    == entityId, ct);
+                                   && p.SubjectId == subjectId
+                                   && p.EntityType == entityType
+                                   && p.EntityId == entityId, ct);
 
         if (level == PermissionLevels.None)
         {
@@ -72,11 +71,11 @@ public class PermissionService
             _db.EntityPermissions.Add(new EntityPermission
             {
                 SubjectType = subjectType,
-                SubjectId   = subjectId,
-                EntityType  = entityType,
-                EntityId    = entityId,
-                Level       = level,
-                CreatedAt   = DateTime.UtcNow,
+                SubjectId = subjectId,
+                EntityType = entityType,
+                EntityId = entityId,
+                Level = level,
+                CreatedAt = DateTime.UtcNow,
             });
         }
         else
@@ -100,8 +99,8 @@ public class PermissionService
         // Supprimer les existantes pour ce sujet+type
         List<EntityPermission> existing = await _db.EntityPermissions
             .Where(p => p.SubjectType == subjectType
-                     && p.SubjectId   == subjectId
-                     && p.EntityType  == entityType)
+                     && p.SubjectId == subjectId
+                     && p.EntityType == entityType)
             .ToListAsync(ct);
         _db.EntityPermissions.RemoveRange(existing);
 
@@ -111,11 +110,11 @@ public class PermissionService
             _db.EntityPermissions.Add(new EntityPermission
             {
                 SubjectType = subjectType,
-                SubjectId   = subjectId,
-                EntityType  = entityType,
-                EntityId    = entityId,
-                Level       = level,
-                CreatedAt   = DateTime.UtcNow,
+                SubjectId = subjectId,
+                EntityType = entityType,
+                EntityId = entityId,
+                Level = level,
+                CreatedAt = DateTime.UtcNow,
             });
         }
 
@@ -152,8 +151,8 @@ public class PermissionService
         // Permissions directes
         List<EntityPermission> direct = await _db.EntityPermissions
             .Where(p => p.SubjectType == SubjectTypes.User
-                     && p.SubjectId   == userId
-                     && p.EntityType  == entityType)
+                     && p.SubjectId == userId
+                     && p.EntityType == entityType)
             .ToListAsync(ct);
 
         foreach (EntityPermission p in direct)

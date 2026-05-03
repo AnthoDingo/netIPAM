@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Hosting;
-using System.Text.Json;
-using System.Text.Json.Nodes;
 using Microsoft.EntityFrameworkCore;
 using netIPAM.Data;
-using netIPAM.Entities;
 using netIPAM.Identity;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace netIPAM.Services;
 
@@ -46,6 +44,11 @@ public class SetupService
         try
         {
             await using AppDbContext db = BuildContext(provider, connectionString);
+            if (string.Equals(provider, "SQLite", StringComparison.OrdinalIgnoreCase))
+            {
+                await db.Database.EnsureCreatedAsync(); // Crée le fichier SQLite s'il n'existe pas, sinon CanConnect échouera
+            }
+
             bool canConnect = await db.Database.CanConnectAsync();
             if (!canConnect)
                 return new TestConnectionResult(false, "Impossible de se connecter. Vérifiez la chaîne de connexion.", null);
@@ -179,10 +182,10 @@ public class SetupService
             {
                 db.Settings.Add(new Setting
                 {
-                    SiteTitle     = "netIPAM",
+                    SiteTitle = "netIPAM",
                     SiteAdminName = username,
                     SiteAdminMail = email,
-                    Theme         = "dark",
+                    Theme = "dark",
                 });
             }
 
@@ -191,9 +194,9 @@ public class SetupService
             {
                 db.UserAuthMethods.Add(new UserAuthMethod
                 {
-                    Type        = "local",
+                    Type = "local",
                     Description = "Local database",
-                    Protected   = "Yes",
+                    Protected = "Yes",
                 });
             }
 
@@ -201,24 +204,24 @@ public class SetupService
             if (!await db.IpTags.AnyAsync())
             {
                 db.IpTags.AddRange(
-                    new IpTag { Type = "Offline",  ShowTag = 1, BgColor = "#f59c99", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
-                    new IpTag { Type = "Used",     ShowTag = 0, BgColor = "#a9c9a4", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
+                    new IpTag { Type = "Offline", ShowTag = 1, BgColor = "#f59c99", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
+                    new IpTag { Type = "Used", ShowTag = 0, BgColor = "#a9c9a4", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
                     new IpTag { Type = "Reserved", ShowTag = 1, BgColor = "#9ac0cd", FgColor = "#fff", Locked = "Yes", UpdateTag = true },
-                    new IpTag { Type = "DHCP",     ShowTag = 1, BgColor = "#c9c9c9", FgColor = "#fff", Locked = "Yes", Compress = "Yes", UpdateTag = true }
+                    new IpTag { Type = "DHCP", ShowTag = 1, BgColor = "#c9c9c9", FgColor = "#fff", Locked = "Yes", Compress = "Yes", UpdateTag = true }
                 );
             }
 
             db.Users.Add(new User
             {
-                Username   = username,
-                Email      = email,
-                Password   = hasher.Hash(password),
-                Role       = "Administrator",
-                RealName   = "Administrator",
+                Username = username,
+                Email = email,
+                Password = hasher.Hash(password),
+                Role = "Administrator",
+                RealName = "Administrator",
                 AuthMethod = 1,
-                Disabled   = "No",
+                Disabled = "No",
                 PassChange = "No",
-                EditDate   = DateTime.UtcNow,
+                EditDate = DateTime.UtcNow,
             });
 
             await db.SaveChangesAsync();
@@ -257,7 +260,7 @@ public class SetupService
             dbSection = new JsonObject();
             root["Database"] = dbSection;
         }
-        dbSection["Provider"]         = provider;
+        dbSection["Provider"] = provider;
         dbSection["ConnectionString"] = connectionString;
 
         // Marquer le setup comme terminé

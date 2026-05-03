@@ -1,8 +1,6 @@
 @page "/admin/nameservers"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
-@inject NameserverService Nameservers
-@inject NavigationManager Nav
 
 <PageTitle>Nameservers — admin</PageTitle>
 
@@ -34,11 +32,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<Nameserver>? _nameservers;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _nameservers = await Nameservers.ListAsync();
-    private async Task Delete(int id) { await Nameservers.DeleteAsync(id); await Reload(); }
 }

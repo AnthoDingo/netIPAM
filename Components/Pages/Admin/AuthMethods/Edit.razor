@@ -1,8 +1,6 @@
 @page "/admin/authmethods/new"
 @page "/admin/authmethods/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
-@inject AuthMethodService Methods
-@inject NavigationManager Nav
 
 <PageTitle>@(_isNew ? "New auth method" : "Edit auth method")</PageTitle>
 
@@ -40,22 +38,3 @@
         }
     </div>
 </div>
-
-@code {
-    [Parameter] public int? Id { get; set; }
-    private UserAuthMethod? _method;
-    private bool _isNew => Id is null;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _method = _isNew ? new UserAuthMethod { Type = "local", Protected = "No" } : await Methods.GetAsync(Id!.Value);
-        if (_method is null) Nav.NavigateTo("/admin/authmethods");
-    }
-
-    private async Task Save()
-    {
-        if (_method is null) return;
-        if (_isNew) await Methods.CreateAsync(_method); else await Methods.UpdateAsync(_method);
-        Nav.NavigateTo("/admin/authmethods");
-    }
-}

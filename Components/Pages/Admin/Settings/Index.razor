@@ -1,9 +1,6 @@
 @page "/admin/settings"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
 @rendermode InteractiveServer
-@inject SettingService SettingsSvc
-@inject MaintenanceState MaintenanceState
-@inject NavigationManager Nav
 
 <PageTitle>Settings — admin</PageTitle>
 
@@ -163,20 +160,4 @@ else
             <i class="bi bi-check-lg"></i> Save settings
         </button>
     </EditForm>
-}
-
-@code {
-    private Setting? _settings;
-    private bool _saved;
-
-    protected override async Task OnInitializedAsync() => _settings = await SettingsSvc.GetOrCreateAsync();
-
-    private async Task Save()
-    {
-        if (_settings is null) return;
-        await SettingsSvc.UpdateAsync(_settings);
-        // Synchronise le singleton en mémoire → le middleware prend effet immédiatement
-        MaintenanceState.Set(_settings.MaintenanceMode);
-        _saved = true;
-    }
 }

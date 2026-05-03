@@ -1,8 +1,6 @@
 @page "/admin/l2domains"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
-@inject VlanDomainService Domains
-@inject NavigationManager Nav
 
 <PageTitle>L2 domains — admin</PageTitle>
 
@@ -36,11 +34,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<VlanDomain>? _domains;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _domains = await Domains.ListAsync();
-    private async Task Delete(int id) { await Domains.DeleteAsync(id); await Reload(); }
 }

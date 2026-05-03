@@ -1,8 +1,6 @@
 @page "/admin/users"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Admin")]
 @rendermode InteractiveServer
-@inject UserService Users
-@inject NavigationManager Nav
 
 <PageTitle>Users — admin</PageTitle>
 
@@ -68,18 +66,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<User>? _users;
-
-    protected override async Task OnInitializedAsync() => await Reload();
-
-    private async Task Reload() => _users = await Users.ListAsync();
-
-    private async Task Delete(int id)
-    {
-        await Users.DeleteAsync(id);
-        await Reload();
-    }
 }

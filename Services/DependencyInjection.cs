@@ -1,9 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using netIPAM.Data;
 using netIPAM.Identity;
-using netIPAM.Services;
 
 namespace netIPAM;
 
@@ -24,14 +21,14 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>((sp, opt) =>
         {
             // Lecture live — supporte le rechargement de IConfiguration après setup
-            IConfiguration cfg        = sp.GetRequiredService<IConfiguration>();
-            string? provider   = cfg["Database:Provider"] ?? "Sqlite";
+            IConfiguration cfg = sp.GetRequiredService<IConfiguration>();
+            string? provider = cfg["Database:Provider"] ?? "Sqlite";
             string? connection = cfg["Database:ConnectionString"];
 
             if (string.IsNullOrWhiteSpace(connection))
             {
-                // Setup non terminé — utiliser InMemory pour que DI ne plante pas
-                opt.UseInMemoryDatabase("setup_placeholder");
+                // Setup non terminé — utiliser une base SQLite locale temporaire
+                opt.UseSqlite("Data Source=:memory:", b => b.MigrationsAssembly("netIPAM"));
                 return;
             }
 

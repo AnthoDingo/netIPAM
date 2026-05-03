@@ -1,17 +1,14 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using netIPAM;
-using netIPAM.Data;
-using netIPAM.Entities;
-using netIPAM.Services;
 using netIPAM.Components;
+using netIPAM.Data;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // ── Détection setup requis ────────────────────────────────────────
-SetupService setupSvc   = new(builder.Environment);
-SetupState   setupState = new();
+SetupService setupSvc = new(builder.Environment);
+SetupState setupState = new();
 
 if (setupSvc.IsSetupRequired(builder.Configuration))
     setupState.MarkRequired();
@@ -40,20 +37,20 @@ builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(opt =>
     {
-        opt.LoginPath         = "/login";
-        opt.LogoutPath        = "/logout";
-        opt.AccessDeniedPath  = "/login";
-        opt.ExpireTimeSpan    = TimeSpan.FromHours(8);
+        opt.LoginPath = "/login";
+        opt.LogoutPath = "/logout";
+        opt.AccessDeniedPath = "/login";
+        opt.ExpireTimeSpan = TimeSpan.FromHours(8);
         opt.SlidingExpiration = true;
-        opt.Cookie.Name       = "netipam.auth";
-        opt.Cookie.HttpOnly   = true;
-        opt.Cookie.SameSite   = SameSiteMode.Lax;
+        opt.Cookie.Name = "netipam.auth";
+        opt.Cookie.HttpOnly = true;
+        opt.Cookie.SameSite = SameSiteMode.Lax;
     });
 
 builder.Services.AddAuthorization(opt =>
 {
-    opt.AddPolicy("Admin",         p => p.RequireRole("Administrator"));
-    opt.AddPolicy("Operator",      p => p.RequireRole("Administrator", "Operator"));
+    opt.AddPolicy("Admin", p => p.RequireRole("Administrator"));
+    opt.AddPolicy("Operator", p => p.RequireRole("Administrator", "Operator"));
     opt.AddPolicy("Authenticated", p => p.RequireAuthenticatedUser());
 });
 builder.Services.AddCascadingAuthenticationState();

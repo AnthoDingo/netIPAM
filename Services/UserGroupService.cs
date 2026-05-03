@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -32,7 +31,7 @@ public class UserGroupService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        UserGroups? g = await _db.UserGroups.FindAsync(new object?[] { id }, ct);
+        UserGroup? g = await _db.UserGroups.FindAsync(new object?[] { id }, ct);
         if (g is null) return;
         _db.UserGroups.Remove(g);
         await _db.SaveChangesAsync(ct);

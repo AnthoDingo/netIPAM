@@ -1,8 +1,6 @@
 @page "/admin/vrfs"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
 @rendermode InteractiveServer
-@inject VrfService Vrfs
-@inject NavigationManager Nav
 
 <PageTitle>VRFs — admin</PageTitle>
 
@@ -38,11 +36,4 @@ else
             </tbody>
         </table>
     </div>
-}
-
-@code {
-    private List<Vrf>? _vrfs;
-    protected override async Task OnInitializedAsync() => await Reload();
-    private async Task Reload() => _vrfs = await Vrfs.ListAsync();
-    private async Task Delete(int id) { await Vrfs.DeleteAsync(id); await Reload(); }
 }

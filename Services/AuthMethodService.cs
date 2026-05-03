@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -34,7 +33,7 @@ public class AuthMethodService
     /// </summary>
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        UserAuthMethods? m = await _db.UserAuthMethods.FindAsync(new object?[] { id }, ct);
+        UserAuthMethod? m = await _db.UserAuthMethods.FindAsync(new object?[] { id }, ct);
         if (m is null) return true;
         if (string.Equals(m.Protected, "Yes", StringComparison.OrdinalIgnoreCase))
             return false;

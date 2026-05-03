@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -32,7 +31,7 @@ public class VlanDomainService
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
         if (id == 1) return false;
-        VlanDomains? d = await _db.VlanDomains.FindAsync(new object?[] { id }, ct);
+        VlanDomain? d = await _db.VlanDomains.FindAsync(new object?[] { id }, ct);
         if (d is null) return true;
         _db.VlanDomains.Remove(d);
         await _db.SaveChangesAsync(ct);

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -30,7 +29,7 @@ public class LocationService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        Locations? l = await _db.Locations.FindAsync(new object?[] { id }, ct);
+        Location? l = await _db.Locations.FindAsync(new object?[] { id }, ct);
         if (l is null) return;
         _db.Locations.Remove(l);
         await _db.SaveChangesAsync(ct);

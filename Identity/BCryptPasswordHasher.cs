@@ -1,5 +1,3 @@
-using BCrypt.Net;
-
 namespace netIPAM.Identity;
 
 public interface IPasswordHasher

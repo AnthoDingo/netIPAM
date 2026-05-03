@@ -1,8 +1,6 @@
 @page "/admin/vrfs/new"
 @page "/admin/vrfs/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
-@inject VrfService Vrfs
-@inject NavigationManager Nav
 
 <PageTitle>@(_isNew ? "New VRF" : "Edit VRF")</PageTitle>
 
@@ -39,22 +37,3 @@
         }
     </div>
 </div>
-
-@code {
-    [Parameter] public int? Id { get; set; }
-    private Vrf? _vrf;
-    private bool _isNew => Id is null;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _vrf = _isNew ? new Vrf() : await Vrfs.GetAsync(Id!.Value);
-        if (_vrf is null) Nav.NavigateTo("/admin/vrfs");
-    }
-
-    private async Task Save()
-    {
-        if (_vrf is null) return;
-        if (_isNew) await Vrfs.CreateAsync(_vrf); else await Vrfs.UpdateAsync(_vrf);
-        Nav.NavigateTo("/admin/vrfs");
-    }
-}

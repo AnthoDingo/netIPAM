@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
-using netIPAM.Services;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -54,7 +52,7 @@ public class SubnetService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        Subnets? s = await _db.Subnets.FindAsync(new object?[] { id }, ct);
+        Subnet? s = await _db.Subnets.FindAsync(new object?[] { id }, ct);
         if (s is null) return;
         _db.Subnets.Remove(s);
         await _db.SaveChangesAsync(ct);

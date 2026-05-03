@@ -13,12 +13,11 @@ public class SqlServerDesignTimeFactory : IDesignTimeDbContextFactory<AppDbConte
     public AppDbContext CreateDbContext(string[] args)
     {
         string? conn = Environment.GetEnvironmentVariable("PHPIPAM_SQLSERVER")
-                   ?? "Server=(localdb)\\MSSQLLocalDB;Database=phpipam_net;Trusted_Connection=True;TrustServerCertificate=True";
+                   ?? "Server=(localdb)\\MSSQLLocalDB;Database=netipam;Trusted_Connection=True;TrustServerCertificate=True";
 
-        DbContextOptionsBuilder<AppDbContext> options = new()
-            .UseSqlServer(conn, b => b.MigrationsAssembly("netIPAM"))
-            .Options;
+        DbContextOptionsBuilder<AppDbContext> options = new();
+        options.UseSqlServer(conn, b => b.MigrationsAssembly("netIPAM"));
 
-        return new AppDbContext(options);
+        return new AppDbContext(options.Options);
     }
 }

@@ -1,8 +1,6 @@
 @page "/admin/devicetypes/new"
 @page "/admin/devicetypes/{Id:int}/edit"
 @attribute [Microsoft.AspNetCore.Authorization.Authorize(Policy = "Operator")]
-@inject DeviceTypeService Types
-@inject NavigationManager Nav
 
 <PageTitle>@(_isNew ? "New type" : "Edit type")</PageTitle>
 
@@ -28,22 +26,3 @@
         }
     </div>
 </div>
-
-@code {
-    [Parameter] public int? Id { get; set; }
-    private DeviceType? _type;
-    private bool _isNew => Id is null;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _type = _isNew ? new DeviceType() : await Types.GetAsync(Id!.Value);
-        if (_type is null) Nav.NavigateTo("/admin/devicetypes");
-    }
-
-    private async Task Save()
-    {
-        if (_type is null) return;
-        if (_isNew) await Types.CreateAsync(_type); else await Types.UpdateAsync(_type);
-        Nav.NavigateTo("/admin/devicetypes");
-    }
-}

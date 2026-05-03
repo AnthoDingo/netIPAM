@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using netIPAM.Entities;
 using netIPAM.Data;
 
 namespace netIPAM.Services;
@@ -35,7 +34,7 @@ public class IpAddressService
 
     public async Task DeleteAsync(int id, CancellationToken ct = default)
     {
-        IpAddresses? ip = await _db.IpAddresses.FindAsync(new object?[] { id }, ct);
+        IpAddress? ip = await _db.IpAddresses.FindAsync(new object?[] { id }, ct);
         if (ip is null) return;
         _db.IpAddresses.Remove(ip);
         await _db.SaveChangesAsync(ct);
