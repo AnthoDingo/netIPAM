@@ -1,0 +1,300 @@
+@page "/migrate"
+@layout EmptyLayout
+@rendermode InteractiveServer
+@inject MigrationState    MigState
+@inject SetupService      SetupSvc
+@inject AppDbContext       Db
+@inject NavigationManager Nav
+@inject IServiceProvider  Services
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+
+<PageTitle>Mise à jour — netIPAM</PageTitle>
+
+<div class="migrate-bg">
+    <div class="migrate-card">
+
+        @* ── Header ── *@
+        <div class="migrate-header">
+            <div class="migrate-header-icon">
+                <svg width="26" height="26" viewBox="0 0 18 18" fill="white">
+                    <path d="M1 1h6v6H1zm10 0h6v6h-6zM1 11h6v6H1zm10 2h2v2h2v2h-2v2h-2v-2H9v-2h2z"/>
+                </svg>
+            </div>
+            <div>
+                <div class="migrate-title">netIPAM — Mise à jour requise</div>
+                <div class="migrate-sub">Des migrations de base de données sont en attente</div>
+            </div>
+            <div class="migrate-version-badge">
+                @MigState.Pending.Count migration(s)
+            </div>
+        </div>
+
+        @* ── Contenu ── *@
+        <div class="migrate-body">
+
+            @* Explication *@
+            <div class="alert alert-warning d-flex gap-3 align-items-start">
+                <i class="bi bi-exclamation-triangle-fill fs-5 text-warning mt-1"></i>
+                <div>
+                    <strong>L'application a été mise à jour</strong> et nécessite des modifications
+                    du schéma de base de données. L'application est <strong>temporairement indisponible</strong>
+                    jusqu'à l'application des migrations.
+                </div>
+            </div>
+
+            @* Auth check *@
+            <CascadingAuthenticationState>
+                <AuthorizeView Policy="Admin">
+                    <Authorized>
+                        @* Migrations en attente *@
+                        <div class="migrate-section-title">
+                            <i class="bi bi-list-check me-2"></i>Migrations en attente
+                        </div>
+                        <div class="migrate-pending-list">
+                            @foreach (var m in MigState.Pending)
+                            {
+                                var parts = m.Split('_', 2);
+                                var ts    = parts.Length > 0 ? parts[0] : m;
+                                var name  = parts.Length > 1 ? parts[1].Replace('_', ' ') : "";
+                                <div class="migrate-pending-row">
+                                    <span class="migrate-pending-ts">@ts</span>
+                                    <span class="migrate-pending-name">@name</span>
+                                </div>
+                            }
+                        </div>
+
+                        @* Log d'exécution *@
+                        @if (_log.Count > 0 || _running)
+                        {
+                            <div class="migrate-section-title mt-3">
+                                <i class="bi bi-terminal me-2"></i>Progression
+                            </div>
+                            <div class="migrate-log">
+                                @foreach (var line in _log)
+                                {
+                                    <div class="log-line @(line.StartsWith("✓") ? "ok" : line.StartsWith("❌") ? "err" : line.StartsWith("  →") ? "indent" : "")">
+                                        @line
+                                    </div>
+                                }
+                                @if (_running)
+                                {
+                                    <div class="log-line">
+                                        <span class="spinner-border spinner-border-sm me-1"></span>En cours…
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @* Résultat *@
+                        @if (_success)
+                        {
+                            <div class="alert alert-success mt-3 d-flex align-items-center gap-2">
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Migrations appliquées avec succès. Redirection vers l'accueil…</span>
+                            </div>
+                        }
+                        else if (_error is not null)
+                        {
+                            <div class="alert alert-danger mt-3">
+                                <i class="bi bi-x-circle me-2"></i><strong>Erreur :</strong> @_error
+                                <div class="mt-2">
+                                    <small>Vérifiez les permissions de la base de données et réessayez.
+                                    En cas d'erreur persistante, appliquez les migrations manuellement :
+                                    <code>dotnet ef database update</code></small>
+                                </div>
+                            </div>
+                        }
+
+                        @* Actions *@
+                        @if (!_running && !_success)
+                        {
+                            <div class="migrate-actions">
+                                <a class="btn btn-outline-secondary btn-sm" href="/logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Déconnexion
+                                </a>
+                                @if (_error is not null)
+                                {
+                                    <button class="btn btn-warning btn-sm" @onclick="RunMigrations">
+                                        <i class="bi bi-arrow-repeat me-1"></i>Réessayer
+                                    </button>
+                                }
+                                <button class="btn btn-primary" @onclick="RunMigrations">
+                                    <i class="bi bi-play-fill me-1"></i>Appliquer les migrations
+                                </button>
+                            </div>
+                        }
+                    </Authorized>
+
+                    <NotAuthorized>
+                        @* Non connecté ou pas admin *@
+                        <div class="migrate-noauth">
+                            <i class="bi bi-shield-lock migrate-noauth-icon"></i>
+                            <h3>Connexion requise</h3>
+                            <p class="text-muted">
+                                Seul un compte <strong>Administrator</strong> peut appliquer les migrations.
+                                Connectez-vous pour continuer.
+                            </p>
+                            <a class="btn btn-primary" href="/login?returnUrl=/migrate">
+                                <i class="bi bi-box-arrow-in-right me-1"></i>Se connecter
+                            </a>
+                            <div class="mt-3 small text-muted">
+                                L'application restera indisponible jusqu'à l'application des migrations.
+                            </div>
+                        </div>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </CascadingAuthenticationState>
+
+        </div>
+
+        @* ── Footer info ── *@
+        <div class="migrate-footer">
+            <i class="bi bi-info-circle me-1"></i>
+            Pour appliquer les migrations manuellement :
+            <code>dotnet ef database update</code>
+            puis redémarrez l'application.
+        </div>
+    </div>
+</div>
+
+<style>
+.migrate-bg {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a2634 0%, #2c3e50 60%, #1a3050 100%);
+    display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.migrate-card {
+    width: 660px; max-width: 100%;
+    background: #fff; border-radius: 12px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.35);
+    overflow: hidden;
+}
+.migrate-header {
+    background: linear-gradient(135deg, #1a2c3a, #2c3e50);
+    padding: 20px 24px; display: flex; align-items: center; gap: 14px; color: #fff;
+}
+.migrate-header-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: rgba(255,255,255,.12);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.migrate-title  { font-size: 1rem; font-weight: 600; }
+.migrate-sub    { font-size: 12px; opacity: .65; margin-top: 2px; }
+.migrate-version-badge {
+    margin-left: auto; flex-shrink: 0;
+    background: #e67e22; color: #fff;
+    padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;
+}
+.migrate-body { padding: 24px; }
+
+/* Section title */
+.migrate-section-title {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .06em; color: #8a94a6; margin-bottom: 10px;
+    display: flex; align-items: center;
+}
+
+/* Pending list */
+.migrate-pending-list {
+    background: #f8f9fa; border: 0.5px solid #e1e4e8; border-radius: 6px;
+    overflow: hidden;
+}
+.migrate-pending-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 9px 14px; border-bottom: 0.5px solid #e1e4e8;
+    font-size: 13px;
+}
+.migrate-pending-row:last-child { border-bottom: none; }
+.migrate-pending-ts {
+    font-family: var(--font-mono, monospace); font-size: 11px;
+    color: #8a94a6; flex-shrink: 0; background: #e9ecef;
+    padding: 2px 6px; border-radius: 4px;
+}
+.migrate-pending-name { color: #2c3e50; flex: 1; }
+
+/* Log terminal */
+.migrate-log {
+    background: #1a2634; color: #b2c8d8;
+    border-radius: 6px; padding: 14px 16px;
+    font-family: var(--font-mono, monospace); font-size: 12.5px; line-height: 1.7;
+    max-height: 240px; overflow-y: auto;
+}
+.log-line.ok     { color: #2ecc71; }
+.log-line.err    { color: #e74c3c; }
+.log-line.indent { padding-left: 16px; color: #85a5be; }
+
+/* Non authentifié */
+.migrate-noauth {
+    text-align: center; padding: 32px 24px;
+}
+.migrate-noauth-icon { font-size: 3rem; color: #b0bcc8; display: block; margin-bottom: 14px; }
+.migrate-noauth h3   { font-size: 1.1rem; font-weight: 500; margin-bottom: 8px; }
+
+/* Actions */
+.migrate-actions {
+    display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end; align-items: center;
+}
+
+/* Footer */
+.migrate-footer {
+    padding: 12px 24px; background: #f8f9fa;
+    border-top: 0.5px solid #e1e4e8;
+    font-size: 12px; color: #8a94a6;
+}
+.migrate-footer code { font-size: 11px; background: #e9ecef; padding: 1px 5px; border-radius: 3px; }
+</style>
+
+@code {
+    private List<string> _log     = [];
+    private bool         _running;
+    private bool         _success;
+    private string?      _error;
+
+    private async Task RunMigrations()
+    {
+        _log     = [];
+        _error   = null;
+        _success = false;
+        _running = true;
+        StateHasChanged();
+
+        try
+        {
+            await foreach (var line in SetupSvc.ApplyFromContextAsync(Db))
+            {
+                _log.Add(line);
+                StateHasChanged();
+                await Task.Delay(60); // effet visuel
+            }
+
+            bool hasError = _log.Any(l => l.StartsWith("❌"));
+            if (!hasError)
+            {
+                // Marquer comme appliqué → le middleware cesse de rediriger
+                MigState.MarkApplied();
+
+                // Seed si nécessaire
+                await Services.SeedAsync();
+
+                _success = true;
+                StateHasChanged();
+                await Task.Delay(2000);
+                Nav.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                _error = _log.LastOrDefault(l => l.StartsWith("❌"))?.Replace("❌ ", "");
+            }
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+        finally
+        {
+            _running = false;
+            StateHasChanged();
+        }
+    }
+}

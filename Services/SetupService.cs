@@ -64,6 +64,7 @@ public class SetupService
 
     /// <summary>
     /// Applique les migrations EF Core et produit un log ligne par ligne.
+    /// Variante ad-hoc (utilisée par le wizard de setup).
     /// </summary>
     public async IAsyncEnumerable<string> ApplyMigrationsAsync(
         string provider, string connectionString)
@@ -105,6 +106,12 @@ public class SetupService
             yield return $"❌ Erreur lors des migrations : {ex.Message}";
         }
     }
+
+    /// <summary>
+    /// Applique les migrations via un DbContext DI existant (utilisée par la page /migrate).
+    /// </summary>
+    public async IAsyncEnumerable<string> ApplyFromContextAsync(
+        netIPAM.Data.AppDbContext db)
 
     // ── Création du compte admin ──────────────────────────────────
 
@@ -228,3 +235,24 @@ public class SetupService
             || !string.Equals(done, "true", StringComparison.OrdinalIgnoreCase);
     }
 }
+    {
+        var migrations = await db.Database.GetPendingMigrationsAsync();
+        var list = migrations.ToList();
+
+        if (list.Count == 0) { yield return "✓ Base de données déjà à jour."; yield break; }
+
+        yield return $"{list.Count} migration(s) à appliquer :";
+        foreach (var m in list) yield return $"  → {m}";
+        yield return "";
+        yield return "Application en cours…";
+
+        try
+        {
+            await db.Database.MigrateAsync();
+            yield return "✓ Toutes les migrations ont été appliquées.";
+        }
+        catch (Exception ex)
+        {
+            yield return $"❌ {ex.Message}";
+        }
+    }
