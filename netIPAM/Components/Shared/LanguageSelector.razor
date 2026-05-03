@@ -1,0 +1,61 @@
+@namespace netIPAM.Components.Shared
+@inject LocalizationService Localization
+
+<div class="language-selector">
+    <div class="btn-group" role="group">
+        @foreach (var lang in AvailableLanguages)
+        {
+            <button 
+                type="button" 
+                class="btn btn-sm @(lang == CurrentLanguage ? "btn-primary active" : "btn-outline-secondary")"
+                @onclick="() => SelectLanguage(lang)"
+                title="@GetLanguageName(lang)">
+                @lang.ToUpper()
+            </button>
+        }
+    </div>
+</div>
+
+<style>
+.language-selector {
+    display: inline-flex;
+    gap: 0.25rem;
+}
+
+.language-selector .btn {
+    min-width: 40px;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.language-selector .btn.active {
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
+}
+</style>
+
+@code {
+    private string[] AvailableLanguages = LocalizationService.AvailableLanguages;
+    private string CurrentLanguage => Localization.GetCurrentLanguage();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Localization.OnLanguageChanged += StateHasChanged;
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SelectLanguage(string language)
+    {
+        await Localization.SetLanguageAsync(language);
+    }
+
+    private string GetLanguageName(string language) =>
+        LocalizationService.LanguageNames.TryGetValue(language, out var name) ? name : language;
+
+    void IAsyncDisposable.DisposeAsync()
+    {
+        Localization.OnLanguageChanged -= StateHasChanged;
+        return default;
+    }
+}
