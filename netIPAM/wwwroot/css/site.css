@@ -410,3 +410,73 @@ body { background: var(--pi-bg); font-size: 0.92rem; }
     margin-left: auto;
     flex-shrink: 0;
 }
+
+/* ───────────────────────────────────────────
+   Profile / Preferences
+   ─────────────────────────────────────────── */
+.phpipam-user {
+    cursor: pointer;
+    display: flex; align-items: center;
+    gap: .25rem;
+    color: rgba(255,255,255,.85);
+    font-size: .875rem;
+    padding: .375rem .5rem;
+    border-radius: 6px;
+    transition: background .15s, color .15s;
+    text-decoration: none;
+}
+.phpipam-user:hover,
+.phpipam-user.show { background: rgba(255,255,255,.1); color: #fff; }
+
+.phpipam-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--pi-primary, #0d6efd);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 2rem; flex-shrink: 0;
+}
+
+.phpipam-profile-tabs {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    border-bottom: 1px solid var(--pi-border, #dee2e6);
+    padding-bottom: .25rem;
+}
+.phpipam-profile-tab {
+    background: none; border: none;
+    padding: .5rem 1.1rem; border-radius: 6px 6px 0 0;
+    color: var(--pi-muted, #6c757d);
+    cursor: pointer; font-size: .9rem;
+    transition: background .15s, color .15s;
+}
+.phpipam-profile-tab:hover { background: rgba(13,110,253,.07); color: #0d6efd; }
+.phpipam-profile-tab.active {
+    background: #0d6efd; color: #fff; font-weight: 600;
+    box-shadow: 0 2px 8px rgba(13,110,253,.25);
+}
+
+.phpipam-lang-btn {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .4rem .85rem; border-radius: 8px;
+    border: 1.5px solid var(--pi-border, #dee2e6);
+    background: var(--pi-card-bg, #fff); color: inherit;
+    cursor: pointer; font-size: .875rem;
+    transition: border-color .15s, background .15s, color .15s;
+}
+.phpipam-lang-btn:hover { border-color: #0d6efd; }
+.phpipam-lang-btn.active { border-color: #0d6efd; background: #0d6efd; color: #fff; }
+.phpipam-lang-flag { font-size: 1.2rem; line-height: 1; }
+
+.phpipam-theme-option {
+    display: flex; flex-direction: column; align-items: center;
+    padding: .75rem 1.5rem; border-radius: 10px;
+    border: 1.5px solid var(--pi-border, #dee2e6);
+    background: var(--pi-card-bg, #fff); color: inherit;
+    cursor: pointer; min-width: 85px;
+    transition: border-color .15s, background .15s, color .15s;
+}
+.phpipam-theme-option:hover { border-color: #0d6efd; }
+.phpipam-theme-option.active {
+    border-color: #0d6efd;
+    background: rgba(13,110,253,.08);
+    color: #0d6efd; font-weight: 600;
+}

@@ -105,10 +105,24 @@
                 @* Utilisateur connecté *@
                 <AuthorizeView>
                     <Authorized>
-                        <li class="nav-item me-2">
-                            <span class="phpipam-user">
+                        <li class="nav-item dropdown me-2">
+                            <a class="phpipam-user dropdown-toggle" href="#"
+                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-person-circle me-1"></i>@context.User.Identity?.Name
-                            </span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end phpipam-dropdown">
+                                <li>
+                                    <a class="dropdown-item" href="/profile">
+                                        <i class="bi bi-sliders me-2"></i>My preferences
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/logout">
+                                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     </Authorized>
                 </AuthorizeView>
@@ -146,12 +160,7 @@
                     </li>
                 </AuthorizeView>
 
-                @* Déconnexion *@
-                <li class="nav-item ms-2">
-                    <a class="phpipam-logout" href="/logout" title="Déconnexion">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </a>
-                </li>
+
 
             </ul>
         </div>

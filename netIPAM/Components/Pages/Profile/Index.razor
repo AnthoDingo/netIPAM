@@ -1,0 +1,280 @@
+@page "/profile"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
+
+<PageTitle>My Profile</PageTitle>
+
+<div class="d-flex align-items-center mb-4 gap-3">
+    <div class="phpipam-avatar">
+        <i class="bi bi-person-circle"></i>
+    </div>
+    <div>
+        <h1 class="h3 mb-0">@_user?.RealName?.Trim() is { Length: > 0 } rn ? rn : _user?.Username</h1>
+        <span class="text-muted small">@_user?.Email</span>
+    </div>
+</div>
+
+@if (_saved)
+{
+    <div class="alert alert-success alert-dismissible py-2 mb-3" role="alert">
+        <i class="bi bi-check-circle me-2"></i>Preferences saved successfully.
+        <button type="button" class="btn-close btn-sm" @onclick="() => _saved = false"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(_error))
+{
+    <div class="alert alert-danger py-2 mb-3">
+        <i class="bi bi-exclamation-triangle me-2"></i>@_error
+    </div>
+}
+
+@if (_user is not null)
+{
+    <div class="phpipam-profile-tabs mb-4">
+        @foreach (var tab in new[] { ("info", "bi-person", "Information"), ("display", "bi-palette", "Display"), ("notifications", "bi-bell", "Notifications"), ("password", "bi-key", "Password") })
+        {
+            <button class="phpipam-profile-tab @(_activeTab == tab.Item1 ? "active" : "")"
+                    @onclick="() => _activeTab = tab.Item1">
+                <i class="bi @tab.Item2 me-2"></i>@tab.Item3
+            </button>
+        }
+    </div>
+
+    @* ── Tab : Information ── *@
+    @if (_activeTab == "info")
+    {
+        <div class="phpipam-card" style="max-width:640px">
+            <div class="phpipam-card-header"><i class="bi bi-person me-2"></i>Personal information</div>
+            <div class="phpipam-card-body">
+                <EditForm Model="_user" OnValidSubmit="SaveInfo" FormName="profileInfo">
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <input class="form-control" value="@_user.Username" disabled />
+                        <div class="form-text">Username cannot be changed.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Full name</label>
+                        <InputText class="form-control" @bind-Value="_user.RealName" placeholder="Your full name" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <InputText type="email" class="form-control" @bind-Value="_user.Email" placeholder="your@email.com" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Save
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    }
+
+    @* ── Tab : Display ── *@
+    @if (_activeTab == "display")
+    {
+        <div class="phpipam-card" style="max-width:640px">
+            <div class="phpipam-card-header"><i class="bi bi-palette me-2"></i>Display preferences</div>
+            <div class="phpipam-card-body">
+                <EditForm Model="_user" OnValidSubmit="SaveDisplay" FormName="profileDisplay">
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Language</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var (code, flag, label) in _languages)
+                            {
+                                <button type="button"
+                                        class="phpipam-lang-btn @(_langCode == code ? "active" : "")"
+                                        @onclick="() => _langCode = code">
+                                    <span class="phpipam-lang-flag">@flag</span>
+                                    @label
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Theme</label>
+                        <div class="d-flex gap-3">
+                            @foreach (var (val, icon, label) in new[] { ("light", "bi-sun", "Light"), ("dark", "bi-moon-stars", "Dark"), ("auto", "bi-circle-half", "System") })
+                            {
+                                <label class="phpipam-theme-option @(_user.Theme == val ? "active" : "")">
+                                    <input type="radio" name="theme" value="@val" class="visually-hidden"
+                                           checked="@(_user.Theme == val)"
+                                           @onchange="() => _user.Theme = val" />
+                                    <i class="bi @icon d-block mb-1" style="font-size:1.4rem"></i>
+                                    <span class="small">@label</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Navigation</label>
+                        <div class="mb-2">
+                            <label class="form-label small text-muted">Menu type</label>
+                            <InputSelect class="form-select form-select-sm" style="max-width:200px" @bind-Value="_user.MenuType">
+                                <option value="Dynamic">Dynamic</option>
+                                <option value="Static">Static</option>
+                            </InputSelect>
+                        </div>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="menuCompact" @bind-Value="_user.MenuCompact" />
+                            <label class="form-check-label" for="menuCompact">Compact menu</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Subnets</label>
+                        <div class="form-check">
+                            <InputCheckbox class="form-check-input" id="hideFree" @bind-Value="_user.HideFreeRange" />
+                            <label class="form-check-label" for="hideFree">Hide free address ranges</label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <InputCheckbox class="form-check-input" id="compressActions" @bind-Value="_user.CompressActions" />
+                            <label class="form-check-label" for="compressActions">Compress action buttons</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Save
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    }
+
+    @* ── Tab : Notifications ── *@
+    @if (_activeTab == "notifications")
+    {
+        <div class="phpipam-card" style="max-width:640px">
+            <div class="phpipam-card-header"><i class="bi bi-bell me-2"></i>Notification settings</div>
+            <div class="phpipam-card-body">
+                <EditForm Model="_user" OnValidSubmit="SaveNotifications" FormName="profileNotif">
+                    <p class="text-muted small mb-3">
+                        Email notifications are sent to <strong>@(string.IsNullOrEmpty(_user.Email) ? "no email configured" : _user.Email)</strong>.
+                        @if (string.IsNullOrEmpty(_user.Email))
+                        {
+                            <a href="#" @onclick:preventDefault @onclick='() => _activeTab = "info"'> Add an email address →</a>
+                        }
+                    </p>
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="mailNotify"
+                               checked="@(_user.MailNotify == "Yes")"
+                               @onchange="e => _user.MailNotify = (bool)e.Value! ? "Yes" : "No"" />
+                        <label class="form-check-label" for="mailNotify">
+                            <strong>IP change notifications</strong>
+                            <div class="text-muted small">Receive an email when an IP address is added, modified or deleted.</div>
+                        </label>
+                    </div>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input" type="checkbox" id="mailChangelog"
+                               checked="@(_user.MailChangelog == "Yes")"
+                               @onchange="e => _user.MailChangelog = (bool)e.Value! ? "Yes" : "No"" />
+                        <label class="form-check-label" for="mailChangelog">
+                            <strong>Changelog digest</strong>
+                            <div class="text-muted small">Receive a daily digest of all changes made in the application.</div>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg me-1"></i>Save
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    }
+
+    @* ── Tab : Password ── *@
+    @if (_activeTab == "password")
+    {
+        <div class="phpipam-card" style="max-width:480px">
+            <div class="phpipam-card-header"><i class="bi bi-key me-2"></i>Change password</div>
+            <div class="phpipam-card-body">
+                <EditForm Model="_pwdForm" OnValidSubmit="SavePassword" FormName="profilePwd">
+                    <DataAnnotationsValidator />
+                    <div class="mb-3">
+                        <label class="form-label">Current password</label>
+                        <input type="password" class="form-control" @bind="_pwdForm.Current" autocomplete="current-password" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">New password</label>
+                        <input type="password" class="form-control" @bind="_pwdForm.New" autocomplete="new-password" />
+                        <div class="form-text">Minimum 8 characters.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">Confirm new password</label>
+                        <input type="password" class="form-control" @bind="_pwdForm.Confirm" autocomplete="new-password" />
+                    </div>
+                    @if (_pwdSaved)
+                    {
+                        <div class="alert alert-success py-2 mb-3">
+                            <i class="bi bi-check-circle me-2"></i>Password changed successfully.
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(_pwdError))
+                    {
+                        <div class="alert alert-danger py-2 mb-3">@_pwdError</div>
+                    }
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-key me-1"></i>Change password
+                    </button>
+                </EditForm>
+            </div>
+        </div>
+    }
+}
+
+<style>
+/* ── Avatar ── */
+.phpipam-avatar {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: var(--pi-primary, #0078d4);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 2rem; flex-shrink: 0;
+}
+
+/* ── Tabs ── */
+.phpipam-profile-tabs {
+    display: flex; flex-wrap: wrap; gap: .5rem;
+    border-bottom: 1px solid var(--pi-border, #dee2e6);
+    padding-bottom: .25rem;
+}
+.phpipam-profile-tab {
+    background: none; border: none; padding: .5rem 1rem;
+    color: var(--pi-muted, #6c757d); border-radius: 6px 6px 0 0;
+    cursor: pointer; font-size: .9rem; transition: background .15s, color .15s;
+}
+.phpipam-profile-tab:hover { background: var(--pi-hover-bg, #f0f4ff); color: var(--pi-text, #212529); }
+.phpipam-profile-tab.active {
+    background: var(--pi-primary, #0078d4); color: #fff; font-weight: 600;
+}
+
+/* ── Language picker ── */
+.phpipam-lang-btn {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .4rem .85rem; border-radius: 8px;
+    border: 1.5px solid var(--pi-border, #dee2e6);
+    background: var(--pi-card-bg, #fff); color: var(--pi-text, #212529);
+    cursor: pointer; font-size: .9rem; transition: all .15s;
+}
+.phpipam-lang-btn:hover { border-color: var(--pi-primary, #0078d4); background: var(--pi-hover-bg, #f0f4ff); }
+.phpipam-lang-btn.active {
+    border-color: var(--pi-primary, #0078d4);
+    background: var(--pi-primary, #0078d4); color: #fff;
+}
+.phpipam-lang-flag { font-size: 1.15rem; line-height: 1; }
+
+/* ── Theme options ── */
+.phpipam-theme-option {
+    display: flex; flex-direction: column; align-items: center;
+    padding: .75rem 1.25rem; border-radius: 10px;
+    border: 1.5px solid var(--pi-border, #dee2e6);
+    background: var(--pi-card-bg, #fff); color: var(--pi-text, #212529);
+    cursor: pointer; min-width: 80px; transition: all .15s;
+}
+.phpipam-theme-option:hover { border-color: var(--pi-primary, #0078d4); }
+.phpipam-theme-option.active {
+    border-color: var(--pi-primary, #0078d4);
+    background: var(--pi-hover-bg, #f0f4ff);
+    color: var(--pi-primary, #0078d4); font-weight: 600;
+}
+</style>
