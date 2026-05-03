@@ -9,7 +9,7 @@
         <i class="bi bi-person-circle"></i>
     </div>
     <div>
-        <h1 class="h3 mb-0">@_user?.RealName?.Trim() is { Length: > 0 } rn ? rn : _user?.Username</h1>
+        <h1 class="h3 mb-0">@((_user?.RealName?.Trim() is string rn && rn.Length > 0) ? rn : _user?.Username)</h1>
         <span class="text-muted small">@_user?.Email</span>
     </div>
 </div>
@@ -158,8 +158,8 @@
                     </p>
                     <div class="form-check mb-3">
                         <input class="form-check-input" type="checkbox" id="mailNotify"
-                               checked="@(_user.MailNotify == "Yes")"
-                               @onchange="e => _user.MailNotify = (bool)e.Value! ? "Yes" : "No"" />
+                               checked='@(_user.MailNotify == "Yes")'
+                               @onchange='e => _user.MailNotify = ((bool)e.Value!) ? "Yes" : "No"' />
                         <label class="form-check-label" for="mailNotify">
                             <strong>IP change notifications</strong>
                             <div class="text-muted small">Receive an email when an IP address is added, modified or deleted.</div>
@@ -167,8 +167,8 @@
                     </div>
                     <div class="form-check mb-4">
                         <input class="form-check-input" type="checkbox" id="mailChangelog"
-                               checked="@(_user.MailChangelog == "Yes")"
-                               @onchange="e => _user.MailChangelog = (bool)e.Value! ? "Yes" : "No"" />
+                               checked='@(_user.MailChangelog == "Yes")'
+                               @onchange='e => _user.MailChangelog = ((bool)e.Value!) ? "Yes" : "No"' />
                         <label class="form-check-label" for="mailChangelog">
                             <strong>Changelog digest</strong>
                             <div class="text-muted small">Receive a daily digest of all changes made in the application.</div>

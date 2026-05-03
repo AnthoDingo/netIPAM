@@ -1,5 +1,4 @@
 @namespace netIPAM.Components.Shared
-@inject LocalizationService Localization
 
 <div class="language-selector">
     <div class="btn-group" role="group">
@@ -34,28 +33,3 @@
     box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25);
 }
 </style>
-
-@code {
-    private string[] AvailableLanguages = LocalizationService.AvailableLanguages;
-    private string CurrentLanguage => Localization.GetCurrentLanguage();
-
-    protected override async Task OnInitializedAsync()
-    {
-        Localization.OnLanguageChanged += StateHasChanged;
-        await base.OnInitializedAsync();
-    }
-
-    private async Task SelectLanguage(string language)
-    {
-        await Localization.SetLanguageAsync(language);
-    }
-
-    private string GetLanguageName(string language) =>
-        LocalizationService.LanguageNames.TryGetValue(language, out var name) ? name : language;
-
-    void IAsyncDisposable.DisposeAsync()
-    {
-        Localization.OnLanguageChanged -= StateHasChanged;
-        return default;
-    }
-}

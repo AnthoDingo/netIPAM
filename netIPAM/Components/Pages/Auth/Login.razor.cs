@@ -40,7 +40,9 @@ namespace netIPAM.Components.Pages.Auth
             await HttpCtx.HttpContext!.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            Nav.NavigateTo(ReturnUrl ?? "/", forceLoad: true);
+            // Server-side redirect for POST handlers
+            HttpCtx.HttpContext!.Response.Redirect(ReturnUrl ?? "/");
+            return;
         }
 
         public class LoginForm
