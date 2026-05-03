@@ -57,7 +57,7 @@ public class Setting
     [Column("scanPingType"), MaxLength(8)] public string ScanPingType { get; set; } = "ping";
     [Column("scanMaxThreads")] public int ScanMaxThreads { get; set; } = 128;
     [Column("prettyLinks"), MaxLength(3)] public string PrettyLinks { get; set; } = "No";
-    [Column("hiddenCustomFields"), Column(TypeName = "text")] public string? HiddenCustomFields { get; set; }
+    [Column("hiddenCustomFields", TypeName = "text")] public string? HiddenCustomFields { get; set; }
     [Column("inactivityTimeout")] public int InactivityTimeout { get; set; } = 3600;
     [Column("updateTags")] public bool UpdateTags { get; set; }
     [Column("enforceUnique")] public bool EnforceUnique { get; set; } = true;
@@ -65,7 +65,7 @@ public class Setting
     [Column("maintaneanceMode")] public bool MaintenanceMode { get; set; }
     [Column("decodeMAC")] public bool DecodeMac { get; set; } = true;
     [Column("tempShare")] public bool TempShare { get; set; }
-    [Column("tempAccess"), Column(TypeName = "text")] public string? TempAccess { get; set; }
+    [Column("tempAccess", TypeName = "text")] public string? TempAccess { get; set; }
     [Column("log"), MaxLength(8)] public string Log { get; set; } = "Database";
     [Column("subnetView")] public byte SubnetView { get; set; }
     [Column("enableCircuits")] public bool EnableCircuits { get; set; } = true;

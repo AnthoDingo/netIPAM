@@ -25,7 +25,7 @@ public static class IpConverter
 
         byte[] bytes = addr.GetAddressBytes();
         // BigInteger ctor expects little-endian, IP bytes are big-endian → reverse and force unsigned
-        byte be = new[bytes.Length + 1];
+        byte[] be = new byte[bytes.Length + 1];
         for (int i = 0; i < bytes.Length; i++) be[bytes.Length - 1 - i] = bytes[i];
         // last byte is 0 → forces non-negative
         return new BigInteger(be).ToString();
@@ -43,7 +43,7 @@ public static class IpConverter
         if (bytes.Length > byteLength && bytes[^1] == 0)
             bytes = bytes[..^1];
 
-        byte be = new[byteLength];
+        byte[] be = new byte[byteLength];
         for (int i = 0; i < bytes.Length && i < byteLength; i++)
             be[byteLength - 1 - i] = bytes[i];
 

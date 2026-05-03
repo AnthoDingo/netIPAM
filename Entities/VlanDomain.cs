@@ -13,7 +13,7 @@ public class VlanDomain
     [Column("name"), MaxLength(64)]
     public string? Name { get; set; }
 
-    [Column("description"), Column(TypeName = "text")]
+    [Column("description", TypeName = "text")]
     public string? Description { get; set; }
 
     [Column("permissions"), MaxLength(128)]

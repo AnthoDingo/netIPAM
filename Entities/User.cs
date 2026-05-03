@@ -27,7 +27,7 @@ public class User
     [Column("groups"), MaxLength(1024)]
     public string? Groups { get; set; }
 
-    [Column("role"), Column(TypeName = "text")]
+    [Column("role", TypeName = "text")]
     public string? Role { get; set; }
 
     [Column("real_name"), MaxLength(128)]

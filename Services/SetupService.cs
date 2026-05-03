@@ -74,13 +74,20 @@ public class SetupService
         await using AppDbContext db = BuildContext(provider, connectionString);
 
         IEnumerable<string> pending;
+        string? error = null;
         try
         {
             pending = await db.Database.GetPendingMigrationsAsync();
         }
         catch (Exception ex)
         {
-            yield return $"❌ Erreur : {ex.Message}";
+            error = $"❌ Erreur : {ex.Message}";
+            pending = [];
+        }
+
+        if (error != null)
+        {
+            yield return error;
             yield break;
         }
 
@@ -96,14 +103,24 @@ public class SetupService
             yield return $"  → {m}";
 
         yield return "Application des migrations…";
+
+        (bool success, string? migError) = await TryApplyMigrationsAsync(db);
+        if (success)
+            yield return "✓ Migrations appliquées avec succès.";
+        else if (migError != null)
+            yield return $"❌ Erreur lors des migrations : {migError}";
+    }
+
+    private async Task<(bool, string?)> TryApplyMigrationsAsync(AppDbContext db)
+    {
         try
         {
             await db.Database.MigrateAsync();
-            yield return "✓ Migrations appliquées avec succès.";
+            return (true, null);
         }
         catch (Exception ex)
         {
-            yield return $"❌ Erreur lors des migrations : {ex.Message}";
+            return (false, ex.Message);
         }
     }
 
@@ -112,6 +129,36 @@ public class SetupService
     /// </summary>
     public async IAsyncEnumerable<string> ApplyFromContextAsync(
         netIPAM.Data.AppDbContext db)
+    {
+        IEnumerable<string> migrations = await db.Database.GetPendingMigrationsAsync();
+        List<string> list = migrations.ToList();
+
+        if (list.Count == 0) { yield return "✓ Base de données déjà à jour."; yield break; }
+
+        yield return $"{list.Count} migration(s) à appliquer :";
+        foreach (string m in list) yield return $"  → {m}";
+        yield return "";
+        yield return "Application en cours…";
+
+        (bool success, string? error) = await TryApplyMigrationsFromContextAsync(db);
+        if (success)
+            yield return "✓ Toutes les migrations ont été appliquées.";
+        else if (error != null)
+            yield return $"❌ {error}";
+    }
+
+    private async Task<(bool, string?)> TryApplyMigrationsFromContextAsync(AppDbContext db)
+    {
+        try
+        {
+            await db.Database.MigrateAsync();
+            return (true, null);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
 
     // ── Création du compte admin ──────────────────────────────────
 
@@ -221,7 +268,7 @@ public class SetupService
         }
         setupSection["Completed"] = true;
 
-        JsonSerializerOptions options = new{ WriteIndented = true };
+        JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
         File.WriteAllText(path, root.ToJsonString(options));
     }
 
@@ -235,24 +282,3 @@ public class SetupService
             || !string.Equals(done, "true", StringComparison.OrdinalIgnoreCase);
     }
 }
-    {
-        IEnumerable<string> migrations = await db.Database.GetPendingMigrationsAsync();
-        List<string> list = migrations.ToList();
-
-        if (list.Count == 0) { yield return "✓ Base de données déjà à jour."; yield break; }
-
-        yield return $"{list.Count} migration(s) à appliquer :";
-        foreach (string m in list) yield return $"  → {m}";
-        yield return "";
-        yield return "Application en cours…";
-
-        try
-        {
-            await db.Database.MigrateAsync();
-            yield return "✓ Toutes les migrations ont été appliquées.";
-        }
-        catch (Exception ex)
-        {
-            yield return $"❌ {ex.Message}";
-        }
-    }

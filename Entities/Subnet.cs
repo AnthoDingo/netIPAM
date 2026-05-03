@@ -24,7 +24,7 @@ public class Subnet
     [Column("sectionId")]
     public int? SectionId { get; set; }
 
-    [Column("description"), Column(TypeName = "text")]
+    [Column("description", TypeName = "text")]
     public string? Description { get; set; }
 
     [Column("linked_subnet")]

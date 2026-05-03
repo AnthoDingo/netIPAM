@@ -19,7 +19,7 @@ public class Vlan
     [Column("number")]
     public int? Number { get; set; }
 
-    [Column("description"), Column(TypeName = "text")]
+    [Column("description", TypeName = "text")]
     public string? Description { get; set; }
 
     [Column("editDate")]

@@ -98,7 +98,7 @@ public class PermissionService
         CancellationToken ct = default)
     {
         // Supprimer les existantes pour ce sujet+type
-        EntityPermission? existing = await _db.EntityPermissions
+        List<EntityPermission> existing = await _db.EntityPermissions
             .Where(p => p.SubjectType == subjectType
                      && p.SubjectId   == subjectId
                      && p.EntityType  == entityType)
@@ -106,7 +106,7 @@ public class PermissionService
         _db.EntityPermissions.RemoveRange(existing);
 
         // Insérer les nouvelles (level > 0 uniquement)
-        foreach ((int entityId, int level) (entityId, level) in permissions.Where(p => p.level > PermissionLevels.None))
+        foreach (var (entityId, level) in permissions.Where(p => p.level > PermissionLevels.None))
         {
             _db.EntityPermissions.Add(new EntityPermission
             {
@@ -182,7 +182,7 @@ public class PermissionService
     public async Task<Dictionary<string, int>> GetPermissionCountsAsync(
         string subjectType, int subjectId, CancellationToken ct = default)
     {
-        List<EntityPermission> perms = await _db.EntityPermissions
+        var perms = await _db.EntityPermissions
             .Where(p => p.SubjectType == subjectType && p.SubjectId == subjectId && p.Level > 0)
             .GroupBy(p => p.EntityType)
             .Select(g => new { g.Key, Count = g.Count() })

@@ -11,6 +11,6 @@ public class Log
     [Column("date"), MaxLength(32)] public string? Date { get; set; }
     [Column("username"), MaxLength(255)] public string? Username { get; set; }
     [Column("ipaddr"), MaxLength(64)] public string? IpAddr { get; set; }
-    [Column("command"), Column(TypeName = "text")] public string? Command { get; set; }
-    [Column("details"), Column(TypeName = "text")] public string? Details { get; set; }
+    [Column("command", TypeName = "text")] public string? Command { get; set; }
+    [Column("details", TypeName = "text")] public string? Details { get; set; }
 }

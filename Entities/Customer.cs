@@ -14,9 +14,9 @@ public class Customer
     [Column("state"), MaxLength(255)] public string? State { get; set; }
     [Column("lat"), MaxLength(31)] public string? Lat { get; set; }
     [Column("long"), MaxLength(31)] public string? Long { get; set; }
-    [Column("contact_person"), Column(TypeName = "text")] public string? ContactPerson { get; set; }
+    [Column("contact_person", TypeName = "text")] public string? ContactPerson { get; set; }
     [Column("contact_phone"), MaxLength(32)] public string? ContactPhone { get; set; }
     [Column("contact_mail"), MaxLength(254)] public string? ContactMail { get; set; }
-    [Column("note"), Column(TypeName = "text")] public string? Note { get; set; }
+    [Column("note", TypeName = "text")] public string? Note { get; set; }
     [Column("status"), MaxLength(16)] public string? Status { get; set; } = "Active";
 }

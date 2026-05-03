@@ -15,8 +15,8 @@ public class Request
     [Column("state")] public int? State { get; set; } = 2;
     [Column("owner"), MaxLength(128)] public string? Owner { get; set; }
     [Column("requester"), MaxLength(128)] public string? Requester { get; set; }
-    [Column("comment"), Column(TypeName = "text")] public string? Comment { get; set; }
+    [Column("comment", TypeName = "text")] public string? Comment { get; set; }
     [Column("processed")] public byte? Processed { get; set; }
     [Column("accepted")] public byte? Accepted { get; set; }
-    [Column("adminComment"), Column(TypeName = "text")] public string? AdminComment { get; set; }
+    [Column("adminComment", TypeName = "text")] public string? AdminComment { get; set; }
 }

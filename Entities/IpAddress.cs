@@ -46,7 +46,7 @@ public class IpAddress
     [Column("port"), MaxLength(32)]
     public string? Port { get; set; }
 
-    [Column("note"), Column(TypeName = "text")]
+    [Column("note", TypeName = "text")]
     public string? Note { get; set; }
 
     [Column("lastSeen")]
